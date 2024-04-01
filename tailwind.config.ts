@@ -12,10 +12,25 @@ const config: Config = {
       serif: "Playfair Display, serif",
     },
     extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      height: {
+        screen: "100dvh",
+      },
+      maxWidth: {
+        sixty: "60%",
+        seventy: "70%",
+        "8xl": "104rem",
+        "9xl": "120rem",
+      },
+      screens: {
+        "dt-xl": { min: "2540px" },
+        dt: { max: "1540px" },
+        "dt-sm": { max: "1344px" },
+        "tab-xl": { max: "1200px" },
+        "tab-lg": { max: "1072px" },
+        tab: { max: "944px" },
+        "mob-lg": { max: "704px" },
+        mob: { max: "544px" },
+        "mob-sm": { max: "440px" },
       },
     },
   },

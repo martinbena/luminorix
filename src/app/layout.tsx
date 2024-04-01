@@ -14,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-serif">{children}</body>
+      <body className="font-serif bg-amber-50">
+        <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
