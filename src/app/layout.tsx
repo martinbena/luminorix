@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/header/Header";
 
 export const metadata: Metadata = {
   title: "Luminorix",
@@ -14,8 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-serif bg-amber-50">
+      <body className="font-serif bg-amber-50 text-sm">
         <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy">
+          <Header />
           {children}
         </div>
       </body>
