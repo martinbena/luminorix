@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/header/Header";
+import Navigation from "@/components/Navigation";
 
 export const metadata: Metadata = {
   title: "Luminorix",
@@ -18,7 +19,12 @@ export default function RootLayout({
       <body className="font-serif bg-amber-50 text-sm">
         <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy">
           <Header />
-          {children}
+          <div className="grid grid-cols-[minmax(250px,_2fr)_11fr] min-h-[65vh]">
+            <aside className="bg-white">
+              <Navigation />
+            </aside>
+            <main>{children}</main>
+          </div>
         </div>
       </body>
     </html>

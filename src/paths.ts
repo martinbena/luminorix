@@ -21,7 +21,7 @@ const paths = {
     return "/tags";
   },
   tagShow(tagSlug: string) {
-    return `/tag/${tagSlug}`;
+    return `/tags/${tagSlug}`;
   },
   userProfile() {
     return "/profile";
