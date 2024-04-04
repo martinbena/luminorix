@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/header/Header";
 import Navigation from "@/components/Navigation";
+import Footer from "@/components/footer/Footer";
 
 export const metadata: Metadata = {
   title: "Luminorix",
@@ -25,6 +26,7 @@ export default function RootLayout({
             </aside>
             <main>{children}</main>
           </div>
+          <Footer />
         </div>
       </body>
     </html>
