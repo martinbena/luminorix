@@ -1,3 +1,9 @@
+import Discount from "@/components/home/Discount";
+
 export default function Home() {
-  return <div>HomePage</div>;
+  return (
+    <div>
+      <Discount />
+    </div>
+  );
 }

@@ -12,6 +12,10 @@ const config: Config = {
       serif: "Playfair Display, serif",
     },
     extend: {
+      backgroundImage: {
+        "discount-banner":
+          "linear-gradient(to right, rgba(255, 251, 235, 0.15), rgba(255, 251, 235, 0.15)), url('/images/jewellery.jpg')",
+      },
       height: {
         screen: "100dvh",
       },
