@@ -2,7 +2,7 @@ import paths from "@/paths";
 import Button from "../Button";
 import HeadingTertiary from "../HeadingTertiary";
 
-export default function Discount() {
+export default function DiscountBanner() {
   return (
     <div className="grid grid-cols-[2fr_3fr] h-60">
       <div className="bg-amber-50 py-8 px-16 flex flex-col justify-between">
@@ -14,13 +14,17 @@ export default function Discount() {
         </div>
         <Button
           href={paths.productShowAll()}
-          type="primary"
+          type="tertiary"
           ariaLabel="Go to the page with all jewellery"
         >
           View all
         </Button>
       </div>
-      <div className="bg-discount-banner bg-cover bg-center"></div>
+      <div
+        role="img"
+        aria-label="Jewellery from our sortiment"
+        className="bg-discount-banner bg-cover bg-center"
+      />
     </div>
   );
 }
