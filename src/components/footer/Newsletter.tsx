@@ -11,7 +11,7 @@ export default function Newsletter() {
           placeholder="Enter email address"
           className="border-2 border-zinc-300 w-96 px-4 py-1"
         />
-        <Button type="primary" hoverBackground="white">
+        <Button type="primary" beforeBackground="before:bg-white">
           Subscribe
         </Button>
       </form>

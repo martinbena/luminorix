@@ -8,7 +8,7 @@ interface ButtonProps {
   onClick?: () => void;
   ariaLabel?: string;
   disabled?: boolean;
-  hoverBackground?: string;
+  beforeBackground?: string;
 }
 
 export default function Button({
@@ -18,14 +18,14 @@ export default function Button({
   onClick,
   ariaLabel,
   disabled,
-  hoverBackground = "amber-50",
+  beforeBackground,
 }: ButtonProps) {
   let buttonStyle =
     "relative uppercase py-3 tracking-[0.2em] font-serif transition-all duration-[400ms] ease-in-out text-center";
 
   switch (type) {
     case "primary":
-      buttonStyle += ` border-2 border-zinc-800 bg-zinc-800 text-zinc-200 hover:text-zinc-800 hover:font-medium before:content-[''] before:absolute before:top-0 before:left-0 before:h-full before:w-0 before:bg-${hoverBackground} before:transition-all before:duration-500 hover:before:w-full`;
+      buttonStyle += ` border-2 border-zinc-800 bg-zinc-800 text-zinc-200 hover:text-zinc-800 hover:font-medium before:content-[''] before:absolute before:top-0 before:left-0 before:h-full before:w-0 before:transition-all before:duration-500 hover:before:w-full ${beforeBackground}`;
       break;
     case "secondary":
       buttonStyle += " bg-amber-300 text-zinc-800 hover:bg-amber-400";
