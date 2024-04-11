@@ -2,11 +2,12 @@ import Button from "../Button";
 import HeadingSecondary from "../HeadingSecondary";
 import Product from "../products/Product";
 
-export default function NewestProducts() {
+export default function TopDiscounts() {
   return (
-    <div className="py-16 px-8">
-      <HeadingSecondary>Newest products</HeadingSecondary>
-      <div className="my-8 grid grid-cols-[repeat(auto-fit,_minmax(20rem,_1fr))] gap-8 max-w-8xl mx-auto">
+    <div className="bg-zinc-100 py-10 px-8">
+      <HeadingSecondary>Top dicounts</HeadingSecondary>
+      <div className="my-8 grid grid-cols-[repeat(auto-fit,_minmax(14rem,_1fr))] gap-8 max-w-8xl mx-auto">
+        <Product />
         <Product />
         <Product />
         <Product />

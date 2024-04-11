@@ -24,7 +24,7 @@ export default function RootLayout({
             <aside className="bg-white">
               <Navigation />
             </aside>
-            <main className="bg-white text-zinc-800 px-8 py-4">{children}</main>
+            <main className="bg-white text-zinc-800 py-4">{children}</main>
           </div>
           <Footer />
         </div>

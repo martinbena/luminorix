@@ -3,7 +3,10 @@ import Button from "../Button";
 
 export default function Product() {
   return (
-    <article className="h-full bg-amber-100 flex flex-col shadow-sm">
+    <article className="h-full bg-amber-100 flex flex-col shadow-sm relative">
+      {/* <div className="absolute top-2 left-2 bg-amber-300 font-sans py-2 px-4">
+        - 24%
+      </div> */}
       <Image
         src="/images/rolex.jpg"
         alt="Rolex watches"
@@ -14,9 +17,14 @@ export default function Product() {
       />
       <div className="pt-8 pb-6 px-5 flex flex-col justify-between flex-1">
         <div>
-          <h3 className="text-xl capitalize mb-1">Golden Rolex chronometer</h3>
-          <p className="text-lg fotn-medium font-sans">$15,500</p>
-          <p className="font-sans my-4">
+          <h3 className="text-xl capitalize mb-1.5 font-medium">
+            Golden Rolex chronometer
+          </h3>
+          <div className="flex gap-2 child:font-sans mb-6 child:text-lg items-center">
+            <p className="text-lg">$15,500</p>
+            {/* <p className="bg-amber-300 py-0.5 px-2">$11,700</p> */}
+          </div>
+          <p className="font-sans mb-8">
             Elevate your style with this exquisite golden Rolex watch. Designed
             for those who appreciate timeless luxury and impeccable
             craftsmanship, it&apos;s the epitome of refined elegance for the
