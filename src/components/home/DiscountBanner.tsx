@@ -4,7 +4,7 @@ import HeadingTertiary from "../HeadingTertiary";
 
 export default function DiscountBanner() {
   return (
-    <div className="grid grid-cols-[2fr_3fr] h-60">
+    <div className="grid grid-cols-[2fr_3fr] h-56">
       <div className="bg-amber-50 py-8 px-16 flex flex-col justify-between">
         <div>
           <HeadingTertiary>Limited offer</HeadingTertiary>

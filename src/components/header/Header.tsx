@@ -1,27 +1,26 @@
 import paths from "@/paths";
 import Image from "next/image";
 import Link from "next/link";
-import { PiHeartThin } from "react-icons/pi";
-import { PiShoppingCartSimpleThin } from "react-icons/pi";
-import HeaderFeature from "./HeaderFeature";
+import HeaderFeatureRow from "./HeaderFeatureRow";
 
 export default function Header() {
   return (
-    <header className="bg-zinc-800 text-zinc-50 tracking-[0.2em] p-12 grid grid-cols-3 justify-items-center gap-y-20 items-center">
-      <span>&nbsp;</span>
+    <header className="bg-zinc-800 relative text-zinc-50 tracking-[0.2em] p-12 mob-lg:p-8 mob:p-5 grid grid-cols-3 tab:grid-cols-2 justify-items-center gap-y-20 tab:gap-y-10 mob-lg:gap-y-4 items-center tab:justify-items-end">
+      <span className="tab:hidden">&nbsp;</span>
 
-      <div>
+      <div className="tab:justify-self-start">
         <Link href={paths.home()}>
           <Image
             src="/images/logo.png"
             width={128}
             height={128}
             alt="Logo of Luminorix"
+            className="mob:h-24 mob:w-24"
           />
         </Link>
       </div>
 
-      <div className="flex gap-20">
+      <div className="flex gap-20 tab-xl:gap-16 tab:gap-8 mob:gap-3">
         <Link href={paths.register()} className="hover:text-amber-200">
           Register
         </Link>
@@ -32,7 +31,7 @@ export default function Header() {
 
       <Link
         href={paths.home()}
-        className="uppercase text-5xl tracking-[0.25em] text-zinc-200 justify-self-start"
+        className="uppercase text-5xl tracking-[0.25em] mob-lg:text-xl text-zinc-200 justify-self-start tab-xl:text-4xl mob-sm:text-base"
       >
         Luminorix
       </Link>
@@ -40,24 +39,10 @@ export default function Header() {
       <input
         type="text"
         placeholder="Search..."
-        className="py-4 px-5 tracking-[0.2em] text-zinc-900"
+        className="py-4 px-5 tracking-[0.2em] w-80 dt-sm:w-56 text-zinc-900 tab:hidden"
       />
 
-      <div className="flex gap-16">
-        <HeaderFeature link={paths.userWishlist()}>
-          <PiHeartThin className="h-16 w-16" /> <span>Wishlist</span>
-        </HeaderFeature>
-
-        <HeaderFeature link={paths.cart()}>
-          <PiShoppingCartSimpleThin className="h-16 w-16" />{" "}
-          <div>
-            <p className="text-base">Cart</p>{" "}
-            <span className="font-sans font-semibold tracking-wider">
-              is empty
-            </span>
-          </div>
-        </HeaderFeature>
-      </div>
+      <HeaderFeatureRow />
     </header>
   );
 }
