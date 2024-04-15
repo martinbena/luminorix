@@ -14,7 +14,7 @@ import Searchbar from "./Searchbar";
 export default function HeaderFeatureRow() {
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
 
-  function toggleSearchVisibility() {
+  function toggleSearchVisibility(): void {
     setIsSearchVisible((visible) => !visible);
 
     document.body.style.overflow = isSearchVisible ? "auto" : "hidden";

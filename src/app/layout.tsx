@@ -18,8 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-serif bg-amber-50 text-sm">
-        <div id="overlay"></div>
-        <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy">
+        <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy dt-lg:p-8 dt:p-0">
           <Header />
           <div className="grid grid-cols-[minmax(250px,_2fr)_11fr] min-h-[65vh]">
             <aside className="bg-white">
@@ -29,6 +28,7 @@ export default function RootLayout({
           </div>
           <Footer />
         </div>
+        <div id="overlay" />
       </body>
     </html>
   );

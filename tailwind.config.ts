@@ -27,6 +27,7 @@ const config: Config = {
       },
       screens: {
         "dt-xl": { min: "2540px" },
+        "dt-lg": { max: "1800px" },
         dt: { max: "1540px" },
         "dt-sm": { max: "1344px" },
         "tab-xl": { max: "1200px" },
