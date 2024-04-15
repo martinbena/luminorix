@@ -5,7 +5,7 @@ import HeaderFeatureRow from "./HeaderFeatureRow";
 
 export default function Header() {
   return (
-    <header className="bg-zinc-800 relative text-zinc-50 tracking-[0.2em] p-12 mob-lg:p-8 mob:p-5 grid grid-cols-3 tab:grid-cols-2 justify-items-center gap-y-20 tab:gap-y-10 mob-lg:gap-y-4 items-center tab:justify-items-end z-30">
+    <header className="bg-zinc-800 relative text-zinc-50 tracking-[0.2em] p-12 tab:p-8 mob:p-5 grid grid-cols-3 tab:grid-cols-2 justify-items-center gap-y-20 tab:gap-y-10 mob-lg:gap-y-4 items-center tab:justify-items-end z-30">
       <span className="tab:hidden">&nbsp;</span>
 
       <div className="tab:justify-self-start">
