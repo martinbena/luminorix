@@ -12,7 +12,7 @@ export default function Home() {
         title="Newest products"
         hasLink={true}
         linkTo={paths.productShowAll()}
-        sectionClasses="py-16 px-8 bg-white"
+        sectionClasses="py-16 bg-white"
         gridSize="large"
       >
         <Product />

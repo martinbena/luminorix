@@ -15,9 +15,9 @@ export default function Product() {
         width={0}
         height={0}
       />
-      <div className="pt-8 pb-6 px-5 flex flex-col justify-between flex-1">
+      <div className="pt-8 pb-6 dt-sm:p-4 px-5 flex flex-col justify-between flex-1">
         <div>
-          <h3 className="text-xl capitalize mb-1.5 font-medium">
+          <h3 className="text-xl capitalize mb-1.5 font-medium mob-sm:text-lg">
             Golden Rolex chronometer
           </h3>
           <div className="flex gap-2 child:font-sans mb-6 child:text-lg items-center">
