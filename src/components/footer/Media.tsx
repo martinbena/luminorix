@@ -9,7 +9,7 @@ export default function Media() {
         </div>
       </div>
 
-      <div className="grid grid-cols-4 justify-items-center gap-8 items-center child:brightness-0 child:opacity-80 child-hover:opacity-100 child-hover:brightness-100">
+      <div className="grid grid-cols-4 mob:gap-4 mob-lg:grid-cols-2 justify-items-center gap-8 items-center child:brightness-0 child:opacity-80 child-hover:opacity-100 child-hover:brightness-100">
         <Image
           src="/images/forbes.png"
           height={32}

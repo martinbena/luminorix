@@ -11,8 +11,8 @@ import Newsletter from "./Newsletter";
 
 export default function Footer() {
   return (
-    <footer className="bg-white child:px-44 pb-16">
-      <div className="bg-zinc-800 text-zinc-50 flex justify-between py-5">
+    <footer className="bg-white child:px-44 dt:child:px-8 pb-16 mob:child:px-5">
+      <div className="bg-zinc-800 text-zinc-50 grid grid-cols-4 justify-items-center gap-8 tab-lg:grid-cols-2 tab-lg:justify-items-stretch py-5 tab-lg:px-36 tab:px-8 mob:grid-cols-1 mob:gap-4">
         <FooterFeature icon={<PiPhoneCallThin />} title="Call us">
           <a href="tel:+555444333" className="hover:text-amber-200">
             555-444-333
@@ -34,7 +34,7 @@ export default function Footer() {
 
       <Media />
 
-      <div className="flex justify-between text-zinc-800 font-sans gap-8">
+      <div className="flex justify-between text-zinc-800 font-sans gap-8 mob-lg:flex-col">
         <AboutUs />
         <Newsletter />
       </div>
