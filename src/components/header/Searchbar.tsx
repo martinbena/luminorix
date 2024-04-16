@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { PiMagnifyingGlassThin, PiXThin } from "react-icons/pi";
 import Overlay from "../Overlay";
+import ButtonIcon from "../ButtonIcon";
 
 interface SearchbarProps {
   isVisible: boolean;
@@ -93,7 +94,7 @@ export default function Searchbar({
       ref={searchBarContainerRef}
     >
       <div className="flex items-center text-zinc-800 gap-6">
-        <PiMagnifyingGlassThin className="h-6 w-6" />
+        <PiMagnifyingGlassThin className="h-8 w-8" />
         <input
           ref={searchInputRef}
           type="text"
@@ -101,9 +102,9 @@ export default function Searchbar({
           placeholder="Search..."
         />
 
-        <button onClick={() => onToggleVisibility()}>
-          <PiXThin className="h-6 w-6" />
-        </button>
+        <ButtonIcon variant="small" onClick={() => onToggleVisibility()}>
+          <PiXThin />
+        </ButtonIcon>
 
         <Overlay isOpen={isVisible} zIndex="z-20" />
       </div>

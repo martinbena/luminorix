@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { PiListThin, PiXThin } from "react-icons/pi";
 import Overlay from "./Overlay";
+import ButtonIcon from "./ButtonIcon";
 
 export default function Navigation() {
   const [isMobileNavVisible, setIsMobileNavVisible] = useState<boolean>(false);
@@ -64,16 +65,20 @@ export default function Navigation() {
 
   return (
     <>
-      <div className="hidden tab:block bg-amber-100 px-12 py-2 tab:px-8 mob:px-5">
-        <button onClick={() => toggleMobileNavVisibility()}>
-          <PiListThin className="h-12 w-12 fill-zinc-800" />
-        </button>
+      <section className="hidden tab:block bg-amber-100 px-12 py-2 tab:px-8 mob:px-5">
+        <ButtonIcon
+          variant="large"
+          onClick={() => toggleMobileNavVisibility()}
+          additionalClasses="child:fill-zinc-800"
+        >
+          <PiListThin />
+        </ButtonIcon>
         <Overlay
           isOpen={isMobileNavVisible}
           onClose={() => toggleMobileNavVisibility()}
           zIndex="z-40"
         />
-      </div>
+      </section>
       <section
         className={`hidden h-screen tab:block fixed transition-all duration-500 z-50 ease-out top-0 left-0 p-8 w-80 bg-white ${
           isMobileNavVisible
@@ -89,9 +94,12 @@ export default function Navigation() {
           }`}
           ref={mobileNavContainerRef}
         >
-          <button onClick={() => toggleMobileNavVisibility()}>
-            <PiXThin className="h-6 w-6" />
-          </button>
+          <ButtonIcon
+            variant="small"
+            onClick={() => toggleMobileNavVisibility()}
+          >
+            <PiXThin />
+          </ButtonIcon>
           <nav className="tracking-[0.2em] text-zinc-800 bg-white uppercase mt-5 child:py-6 child:flex child:flex-col child:gap-2">
             <ul className="bg-amber-200 child-hover:bg-zinc-800 child:px-8 child-hover:text-amber-200 child:py-2.5">
               <li>
