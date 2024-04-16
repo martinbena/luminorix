@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { PiMagnifyingGlassThin, PiXThin } from "react-icons/pi";
 import Overlay from "../Overlay";
 import ButtonIcon from "../ButtonIcon";
+import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
 
 interface SearchbarProps {
   isVisible: boolean;
@@ -36,53 +37,20 @@ export default function Searchbar({
         searchInputRef.current?.focus();
       }, 100);
 
-      const handleTabKey = (e: KeyboardEvent): void => {
-        const focusableElements =
-          searchInputRef.current?.parentElement?.querySelectorAll(
-            "input, button"
-          );
-
-        if (!focusableElements) return;
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (
-          e.key === "Tab" &&
-          e.shiftKey &&
-          document.activeElement === firstElement
-        ) {
-          e.preventDefault();
-          (lastElement as HTMLElement).focus();
-        }
-
-        if (
-          e.key === "Tab" &&
-          !e.shiftKey &&
-          document.activeElement === lastElement
-        ) {
-          e.preventDefault();
-          (firstElement as HTMLElement).focus();
-        }
-      };
-
-      const handleEscapeKey = (e: KeyboardEvent): void => {
-        if (e.key === "Escape") {
-          onSetVisibility(false);
-          document.body.style.overflow = "auto";
-        }
-      };
-
       document.addEventListener("click", handleClickOutside);
-      document.addEventListener("keydown", handleTabKey);
-      document.addEventListener("keydown", handleEscapeKey);
 
       return () => {
         document.removeEventListener("click", handleClickOutside);
-        document.removeEventListener("keydown", handleTabKey);
-        document.removeEventListener("keydown", handleEscapeKey);
       };
     }
   }, [isVisible, onSetVisibility]);
+
+  useKeyboardInteractions(
+    isVisible,
+    onSetVisibility,
+    searchBarContainerRef,
+    "input, button"
+  );
 
   return (
     <div

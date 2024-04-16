@@ -2,60 +2,21 @@
 
 import paths from "@/paths";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { PiListThin, PiXThin } from "react-icons/pi";
 import Overlay from "./Overlay";
 import ButtonIcon from "./ButtonIcon";
+import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
 
 export default function Navigation() {
   const [isMobileNavVisible, setIsMobileNavVisible] = useState<boolean>(false);
   const mobileNavContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (isMobileNavVisible) {
-      const handleTabKey = (e: KeyboardEvent): void => {
-        const focusableElements =
-          mobileNavContainerRef.current?.querySelectorAll("a, button");
-
-        if (!focusableElements) return;
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements.length - 1];
-
-        if (
-          e.key === "Tab" &&
-          e.shiftKey &&
-          document.activeElement === firstElement
-        ) {
-          e.preventDefault();
-          (lastElement as HTMLElement).focus();
-        }
-
-        if (
-          e.key === "Tab" &&
-          !e.shiftKey &&
-          document.activeElement === lastElement
-        ) {
-          e.preventDefault();
-          (firstElement as HTMLElement).focus();
-        }
-      };
-
-      const handleEscapeKey = (e: KeyboardEvent): void => {
-        if (e.key === "Escape") {
-          setIsMobileNavVisible(false);
-          document.body.style.overflow = "auto";
-        }
-      };
-
-      document.addEventListener("keydown", handleTabKey);
-      document.addEventListener("keydown", handleEscapeKey);
-
-      return () => {
-        document.removeEventListener("keydown", handleTabKey);
-        document.removeEventListener("keydown", handleEscapeKey);
-      };
-    }
-  }, [isMobileNavVisible]);
+  useKeyboardInteractions(
+    isMobileNavVisible,
+    setIsMobileNavVisible,
+    mobileNavContainerRef
+  );
 
   function toggleMobileNavVisibility(): void {
     setIsMobileNavVisible((visible) => !visible);
