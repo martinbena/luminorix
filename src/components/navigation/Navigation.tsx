@@ -1,4 +1,4 @@
-import paths from "@/paths";
+import paths from "@/lib/paths";
 import NavigationLink from "./NavigationLink";
 
 export default function Navigation() {

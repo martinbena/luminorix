@@ -6,7 +6,7 @@ import {
   PiShoppingCartSimpleThin,
 } from "react-icons/pi";
 import HeaderFeature from "./HeaderFeature";
-import paths from "@/paths";
+import paths from "@/lib/paths";
 import { useState } from "react";
 
 import Searchbar from "./Searchbar";

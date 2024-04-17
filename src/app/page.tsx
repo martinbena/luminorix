@@ -1,7 +1,7 @@
 import DiscountSection from "@/components/home/DiscountSection";
 import Product from "@/components/products/Product";
 import ProductRow from "@/components/products/ProductRow";
-import paths from "@/paths";
+import paths from "@/lib/paths";
 
 export default function Home() {
   return (

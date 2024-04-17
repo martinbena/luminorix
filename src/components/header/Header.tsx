@@ -1,4 +1,4 @@
-import paths from "@/paths";
+import paths from "@/lib/paths";
 import Image from "next/image";
 import Link from "next/link";
 import HeaderFeatureRow from "./HeaderFeatureRow";

@@ -16,7 +16,7 @@ interface ConnectDBResponse {
   message?: string;
 }
 
-export default async function ConnectDB(): Promise<void | ConnectDBResponse> {
+export default async function ConnectDB(): Promise<ConnectDBResponse> {
   mongoose.set("strictQuery", true);
 
   if (mongoose.connection.readyState >= 1) {
