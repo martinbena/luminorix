@@ -11,20 +11,20 @@ const registerUserSchema = z
   .object({
     name: z
       .string()
-      .min(5)
       .max(50)
       .regex(/^[\p{L}'’\-]{2,}(?:\s[\p{L}'’\-]{2,})+$/u, {
         message: "Please enter a correct full name",
       }),
     email: z
       .string()
-      .min(5)
       .max(50)
       .regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, {
         message: "Please enter a correct e-mail address",
       }),
-    password: z.string().min(5),
-    passwordConfirm: z.string().min(5),
+    password: z
+      .string()
+      .min(5, { message: "Password must be at least 5 characters long" }),
+    passwordConfirm: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     message: "Passwords do not match",
@@ -53,7 +53,6 @@ export async function registerUser(
   });
 
   if (!result.success) {
-    console.log(result.error.flatten().fieldErrors);
     return {
       errors: result.error.flatten().fieldErrors,
     };
@@ -62,7 +61,7 @@ export async function registerUser(
   try {
     await ConnectDB();
 
-    const existingUser = await User.find({ email: result.data.email });
+    const existingUser = await User.findOne({ email: result.data.email });
 
     if (existingUser) {
       return {
@@ -72,7 +71,7 @@ export async function registerUser(
       };
     }
 
-    const hashedPassword = hashPassword(result.data.password);
+    const hashedPassword = await hashPassword(result.data.password);
 
     const registeredUser = new User({
       name: result.data.name,
@@ -81,8 +80,6 @@ export async function registerUser(
     });
 
     await registeredUser.save();
-
-    redirect(paths.login());
   } catch (error: unknown) {
     if (error instanceof Error) {
       return {
@@ -98,4 +95,6 @@ export async function registerUser(
       };
     }
   }
+
+  redirect(paths.login());
 }
