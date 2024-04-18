@@ -10,14 +10,17 @@
   },
   "dependencies": {
     "@types/mongoose-unique-validator": "^1.0.9",
+    "bcrypt": "^5.1.1",
     "mongoose": "^8.3.2",
     "mongoose-unique-validator": "^5.0.0",
     "next": "14.1.4",
     "react": "^18",
     "react-dom": "^18",
-    "react-icons": "^5.0.1"
+    "react-icons": "^5.0.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
