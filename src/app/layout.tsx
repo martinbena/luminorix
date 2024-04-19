@@ -32,7 +32,22 @@ export default function RootLayout({
           <Footer />
         </div>
         <div id="overlay" />
-        <Toaster position="top-right" />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            success: {
+              style: {
+                padding: "16px",
+                color: "#27272a",
+                backgroundColor: "#fef3c7",
+              },
+              iconTheme: {
+                primary: "#f59e0b",
+                secondary: "#fef3c7",
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );
