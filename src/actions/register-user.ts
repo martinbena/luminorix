@@ -2,9 +2,7 @@
 
 import { hashPassword } from "@/lib/auth";
 import ConnectDB from "@/lib/connectDB";
-import paths from "@/lib/paths";
 import User from "@/models/User";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 
 const registerUserSchema = z
@@ -39,6 +37,7 @@ interface RegisterUserFormState {
     passwordConfirm?: string[];
     _form?: string[];
   };
+  success?: boolean;
 }
 
 export async function registerUser(
@@ -80,6 +79,11 @@ export async function registerUser(
     });
 
     await registeredUser.save();
+
+    return {
+      errors: {},
+      success: true,
+    };
   } catch (error: unknown) {
     if (error instanceof Error) {
       return {
@@ -95,6 +99,4 @@ export async function registerUser(
       };
     }
   }
-
-  redirect(paths.login());
 }

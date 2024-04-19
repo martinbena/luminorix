@@ -1,13 +1,35 @@
 "use client";
 
 import * as actions from "@/actions";
+import FormButton from "@/components/FormButton";
 import HeadingSecondary from "@/components/HeadingSecondary";
+import paths from "@/lib/paths";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useFormState } from "react-dom";
+import toast from "react-hot-toast";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formState, action] = useFormState(actions.registerUser, {
     errors: {},
+    success: false,
   });
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (formState.success) {
+      toast.success("Well done! You have registered successfully.");
+      timer = setTimeout(() => {
+        router.push(paths.login());
+      }, 2000);
+    }
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [formState.success, router]);
+
   return (
     <div className="px-8">
       <HeadingSecondary>Register</HeadingSecondary>
@@ -60,7 +82,7 @@ export default function RegisterPage() {
             </p>
           ) : null}
           <div className="mt-5">
-            <button>Submit</button>
+            <FormButton>Submit</FormButton>
           </div>
         </form>
       </div>

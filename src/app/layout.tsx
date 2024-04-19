@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import Navbar from "@/components/navigation/Navbar";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Luminorix",
@@ -31,6 +32,7 @@ export default function RootLayout({
           <Footer />
         </div>
         <div id="overlay" />
+        <Toaster position="top-right" />
       </body>
     </html>
   );
