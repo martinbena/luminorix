@@ -1,5 +1,5 @@
 import { hash, compare } from "bcrypt";
-import NextAuth from "next-auth/next";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import ConnectDB from "./connectDB";
 import User from "@/models/User";
@@ -20,12 +20,7 @@ export async function verifyPassword(
   return isValid;
 }
 
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
+export const { handler, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
   },
