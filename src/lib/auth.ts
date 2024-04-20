@@ -20,7 +20,12 @@ export async function verifyPassword(
   return isValid;
 }
 
-export const { handler, auth, signIn, signOut } = NextAuth({
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} = NextAuth({
   session: {
     strategy: "jwt",
   },
@@ -56,5 +61,6 @@ export const { handler, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  secret: process.env.NEXTAUTH_SECRET,
   pages: { signIn: paths.login() },
 });
