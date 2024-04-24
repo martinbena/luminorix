@@ -56,9 +56,9 @@ export default function Searchbar({
     <div
       className={`${
         isVisible
-          ? "translate-y-[20px] pointer-events-auto"
+          ? "translate-y-[20px] pointer-events-auto transition-all duration-300 ease-out"
           : "-translate-y-5 opacity-0 invisible pointer-events-none -z-10 h-0"
-      } absolute left-0 -bottom-10 w-full block bg-amber-50 px-12 mob-lg:px-8 mob:px-5 py-2 transition-all duration-300 ease-out`}
+      } absolute left-0 -bottom-10 w-full block bg-amber-50 px-12 mob-lg:px-8 mob:px-5 py-2`}
       ref={searchBarContainerRef}
     >
       <div className="flex items-center text-zinc-800 gap-6">

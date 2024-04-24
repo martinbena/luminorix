@@ -20,6 +20,7 @@ export default async function Header() {
             height={128}
             alt="Logo of Luminorix"
             className="mob:h-24 mob:w-24"
+            priority
           />
         </Link>
       </div>
