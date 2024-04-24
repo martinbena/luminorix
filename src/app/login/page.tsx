@@ -3,32 +3,13 @@
 import * as actions from "@/actions";
 import FormButton from "@/components/FormButton";
 import HeadingSecondary from "@/components/HeadingSecondary";
-import paths from "@/lib/paths";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { useFormState } from "react-dom";
-import toast from "react-hot-toast";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [formState, action] = useFormState(actions.signInWithCredentials, {
     errors: {},
-    success: false,
   });
 
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (formState.success) {
-      toast.success("Well done! You have logged in successfully.");
-      timer = setTimeout(() => {
-        router.push(paths.home());
-      }, 1000);
-    }
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [formState.success, router]);
   return (
     <div className="px-8">
       <HeadingSecondary>Login</HeadingSecondary>

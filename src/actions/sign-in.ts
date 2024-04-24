@@ -1,6 +1,7 @@
 "use server";
 
 import * as auth from "@/lib/auth";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 
 const signInUserSchema = z.object({
@@ -18,7 +19,6 @@ interface SignInWithCredentialsFormState {
     password?: string[];
     _form?: string[];
   };
-  success?: boolean;
 }
 
 export async function signInWithCredentials(
@@ -42,11 +42,6 @@ export async function signInWithCredentials(
       email: result.data.email,
       password: result.data.password,
     });
-
-    return {
-      errors: {},
-      success: true,
-    };
   } catch (error: any) {
     return {
       errors: {
@@ -54,4 +49,6 @@ export async function signInWithCredentials(
       },
     };
   }
+
+  redirect("/");
 }

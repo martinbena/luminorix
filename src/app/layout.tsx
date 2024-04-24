@@ -4,6 +4,7 @@ import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import Navbar from "@/components/navigation/Navbar";
 import { Toaster } from "react-hot-toast";
+import Providers from "./providers";
 
 export const metadata: Metadata = {
   title: "Luminorix",
@@ -19,35 +20,37 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-serif bg-amber-50 text-sm">
-        <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy dt-lg:p-8 dt:p-0">
-          <Header />
-          <div className="grid grid-cols-[minmax(250px,_2fr)_minmax(550px,_11fr)] tab:grid-cols-1">
-            <div className="bg-zinc-50 overflow-hidden">
-              <Navbar />
+        <Providers>
+          <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy dt-lg:p-8 dt:p-0">
+            <Header />
+            <div className="grid grid-cols-[minmax(250px,_2fr)_minmax(550px,_11fr)] tab:grid-cols-1">
+              <div className="bg-zinc-50 overflow-hidden">
+                <Navbar />
+              </div>
+              <main className="bg-white text-zinc-800 pt-8 min-h-[65vh]">
+                {children}
+              </main>
             </div>
-            <main className="bg-white text-zinc-800 pt-8 min-h-[65vh]">
-              {children}
-            </main>
+            <Footer />
           </div>
-          <Footer />
-        </div>
-        <div id="overlay" />
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            success: {
-              style: {
-                padding: "16px",
-                color: "#27272a",
-                backgroundColor: "#fef3c7",
+          <div id="overlay" />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              success: {
+                style: {
+                  padding: "16px",
+                  color: "#27272a",
+                  backgroundColor: "#fef3c7",
+                },
+                iconTheme: {
+                  primary: "#f59e0b",
+                  secondary: "#fef3c7",
+                },
               },
-              iconTheme: {
-                primary: "#f59e0b",
-                secondary: "#fef3c7",
-              },
-            },
-          }}
-        />
+            }}
+          />
+        </Providers>
       </body>
     </html>
   );

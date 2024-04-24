@@ -2,8 +2,12 @@ import paths from "@/lib/paths";
 import Image from "next/image";
 import Link from "next/link";
 import HeaderFeatureRow from "./HeaderFeatureRow";
+import { auth } from "@/lib/auth";
+import * as actions from "@/actions";
 
-export default function Header() {
+export default async function Header() {
+  const session = await auth();
+
   return (
     <header className="bg-zinc-800 relative text-zinc-50 tracking-[0.2em] p-12 tab:p-8 mob:p-5 grid grid-cols-3 tab:grid-cols-2 justify-items-center gap-y-20 tab:gap-y-10 mob-lg:gap-y-4 items-center tab:justify-items-end z-30">
       <span className="tab:hidden">&nbsp;</span>
@@ -21,12 +25,20 @@ export default function Header() {
       </div>
 
       <div className="flex gap-20 tab-xl:gap-16 tab:gap-8 mob:gap-3 justify-self-end">
-        <Link href={paths.register()} className="hover:text-amber-200">
-          Register
-        </Link>
-        <Link href={paths.login()} className="hover:text-amber-200">
-          Login
-        </Link>
+        {session?.user ? (
+          <form action={actions.signOut}>
+            <button type="submit">Sign Out</button>
+          </form>
+        ) : (
+          <>
+            <Link href={paths.register()} className="hover:text-amber-200">
+              Register
+            </Link>
+            <Link href={paths.login()} className="hover:text-amber-200">
+              Login
+            </Link>
+          </>
+        )}
       </div>
 
       <Link
