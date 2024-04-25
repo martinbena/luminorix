@@ -14,7 +14,7 @@ const config: Config = {
     extend: {
       backgroundImage: {
         "discount-banner":
-          "linear-gradient(to right, rgba(255, 251, 235, 0.15), rgba(255, 251, 235, 0.15)), url('/images/jewellery.jpg')",
+          "linear-gradient(to right, rgba(255, 251, 235, 0.15), rgba(255, 251, 235, 0.15)), url('/images/jewelry.jpg')",
       },
       height: {
         screen: "100dvh",
@@ -40,7 +40,7 @@ const config: Config = {
     },
   },
   plugins: [
-    function ({ addVariant }) {
+    function ({ addVariant }: any) {
       addVariant("child", "& > *");
       addVariant("child-hover", "& > *:hover");
       addVariant("hover-child", "&:hover > *");

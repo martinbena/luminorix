@@ -25,14 +25,14 @@ export default function MobileNavigation({
 
   return (
     <section
-      className={`hidden h-screen tab:block fixed z-50 top-0 left-0 p-8 w-80 bg-white ${
+      className={`hidden h-screen tab:block fixed z-50 transition-all duration-500 ease-out top-0 left-0 p-8 w-80 bg-white ${
         isVisible
-          ? "translate-x-0 visible pointer-events-auto transition-all duration-500 ease-out"
+          ? "translate-x-0 visible pointer-events-auto "
           : "pointer-events-none invisible -translate-x-full"
       } `}
     >
       <div
-        className={`transition-all duration-500 delay-[250ms] ease-out ${
+        className={`transition-[opacity,_transform] duration-500 delay-[250ms] ease-out ${
           isVisible ? "translate-x-0 opacity-100" : "-translate-x-16 opacity-0"
         }`}
         ref={mobileNavContainerRef}

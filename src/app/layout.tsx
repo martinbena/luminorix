@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
 import "./globals.css";
+import "skeleton-elements/css";
+import type { Metadata } from "next";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import Navbar from "@/components/navigation/Navbar";
