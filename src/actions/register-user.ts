@@ -1,6 +1,6 @@
 "use server";
 
-import { hashPassword } from "@/lib/auth";
+import { hashPassword } from "@/lib/brcypt";
 import ConnectDB from "@/lib/connectDB";
 import User from "@/models/User";
 import { z } from "zod";

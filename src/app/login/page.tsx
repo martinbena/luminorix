@@ -1,6 +1,6 @@
 import HeadingSecondary from "@/components/HeadingSecondary";
 import LoginForm from "@/components/auth/LoginForm";
-import { auth } from "@/lib/auth";
+import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 
 export default async function LoginPage() {

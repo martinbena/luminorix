@@ -1,6 +1,6 @@
 "use server";
 
-import * as auth from "@/lib/auth";
+import * as auth from "@/auth";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
