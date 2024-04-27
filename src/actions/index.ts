@@ -1,3 +1,4 @@
 export { signInWithCredentials } from "./sign-in";
+export { signInWithGoogle } from "./sign-in";
 export { signOut } from "./sign-out";
 export { registerUser } from "./register-user";

@@ -52,3 +52,7 @@ export async function signInWithCredentials(
 
   redirect("/");
 }
+
+export async function signInWithGoogle() {
+  return auth.signIn("google");
+}

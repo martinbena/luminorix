@@ -1,5 +1,6 @@
 import { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import User from "@/models/User";
 import type { User as UserType } from "next-auth";
 import ConnectDB from "./connectDB";
@@ -15,7 +16,7 @@ export const authConfig: NextAuthConfig = {
       type: "credentials",
       credentials: {},
       async authorize(credentials): Promise<UserType | null> {
-        ConnectDB();
+        await ConnectDB();
         const { email, password } = credentials as {
           email: string;
           password: string;
@@ -24,24 +25,35 @@ export const authConfig: NextAuthConfig = {
         return user;
       },
     }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+    }),
   ],
   callbacks: {
-    // async signIn({ user }) {
-    //   const { email, name, image } = user;
-    //   ConnectDB();
-    //   let dbUser = await User.findOne({ email });
-    //   if (!dbUser) {
-    //     await User.create({
-    //       email,
-    //       name,
-    //       image,
-    //     });
-    //   }
-    //   return true;
-    // },
+    async signIn({ profile }: any) {
+      const { email, name, picture } = profile;
+      await ConnectDB();
+      const dbUser = await User.findOne({ email });
+      if (!dbUser) {
+        await User.create({
+          email,
+          name,
+          image: picture,
+        });
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
-        ConnectDB();
+        await ConnectDB();
         const userByEmail = await User.findOne({ email: user.email });
         userByEmail.password = undefined;
         userByEmail.resetCode = undefined;
