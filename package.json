@@ -9,12 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/mongoose-unique-validator": "^1.0.9",
-    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "mongoose": "^8.3.2",
-    "mongoose-unique-validator": "^5.0.0",
     "next": "14.1.4",
     "next-auth": "^5.0.0-beta.3",
     "react": "^18",
@@ -26,7 +22,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

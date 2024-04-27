@@ -8,6 +8,7 @@ const { auth } = NextAuth(authConfig);
 
 export const config = {
   matcher: ["/profile/:path*", "/admin/:path*"],
+  unstable_allowDynamic: ["/node_modules/mongoose/dist/browser.umd.js"],
 };
 
 export default auth((req) => {

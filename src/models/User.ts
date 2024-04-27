@@ -1,5 +1,4 @@
 import mongoose, { Document, Types } from "mongoose";
-import uniqueValidator from "mongoose-unique-validator";
 
 interface WishlistItem extends Document {
   product: Types.ObjectId;
@@ -72,8 +71,6 @@ const userSchema = new mongoose.Schema<User>(
   },
   { timestamps: true }
 );
-
-userSchema.plugin(uniqueValidator);
 
 export default mongoose.models?.User ||
   mongoose.model<User>("User", userSchema);
