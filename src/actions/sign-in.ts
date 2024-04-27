@@ -1,16 +1,16 @@
 "use server";
 
 import * as auth from "@/auth";
-import { redirect } from "next/navigation";
+import paths from "@/lib/paths";
 import { z } from "zod";
+import { AuthError } from "@auth/core/errors";
+import { isRedirectError } from "next/dist/client/components/redirect";
 
 const signInUserSchema = z.object({
   email: z.string().regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, {
     message: "Please enter a correct e-mail address",
   }),
-  password: z
-    .string()
-    .min(5, { message: "Password must be at least 5 characters long" }),
+  password: z.string().min(1, { message: "Password is required" }),
 });
 
 interface SignInWithCredentialsFormState {
@@ -38,19 +38,40 @@ export async function signInWithCredentials(
 
   try {
     await auth.signIn("credentials", {
-      redirect: false,
       email: result.data.email,
       password: result.data.password,
+      redirectTo: paths.home(),
     });
-  } catch (error: any) {
-    return {
-      errors: {
-        _form: ["Invalid e-mail or password"],
-      },
-    };
+  } catch (error: unknown) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
+    if (error instanceof Error) {
+      const { message } = error as AuthError;
+
+      if (
+        message === "CallbackRouteError" ||
+        message.toLowerCase().startsWith("a")
+      ) {
+        return {
+          errors: {
+            _form: ["Invalid e-mail or password"],
+          },
+        };
+      }
+
+      return {
+        errors: {
+          _form: ["Something went wrong"],
+        },
+      };
+    }
   }
 
-  redirect("/");
+  return {
+    errors: {},
+  };
 }
 
 export async function signInWithGoogle() {
