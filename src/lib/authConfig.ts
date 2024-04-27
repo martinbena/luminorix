@@ -39,15 +39,17 @@ export const authConfig: NextAuthConfig = {
   ],
   callbacks: {
     async signIn({ profile }: any) {
-      const { email, name, picture } = profile;
-      await ConnectDB();
-      const dbUser = await User.findOne({ email });
-      if (!dbUser) {
-        await User.create({
-          email,
-          name,
-          image: picture,
-        });
+      if (profile) {
+        const { email, name, picture } = profile;
+        await ConnectDB();
+        const dbUser = await User.findOne({ email });
+        if (!dbUser) {
+          await User.create({
+            email,
+            name,
+            image: picture,
+          });
+        }
       }
       return true;
     },
