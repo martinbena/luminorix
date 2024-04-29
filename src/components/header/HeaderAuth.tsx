@@ -2,16 +2,18 @@
 
 import paths from "@/lib/paths";
 import Link from "next/link";
-import * as actions from "@/actions";
 import { useSession } from "next-auth/react";
 import { SkeletonAvatar } from "skeleton-elements/react";
 import { PiBellFill } from "react-icons/pi";
 import { HiUser } from "react-icons/hi";
 import Image from "next/image";
 import UserMenuButton from "./UserMenuButton";
+import { useState } from "react";
+import UserMenu from "./UserMenu";
 
 export default function HeaderAuth() {
   const session = useSession();
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
 
   return (
     <div className="flex gap-10 tab-xl:gap-14 tab:gap-6 mob:gap-8 mob-sm:gap-3 justify-self-end place-items-center">
@@ -41,9 +43,6 @@ export default function HeaderAuth() {
           </div>
         </>
       ) : session.data?.user ? (
-        // <form action={actions.signOut}>
-        //   <button type="submit">Sign Out</button>
-        // </form>
         <>
           <Link href={paths.userMessages()} className="relative">
             <UserMenuButton screenReaderText="View notifications">
@@ -54,9 +53,12 @@ export default function HeaderAuth() {
             </UserMenuButton>
           </Link>
 
-          <div>
+          <div className="relative">
             <div>
-              <UserMenuButton screenReaderText="Open user menu">
+              <UserMenuButton
+                onClick={() => setIsProfileMenuOpen((isOpen) => !isOpen)}
+                screenReaderText="Open user menu"
+              >
                 {session.data.user.image ? (
                   <Image
                     src={session.data.user.image}
@@ -70,6 +72,7 @@ export default function HeaderAuth() {
                 )}
               </UserMenuButton>
             </div>
+            {isProfileMenuOpen && <UserMenu isOpen={isProfileMenuOpen} setIsOpen={setIsProfileMenuOpen} />}
           </div>
         </>
       ) : (

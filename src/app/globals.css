@@ -3,3 +3,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.triangle {
+  border-style: solid;
+  border-width: 10px 15px 10px 0;
+  transform: rotate(90deg);
+  border-color: transparent #fafafa transparent transparent;
+  position: absolute;
+  top: -10px;
+  right: 20px;
+}
+
+@media only screen and (max-width: 34em) {
+  .triangle {
+    right: 12px;
+  }
+}

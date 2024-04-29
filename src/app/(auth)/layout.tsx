@@ -1,10 +1,9 @@
 import "../globals.css";
-import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import Providers from "../providers";
 import Button from "@/components/Button";
 import paths from "@/lib/paths";
-import Logo from "@/components/header/Logo";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Luminorix",
