@@ -52,7 +52,8 @@ export async function signInWithCredentials(
 
       if (
         message === "CallbackRouteError" ||
-        message.toLowerCase().startsWith("a")
+        message.toLowerCase().startsWith("a") ||
+        message.toLowerCase().startsWith("o")
       ) {
         return {
           errors: {

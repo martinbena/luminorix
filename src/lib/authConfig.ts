@@ -70,7 +70,7 @@ export const authConfig: NextAuthConfig = {
       }
       return session;
     },
-  },
+  },  
   secret: process.env.NEXTAUTH_SECRET,
   pages: { signIn: paths.login() },
 };

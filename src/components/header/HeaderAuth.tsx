@@ -10,10 +10,10 @@ export default function HeaderAuth() {
   const session = useSession();
 
   return (
-    <div className="flex gap-20 tab-xl:gap-16 tab:gap-8 mob:gap-3 justify-self-end">
+    <div className="flex gap-20 tab-xl:gap-16 tab:gap-8 mob-sm:gap-3 justify-self-end place-items-center">
       {session.status === "loading" ? (
         <>
-          <div className="rounded-full flex justify-center items-center p-0.5 bg-amber-200">
+          <div className="rounded-full flex justify-center items-center p-0.5 bg-amber-200 mob:w-9 mob:h-9">
             <SkeletonAvatar
               size={48}
               color="#d4d4d4"
@@ -24,7 +24,7 @@ export default function HeaderAuth() {
               borderRadius="50%"
             />
           </div>
-          <div className="rounded-full flex justify-center items-center p-0.5 bg-amber-200">
+          <div className="rounded-full flex justify-center items-center p-0.5 bg-amber-200 mob:w-9 mob:h-9">
             <SkeletonAvatar
               size={48}
               color="#d4d4d4"

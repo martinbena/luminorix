@@ -12,7 +12,7 @@ export default function Logo() {
           width={128}
           height={128}
           alt="Logo of Luminorix"
-          className="mob:h-24 mob:w-24"
+          className="mob:h-24 mob:w-24 mob-sm:h-20 mob-sm:w-20"
           priority
         />
       </Link>
