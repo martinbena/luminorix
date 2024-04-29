@@ -1,11 +1,11 @@
-import "./globals.css";
+import "../globals.css";
 import "skeleton-elements/css";
 import type { Metadata } from "next";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import Navbar from "@/components/navigation/Navbar";
 import { Toaster } from "react-hot-toast";
-import Providers from "./providers";
+import Providers from "../providers";
 
 export const metadata: Metadata = {
   title: "Luminorix",
@@ -28,7 +28,7 @@ export default function RootLayout({
               <div className="bg-zinc-50 overflow-hidden">
                 <Navbar />
               </div>
-              <main className="bg-white text-zinc-800 pt-8 min-h-[65vh]">
+              <main className="bg-white text-zinc-800 py-8 min-h-[65vh]">
                 {children}
               </main>
             </div>
