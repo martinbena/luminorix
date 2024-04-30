@@ -13,13 +13,13 @@ export default function UserMenuItem<C extends ElementType>({
   const MenuItem = as || "a";
   return (
     <MenuItem
-      className="block w-full px-4 py-2 text-sm text-zinc-800 hover:bg-amber-200 transition-colors duration-200 ease-out"
+      className="block w-full px-4 py-2 text-sm text-zinc-800 focus:outline-none focus:bg-amber-200 hover:bg-amber-200 transition-colors duration-200 ease-out"
       role="menuitem"
       {...props}
     >
-      <span className="flex items-center gap-3 [&>*:nth-child(1)]:w-5 [&>*:nth-child(1)]:h-5 [&:nth-child(1)]:text-zinc-600">
+      <p className="flex items-center gap-3 [&>*:nth-child(1)]:w-5 [&>*:nth-child(1)]:h-5">
         {children}
-      </span>
+      </p>
     </MenuItem>
   );
 }

@@ -13,7 +13,7 @@ export default function HeaderFeature({
   onClick,
 }: HeaderFeatureProps) {
   const baseClasses =
-    "font-medium text-base hover-child:text-amber-200 [&>*:nth-child(1)]:h-16 [&>*:nth-child(1)]:w-16 tab-xl:[&>*:nth-child(1)]:h-12 tab-xl:[&>*:nth-child(1)]:w-12 mob:[&>*:nth-child(1)]:w-9 mob:[&>*:nth-child(1)]:h-9 flex items-center gap-3 tab-xl:[&>*:nth-child(2)]:hidden";
+    "font-medium text-base hover-child:text-amber-200 [&>*:nth-child(1)]:h-16 [&>*:nth-child(1)]:w-16 tab-xl:[&>*:nth-child(1)]:h-12 tab-xl:[&>*:nth-child(1)]:w-12 mob:[&>*:nth-child(1)]:w-9 mob:[&>*:nth-child(1)]:h-9 flex items-center gap-3 tab-xl:[&>*:nth-child(2)]:hidden focus:outline-none focus-child:text-amber-200";
   return (
     <div className="relative">
       {link && (
