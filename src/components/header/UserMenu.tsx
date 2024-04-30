@@ -4,10 +4,11 @@ import paths from "@/lib/paths";
 import Link from "next/link";
 import { HiUser } from "react-icons/hi";
 import { HiMiniCog6Tooth } from "react-icons/hi2";
-import { PiPowerBold } from "react-icons/pi";
+import { PiCrownSimpleFill, PiPowerBold } from "react-icons/pi";
 import * as actions from "@/actions";
 import UserMenuItem from "./UserMenuItem";
 import { useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
 
 interface UserMenuProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface UserMenuProps {
 }
 
 export default function UserMenu({ isOpen, setIsOpen }: UserMenuProps) {
+  const session = useSession();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,6 +46,16 @@ export default function UserMenu({ isOpen, setIsOpen }: UserMenuProps) {
       aria-orientation="vertical"
       ref={userMenuRef}
     >
+      {session.data?.user.role === "admin" && (
+        <UserMenuItem
+          as={Link}
+          href={paths.admin()}
+          onClick={() => setIsOpen(false)}
+        >
+          <PiCrownSimpleFill />
+          <span>Admin</span>
+        </UserMenuItem>
+      )}
       <UserMenuItem
         as={Link}
         href={paths.userProfile()}
