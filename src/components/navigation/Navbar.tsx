@@ -1,15 +1,9 @@
-import Navigation from "./Navigation";
-import MobileControlPanel from "./MobileControlPanel";
+import { ReactNode } from "react";
 
-export default function Navbar() {
-  return (
-    <>
-      <MobileControlPanel />
+interface NavbarProps {
+  children: ReactNode;
+}
 
-      {/* Desktop navigation */}
-      <aside className="tab:hidden">
-        <Navigation />
-      </aside>
-    </>
-  );
+export default function Navbar({ children }: NavbarProps) {
+  return <div className="bg-zinc-50 overflow-hidden">{children}</div>;
 }

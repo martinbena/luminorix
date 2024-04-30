@@ -43,7 +43,7 @@ export default function MobileNavigation({
           </ButtonIcon>
         </header>
 
-        <Navigation />
+        <Navigation mode="shop" />
       </div>
     </section>
   );

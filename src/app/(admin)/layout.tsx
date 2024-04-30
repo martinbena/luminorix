@@ -10,9 +10,9 @@ import MobileControlPanel from "@/components/navigation/MobileControlPanel";
 import Navigation from "@/components/navigation/Navigation";
 
 export const metadata: Metadata = {
-  title: "Luminorix",
+  title: "Luminorix | Administration",
   description:
-    "Discover a world of opulence and elegance at Luminorix, where luxury meets sophistication. Shop exquisite fashion, jewelry, home decor, and more from the world's most prestigious brands. Indulge in the finest selection of high-end products, curated for the discerning connoisseur. Elevate your lifestyle with Luminorix today.",
+    "Access the secure admin section to manage critical aspects of the platform. Gain control over settings, product editing, and data management tools. This section is reserved for authorized administrators to oversee platform operations efficiently.",
 };
 
 export default function RootLayout({
@@ -29,9 +29,8 @@ export default function RootLayout({
             <div className="grid grid-cols-[minmax(250px,_2fr)_minmax(550px,_11fr)] tab:grid-cols-1">
               <Navbar>
                 <MobileControlPanel />
-                <Navigation mode="shop" />
+                <Navigation mode="admin" />
               </Navbar>
-
               <main className="bg-white text-zinc-800 py-8 min-h-[65vh]">
                 {children}
               </main>
