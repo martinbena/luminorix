@@ -25,7 +25,6 @@ export default function UserMenu({ isOpen, setIsOpen }: UserMenuProps) {
         !userMenuRef.current?.contains(e.target as Node)
       ) {
         setIsOpen(false);
-        document.body.style.overflow = "auto";
       }
     }
 
@@ -51,7 +50,7 @@ export default function UserMenu({ isOpen, setIsOpen }: UserMenuProps) {
         onClick={() => setIsOpen(false)}
       >
         <HiUser />
-        Your Profile
+        <span>Your Profile</span>
       </UserMenuItem>
       <UserMenuItem
         as={Link}
@@ -59,12 +58,12 @@ export default function UserMenu({ isOpen, setIsOpen }: UserMenuProps) {
         onClick={() => setIsOpen(false)}
       >
         <HiMiniCog6Tooth />
-        Settings
+        <span>Settings</span>
       </UserMenuItem>
       <form action={actions.signOut}>
         <UserMenuItem as={"button"} type="submit">
           <PiPowerBold />
-          Logout
+          <span>Logout</span>
         </UserMenuItem>
       </form>
       <div className="triangle" />

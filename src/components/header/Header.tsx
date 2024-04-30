@@ -12,7 +12,7 @@ export default function Header() {
       <HeaderAuth />
       <Link
         href={paths.home()}
-        className="uppercase text-5xl tracking-[0.25em] mob-lg:text-xl text-zinc-200 justify-self-start tab-xl:text-4xl mob-sm:text-base"
+        className="uppercase text-5xl tracking-[0.25em] mob-lg:text-xl focus:outline-none focus:text-amber-200 text-zinc-200 justify-self-start tab-xl:text-4xl mob-sm:text-base"
       >
         <h1>Luminorix</h1>
       </Link>
