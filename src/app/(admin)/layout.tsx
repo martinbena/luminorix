@@ -29,7 +29,9 @@ export default function RootLayout({
             <div className="grid grid-cols-[minmax(250px,_2fr)_minmax(550px,_11fr)] tab:grid-cols-1">
               <Navbar>
                 <MobileControlPanel />
-                <Navigation mode="admin" />
+                <aside className="tab:hidden">
+                  <Navigation mode="admin" />
+                </aside>
               </Navbar>
               <main className="bg-white text-zinc-800 py-8 min-h-[65vh]">
                 {children}

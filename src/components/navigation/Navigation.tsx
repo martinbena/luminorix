@@ -1,4 +1,3 @@
-import paths from "@/lib/paths";
 import NavigationLink from "./NavigationLink";
 import {
   adminLinks,
@@ -12,8 +11,7 @@ interface NavigationProps {
 }
 
 export default function Navigation({ mode }: NavigationProps) {
-  return (
-    <aside className="tab:hidden">
+  return (    
       <nav className="tracking-[0.2em] text-zinc-800 bg-white uppercase child:py-6 child:flex child:flex-col child:gap-2">
         {mode === "shop" && (
           <ul className="bg-amber-200 child-hover:bg-zinc-800 child-hover:text-amber-200">
@@ -26,7 +24,7 @@ export default function Navigation({ mode }: NavigationProps) {
             ))}
           </ul>
         )}
-        <ul className="child-hover:bg-zinc-800 child-hover:text-zinc-50 bg-zinc-50">
+        <ul className="child-hover:bg-zinc-800 child-hover:text-zinc-50 bg-amber-100">
           {mode === "shop" &&
             tagLinks.map((link) => (
               <NavigationLink
@@ -54,7 +52,6 @@ export default function Navigation({ mode }: NavigationProps) {
               />
             ))}
         </ul>
-      </nav>
-    </aside>
+      </nav>   
   );
 }
