@@ -91,7 +91,7 @@ export const adminLinks = [
     description: "Tags",
   },
   {
-    href: paths.adminTagShow(),
+    href: paths.adminOrderShow(),
     description: "User Orders",
   },
 ];

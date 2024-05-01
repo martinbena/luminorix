@@ -21,11 +21,12 @@ export default function Navigation({ mode }: NavigationProps) {
               key={link.description}
               href={link.href}
               description={link.description}
+              activeClasses="bg-zinc-800 text-amber-200"
             />
           ))}
         </ul>
       )}
-      <ul className="child-hover:bg-zinc-800 child-hover:text-zinc-50 bg-zinc-50">
+      <ul className="child-hover:bg-amber-200 bg-zinc-50">
         {mode === "shop" &&
           tagLinks.map((link) => (
             <NavigationLink
