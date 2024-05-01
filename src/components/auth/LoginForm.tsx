@@ -3,8 +3,8 @@
 import * as actions from "@/actions";
 import { useFormState } from "react-dom";
 import AuthForm from "./AuthForm";
-import AuthFormInputGroup from "./AuthFormInputGroup";
-import AuthFormError from "./AuthFormError";
+import FormInputGroup from "../FormInputGroup";
+import FormError from "../FormError";
 
 export default function LoginForm() {
   const [formState, action] = useFormState(actions.signInWithCredentials, {
@@ -13,22 +13,22 @@ export default function LoginForm() {
 
   return (
     <AuthForm type="login" formAction={action}>
-      <AuthFormInputGroup
+      <FormInputGroup
         name="email"
         inputType="email"
         error={formState.errors.email}
       >
         E-mail
-      </AuthFormInputGroup>
-      <AuthFormInputGroup
+      </FormInputGroup>
+      <FormInputGroup
         name="password"
         inputType="password"
         error={formState.errors.password}
       >
         Password
-      </AuthFormInputGroup>
+      </FormInputGroup>
       {formState.errors._form ? (
-        <AuthFormError>{formState.errors._form?.join(" | ")}</AuthFormError>
+        <FormError>{formState.errors._form?.join(" | ")}</FormError>
       ) : null}
     </AuthForm>
   );

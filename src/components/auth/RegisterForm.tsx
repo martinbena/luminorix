@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import toast from "react-hot-toast";
-import AuthFormInputGroup from "./AuthFormInputGroup";
+import FormInputGroup from "../FormInputGroup";
 import AuthForm from "./AuthForm";
-import AuthFormError from "./AuthFormError";
+import FormError from "../FormError";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -35,36 +35,36 @@ export default function RegisterForm() {
   }, [formState.success, router]);
   return (
     <AuthForm type="register" formAction={action} formRef={formRef}>
-      <AuthFormInputGroup
+      <FormInputGroup
         name="fullName"
         inputType="text"
         error={formState.errors.name}
       >
         Full name
-      </AuthFormInputGroup>
-      <AuthFormInputGroup
+      </FormInputGroup>
+      <FormInputGroup
         name="email"
         inputType="email"
         error={formState.errors.email}
       >
         E-mail
-      </AuthFormInputGroup>
-      <AuthFormInputGroup
+      </FormInputGroup>
+      <FormInputGroup
         name="password"
         inputType="password"
         error={formState.errors.password}
       >
         Password
-      </AuthFormInputGroup>
-      <AuthFormInputGroup
+      </FormInputGroup>
+      <FormInputGroup
         name="passwordConfirm"
         inputType="password"
         error={formState.errors.passwordConfirm}
       >
         Confirm password
-      </AuthFormInputGroup>
+      </FormInputGroup>
       {formState.errors._form ? (
-        <AuthFormError>{formState.errors._form?.join(" | ")}</AuthFormError>
+        <FormError>{formState.errors._form?.join(" | ")}</FormError>
       ) : null}
     </AuthForm>
   );
