@@ -11,12 +11,14 @@ interface MobileNavigationProps {
   isVisible: boolean;
   onToggleVisibility: () => void;
   onSetVisibility: React.Dispatch<React.SetStateAction<boolean>>;
+  mode: "shop" | "user" | "admin";
 }
 
 export default function MobileNavigation({
   isVisible,
   onToggleVisibility,
   onSetVisibility,
+  mode,
 }: MobileNavigationProps) {
   const mobileNavContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,7 +45,7 @@ export default function MobileNavigation({
           </ButtonIcon>
         </header>
 
-        <Navigation mode="shop" />
+        <Navigation mode={mode} />
       </div>
     </section>
   );
