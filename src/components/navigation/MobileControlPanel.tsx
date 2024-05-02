@@ -25,7 +25,7 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
   function closeVisibleNavigation(): void {
     setActiveNav(null);
     document.body.style.overflow = "auto";
-  }  
+  }
 
   return (
     <>
@@ -38,6 +38,7 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
             variant="large"
             onClick={() => toggleVisibility("shop")}
             additionalClasses="child:fill-zinc-800"
+            tabIndex={activeNav ? -1 : 0}
           >
             <PiListThin />
           </ButtonIcon>
@@ -46,6 +47,7 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
               variant="large"
               onClick={() => toggleVisibility("user")}
               additionalClasses="child:fill-zinc-800"
+              tabIndex={activeNav ? -1 : 0}
             >
               <PiUserListThin />
             </ButtonIcon>
@@ -58,6 +60,7 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
               variant="large"
               onClick={() => toggleVisibility("admin")}
               additionalClasses="child:fill-zinc-800"
+              tabIndex={activeNav ? -1 : 0}
             >
               <PiCrownSimpleLight />
             </ButtonIcon>

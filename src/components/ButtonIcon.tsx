@@ -5,6 +5,7 @@ interface ButtonIconProps {
   additionalClasses?: string;
   onClick: () => void;
   children: ReactNode;
+  tabIndex?: number;
 }
 
 export default function ButtonIcon({
@@ -12,6 +13,7 @@ export default function ButtonIcon({
   additionalClasses,
   onClick,
   children,
+  tabIndex = 0,
 }: ButtonIconProps) {
   return (
     <button
@@ -23,6 +25,7 @@ export default function ButtonIcon({
           : ""
       } ${additionalClasses}`}
       onClick={onClick}
+      tabIndex={tabIndex}
     >
       {children}
     </button>
