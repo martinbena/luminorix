@@ -3,8 +3,8 @@
 import * as actions from "@/actions";
 import { useFormState } from "react-dom";
 import AuthForm from "./AuthForm";
-import FormInputGroup from "../FormInputGroup";
-import FormError from "../FormError";
+import FormInputGroup from "../ui/FormInputGroup";
+import FormError from "../ui/FormError";
 
 export default function LoginForm() {
   const [formState, action] = useFormState(actions.signInWithCredentials, {

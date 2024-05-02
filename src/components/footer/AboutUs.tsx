@@ -1,4 +1,4 @@
-import HeadingTertiary from "../HeadingTertiary";
+import HeadingTertiary from "../ui/HeadingTertiary";
 
 export default function AboutUs() {
   return (

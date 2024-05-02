@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import HeadingSecondary from "@/components/HeadingSecondary";
+import HeadingSecondary from "@/components/ui/HeadingSecondary";
 import LoginForm from "@/components/auth/LoginForm";
 import AuthFormContainer from "@/components/auth/AuthFormContainer";
 import type { Metadata } from "next";

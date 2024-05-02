@@ -1,9 +1,9 @@
 import { ReactNode } from "react";
-import FormButton from "../FormButton";
+import FormButton from "../ui/FormButton";
 import GoogleLoginButton from "./GoogleLoginButton";
 
 interface AuthFormProps {
-  formAction: (payload: FormData) => void; 
+  formAction: (payload: FormData) => void;
   children: ReactNode;
   formRef?: React.Ref<HTMLFormElement>;
   type: "register" | "login";
@@ -22,7 +22,7 @@ export default function AuthForm({
         action={formAction}
         className="flex flex-col gap-8 font-sans"
       >
-        {children}        
+        {children}
         <div className="mt-6 child:w-full">
           <FormButton>{type}</FormButton>
         </div>

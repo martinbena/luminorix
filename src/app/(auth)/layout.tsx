@@ -1,7 +1,7 @@
 import "../globals.css";
 import { Toaster } from "react-hot-toast";
 import Providers from "../providers";
-import Button from "@/components/Button";
+import Button from "@/components/ui/Button";
 import paths from "@/lib/paths";
 import type { Metadata } from "next";
 

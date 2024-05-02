@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
-import ButtonIcon from "../ButtonIcon";
+import { useState } from "react";
+import ButtonIcon from "../ui/ButtonIcon";
 import { PiCrownSimpleLight, PiListThin, PiUserListThin } from "react-icons/pi";
-import Overlay from "../Overlay";
+import Overlay from "../ui/Overlay";
 import MobileNavigation from "./MobileNavigation";
 import Navigation, { NavigationProps } from "./Navigation";
 
@@ -15,7 +15,6 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
   const [activeNav, setActiveNav] = useState<NavigationProps["mode"] | null>(
     null
   );
-  const panelRef = useRef<HTMLElement>(null);
 
   function toggleVisibility(nav: NavigationProps["mode"]): void {
     setActiveNav((prevNav) => (prevNav === nav ? null : nav));
@@ -29,10 +28,7 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
 
   return (
     <>
-      <section
-        ref={panelRef}
-        className="hidden tab:flex gap-8 justify-between bg-amber-100 px-12 py-2 tab:px-8 mob:px-5"
-      >
+      <section className="hidden tab:flex gap-8 justify-between bg-amber-100 px-12 py-2 tab:px-8 mob:px-5">
         <div className="flex gap-8">
           <ButtonIcon
             variant="large"

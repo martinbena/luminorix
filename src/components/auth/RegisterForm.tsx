@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import toast from "react-hot-toast";
-import FormInputGroup from "../FormInputGroup";
+import FormInputGroup from "../ui/FormInputGroup";
 import AuthForm from "./AuthForm";
-import FormError from "../FormError";
+import FormError from "../ui/FormError";
 
 export default function RegisterForm() {
   const router = useRouter();

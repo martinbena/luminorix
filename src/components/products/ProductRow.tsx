@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import HeadingSecondary from "../HeadingSecondary";
-import Button from "../Button";
+import HeadingSecondary from "../ui/HeadingSecondary";
+import Button from "../ui/Button";
 
 interface ProductRowProps {
   sectionClasses?: string;

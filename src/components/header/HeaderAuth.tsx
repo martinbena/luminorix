@@ -4,7 +4,7 @@ import paths from "@/lib/paths";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import UserLoadingSkeleton from "./UserLoading";
-import UserMenuContainer from "./UserMenuContainer";
+import UserMenu from "./UserMenu";
 
 export default function HeaderAuth() {
   const session = useSession();
@@ -14,7 +14,7 @@ export default function HeaderAuth() {
       {session.status === "loading" ? (
         <UserLoadingSkeleton />
       ) : session.data?.user ? (
-        <UserMenuContainer />
+        <UserMenu />
       ) : (
         <>
           <Link

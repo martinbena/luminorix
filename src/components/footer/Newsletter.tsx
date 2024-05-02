@@ -1,5 +1,5 @@
-import Button from "../Button";
-import HeadingTertiary from "../HeadingTertiary";
+import Button from "../ui/Button";
+import HeadingTertiary from "../ui/HeadingTertiary";
 
 export default function Newsletter() {
   return (

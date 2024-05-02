@@ -2,66 +2,75 @@
 
 import paths from "@/lib/paths";
 import Link from "next/link";
-import { HiUser } from "react-icons/hi";
-import { HiMiniCog6Tooth } from "react-icons/hi2";
-import { PiCrownSimpleFill, PiPowerBold } from "react-icons/pi";
-import * as actions from "@/actions";
-import UserMenuItem from "./UserMenuItem";
-import { useEffect, useRef } from "react";
+import UserMenuImage from "./UserMenuImage";
 import { useSession } from "next-auth/react";
-import useCloseOnClickOutside from "@/hooks/useCloseOnClickOutside";
+import { PiBellFill, PiCrownSimpleFill, PiPowerBold } from "react-icons/pi";
+import Image from "next/image";
+import { HiUser } from "react-icons/hi";
+import Popover from "../ui/Popover";
+import { HiMiniCog6Tooth } from "react-icons/hi2";
+import * as actions from "@/actions";
 
-interface UserMenuProps {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-}
-
-export default function UserMenu({ isOpen, setIsOpen }: UserMenuProps) {
+export default function UserMenu() {
   const session = useSession();
-  const userMenuRef = useRef<HTMLDivElement>(null);
-
-  useCloseOnClickOutside(isOpen, setIsOpen, userMenuRef);
-
   return (
-    <div
-      className="absolute font-sans flex flex-col gap-2.5 right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-zinc-50 py-2 ring-1 ring-black ring-opacity-5 focus:outline-none"
-      role="menu"
-      aria-orientation="vertical"
-      ref={userMenuRef}
-    >
-      {session.data?.user.role === "admin" && (
-        <UserMenuItem
-          as={Link}
-          href={paths.admin()}
-          onClick={() => setIsOpen(false)}
-        >
-          <PiCrownSimpleFill />
-          <span>Admin</span>
-        </UserMenuItem>
-      )}
-      <UserMenuItem
-        as={Link}
-        href={paths.userProfile()}
-        onClick={() => setIsOpen(false)}
-      >
-        <HiUser />
-        <span>Your Profile</span>
-      </UserMenuItem>
-      <UserMenuItem
-        as={Link}
-        href={paths.userSettings()}
-        onClick={() => setIsOpen(false)}
-      >
-        <HiMiniCog6Tooth />
-        <span>Settings</span>
-      </UserMenuItem>
-      <form action={actions.signOut}>
-        <UserMenuItem as={"button"} type="submit">
-          <PiPowerBold />
-          <span>Logout</span>
-        </UserMenuItem>
-      </form>
-      <div className="triangle" />
-    </div>
+    <>
+      <Link href={paths.userMessages()} className="relative" tabIndex={-1}>
+        <UserMenuImage screenReaderText="View notifications">
+          <PiBellFill className="w-9 h-9 mob:w-7 mob:h-7 text-zinc-600" />
+          <span className="absolute -top-1 -right-1 bg-amber-200 text-zinc-800 tracking-normal min-h-5 min-w-5 text-center rounded-full leading-none flex items-center justify-center pointer-events-none py-[2px] px-1 font-sans mob:left-5 mob:-top-1">
+            0
+          </span>
+        </UserMenuImage>
+      </Link>
+
+      <Popover>
+        <Popover.Button>
+          <UserMenuImage screenReaderText="Open menu">
+            {session.data?.user.image ? (
+              <Image
+                src={session.data.user.image}
+                alt={`Photo of ${session.data.user.name}`}
+                height={64}
+                width={64}
+                className="rounded-full"
+              />
+            ) : (
+              <HiUser className="w-9 h-9 mob:w-7 mob:h-7 text-zinc-600" />
+            )}
+          </UserMenuImage>
+        </Popover.Button>
+
+        <Popover.Content>
+          {session.data?.user.role === "admin" && (
+            <Popover.Row
+              as={Link}
+              href={paths.admin()}
+              icon={<PiCrownSimpleFill />}
+            >
+              Admin
+            </Popover.Row>
+          )}
+
+          <Popover.Row as={Link} href={paths.userProfile()} icon={<HiUser />}>
+            Your Profile
+          </Popover.Row>
+
+          <Popover.Row
+            as={Link}
+            href={paths.userSettings()}
+            icon={<HiMiniCog6Tooth />}
+          >
+            Settings
+          </Popover.Row>
+
+          <form action={actions.signOut}>
+            <Popover.Row as={"button"} type="submit" icon={<PiPowerBold />}>
+              Logout
+            </Popover.Row>
+          </form>
+        </Popover.Content>
+      </Popover>
+    </>
   );
 }

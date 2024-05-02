@@ -1,6 +1,6 @@
 import paths from "@/lib/paths";
-import Button from "../Button";
-import HeadingTertiary from "../HeadingTertiary";
+import Button from "../ui/Button";
+import HeadingTertiary from "../ui/HeadingTertiary";
 
 export default function DiscountBanner() {
   return (

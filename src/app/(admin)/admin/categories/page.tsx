@@ -1,9 +1,9 @@
 "use client";
 
-import ButtonIcon from "@/components/ButtonIcon";
-import FormButton from "@/components/FormButton";
-import FormInputGroup from "@/components/FormInputGroup";
-import HeadingSecondary from "@/components/HeadingSecondary";
+import ButtonIcon from "@/components/ui/ButtonIcon";
+import FormButton from "@/components/ui/FormButton";
+import FormInputGroup from "@/components/ui/FormInputGroup";
+import HeadingSecondary from "@/components/ui/HeadingSecondary";
 import { PiDotsThreeVerticalLight } from "react-icons/pi";
 
 export default function AdminCategoriesPage() {

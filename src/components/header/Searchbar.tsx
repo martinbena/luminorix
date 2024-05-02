@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { PiMagnifyingGlassThin, PiXThin } from "react-icons/pi";
-import Overlay from "../Overlay";
-import ButtonIcon from "../ButtonIcon";
+import Overlay from "../ui/Overlay";
+import ButtonIcon from "../ui/ButtonIcon";
 import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
 import useCloseOnClickOutside from "@/hooks/useCloseOnClickOutside";
 
