@@ -1,19 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ButtonIcon from "../ButtonIcon";
 import { PiCrownSimpleLight, PiListThin, PiUserListThin } from "react-icons/pi";
 import Overlay from "../Overlay";
 import MobileNavigation from "./MobileNavigation";
+import Navigation, { NavigationProps } from "./Navigation";
 
-interface MobileControlPanel {
+interface MobileControlPanelProps {
   mode?: "user" | "admin";
 }
 
-export default function MobileControlPanel({ mode }: MobileControlPanel) {
-  const [activeNav, setActiveNav] = useState<string | null>(null);
+export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
+  const [activeNav, setActiveNav] = useState<NavigationProps["mode"] | null>(
+    null
+  );
+  const panelRef = useRef<HTMLElement>(null);
 
-  function toggleVisibility(nav: string): void {
+  function toggleVisibility(nav: NavigationProps["mode"]): void {
     setActiveNav((prevNav) => (prevNav === nav ? null : nav));
     document.body.style.overflow = activeNav === nav ? "auto" : "hidden";
   }
@@ -21,15 +25,18 @@ export default function MobileControlPanel({ mode }: MobileControlPanel) {
   function closeVisibleNavigation(): void {
     setActiveNav(null);
     document.body.style.overflow = "auto";
-  }
+  }  
 
   return (
     <>
-      <section className="hidden tab:flex gap-8 justify-between bg-amber-100 px-12 py-2 tab:px-8 mob:px-5">
+      <section
+        ref={panelRef}
+        className="hidden tab:flex gap-8 justify-between bg-amber-100 px-12 py-2 tab:px-8 mob:px-5"
+      >
         <div className="flex gap-8">
           <ButtonIcon
             variant="large"
-            onClick={() => toggleVisibility("mobile")}
+            onClick={() => toggleVisibility("shop")}
             additionalClasses="child:fill-zinc-800"
           >
             <PiListThin />
@@ -65,35 +72,14 @@ export default function MobileControlPanel({ mode }: MobileControlPanel) {
       </section>
 
       <MobileNavigation
-        isVisible={activeNav === "mobile"}
-        onToggleVisibility={() => toggleVisibility("mobile")}
+        isVisible={activeNav !== null}
+        onToggleVisibility={() => activeNav && toggleVisibility(activeNav)}
         onSetVisibility={(isVisible) =>
-          isVisible ? setActiveNav("mobile") : setActiveNav(null)
+          isVisible ? setActiveNav(activeNav) : setActiveNav(null)
         }
-        mode="shop"
-      />
-
-      {(mode === "user" || mode === "admin") && (
-        <MobileNavigation
-          isVisible={activeNav === "user"}
-          onToggleVisibility={() => toggleVisibility("user")}
-          onSetVisibility={(isVisible) =>
-            isVisible ? setActiveNav("user") : setActiveNav(null)
-          }
-          mode="user"
-        />
-      )}
-
-      {mode === "admin" && (
-        <MobileNavigation
-          isVisible={activeNav === "admin"}
-          onToggleVisibility={() => toggleVisibility("admin")}
-          onSetVisibility={(isVisible) =>
-            isVisible ? setActiveNav("admin") : setActiveNav(null)
-          }
-          mode="admin"
-        />
-      )}
+      >
+        {activeNav ? <Navigation mode={activeNav} /> : null}
+      </MobileNavigation>
     </>
   );
 }

@@ -2,8 +2,7 @@
 
 import { PiXThin } from "react-icons/pi";
 import ButtonIcon from "../ButtonIcon";
-import Navigation from "./Navigation";
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
 import useClickInteraction from "@/hooks/useClickInteraction";
 
@@ -11,14 +10,14 @@ interface MobileNavigationProps {
   isVisible: boolean;
   onToggleVisibility: () => void;
   onSetVisibility: React.Dispatch<React.SetStateAction<boolean>>;
-  mode: "shop" | "user" | "admin";
+  children: ReactNode;  
 }
 
 export default function MobileNavigation({
   isVisible,
   onToggleVisibility,
-  onSetVisibility,
-  mode,
+  onSetVisibility,  
+  children,
 }: MobileNavigationProps) {
   const mobileNavContainerRef = useRef<HTMLDivElement | null>(null);
 
@@ -43,9 +42,8 @@ export default function MobileNavigation({
           <ButtonIcon variant="small" onClick={() => onToggleVisibility()}>
             <PiXThin />
           </ButtonIcon>
-        </header>
-
-        <Navigation mode={mode} />
+        </header>       
+        {children}
       </div>
     </section>
   );

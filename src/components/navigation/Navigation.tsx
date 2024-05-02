@@ -7,7 +7,7 @@ import {
   userLinks,
 } from "@/lib/navLinkCategories";
 
-interface NavigationProps {
+export interface NavigationProps {
   mode: "shop" | "user" | "admin";
 }
 
