@@ -5,6 +5,7 @@ import { PiMagnifyingGlassThin, PiXThin } from "react-icons/pi";
 import Overlay from "../Overlay";
 import ButtonIcon from "../ButtonIcon";
 import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
+import useCloseOnClickOutside from "@/hooks/useCloseOnClickOutside";
 
 interface SearchbarProps {
   isVisible: boolean;
@@ -21,29 +22,18 @@ export default function Searchbar({
   const searchBarContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    function handleClickOutside(e: MouseEvent): void {
-      if (
-        isVisible &&
-        searchInputRef.current &&
-        !searchBarContainerRef.current?.contains(e.target as Node)
-      ) {
-        onSetVisibility(false);
-        document.body.style.overflow = "auto";
-      }
-    }
-
     if (isVisible) {
       setTimeout(() => {
         searchInputRef.current?.focus();
       }, 100);
-
-      document.addEventListener("click", handleClickOutside);
-
-      return () => {
-        document.removeEventListener("click", handleClickOutside);
-      };
     }
-  }, [isVisible, onSetVisibility]);
+
+    if (!isVisible) {
+      document.body.style.overflow = "auto";
+    }
+  }, [isVisible]);
+
+  useCloseOnClickOutside(isVisible, onSetVisibility, searchBarContainerRef);
 
   useKeyboardInteractions(
     isVisible,

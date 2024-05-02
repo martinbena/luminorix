@@ -9,6 +9,7 @@ import * as actions from "@/actions";
 import UserMenuItem from "./UserMenuItem";
 import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
+import useCloseOnClickOutside from "@/hooks/useCloseOnClickOutside";
 
 interface UserMenuProps {
   isOpen: boolean;
@@ -19,25 +20,7 @@ export default function UserMenu({ isOpen, setIsOpen }: UserMenuProps) {
   const session = useSession();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent): void {
-      if (
-        isOpen &&
-        userMenuRef.current &&
-        !userMenuRef.current?.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener("click", handleClickOutside);
-
-      return () => {
-        document.removeEventListener("click", handleClickOutside);
-      };
-    }
-  }, [isOpen, setIsOpen]);
+  useCloseOnClickOutside(isOpen, setIsOpen, userMenuRef);
 
   return (
     <div
