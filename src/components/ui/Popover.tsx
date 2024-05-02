@@ -66,7 +66,7 @@ function Content({ children }: ContentProps) {
 
   return (
     <div
-      className="absolute font-sans flex flex-col gap-2.5 right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-zinc-50 py-2 ring-1 ring-black ring-opacity-5 focus:outline-none"
+      className="absolute font-sans flex flex-col gap-2.5 right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-zinc-100 py-2 ring-1 ring-black ring-opacity-5 focus:outline-none"
       role="menu"
       aria-orientation="vertical"
       ref={popoverContentRef}
