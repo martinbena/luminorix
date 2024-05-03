@@ -17,7 +17,13 @@ export default function FormButton({ children }: FormButtonProps) {
       beforeBackground="before:bg-white"
       disabled={pending}
     >
-      {!pending ? children : "Submitting..."}
+      {!pending ? (
+        children
+      ) : (
+        <div className="flex justify-center">
+          <div className="form__loader" />
+        </div>
+      )}
     </Button>
   );
 }

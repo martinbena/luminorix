@@ -96,7 +96,7 @@ function Row<C extends ElementType>({
     <MenuItem
       className="block w-full px-4 py-2 text-sm text-zinc-800 focus:outline-none focus:bg-amber-200 hover:bg-amber-200 transition-colors duration-200 ease-out"
       role="menuitem"
-      onClick={() => setIsOpen(false)}
+      onClick={as === "button" ? undefined : () => setIsOpen(false)}
       {...props}
     >
       <p
