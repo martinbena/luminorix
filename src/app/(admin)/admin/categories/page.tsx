@@ -7,6 +7,8 @@ import TableHeader from "@/components/data-tables/TableHeader";
 import TableBody from "@/components/data-tables/TableBody";
 import TableRow from "@/components/data-tables/TableRow";
 import { getAllCategories } from "@/db/queries/categories";
+import { Category } from "@/models/Category";
+import ItemTitle from "@/components/data-tables/ItemTitle";
 
 export default async function AdminCategoriesPage() {
   const categories = await getAllCategories();
@@ -20,16 +22,15 @@ export default async function AdminCategoriesPage() {
         <TableContainer>
           <Table>
             <TableHeader>Categories</TableHeader>
-            <TableBody>
-              {categories.map((category) => (
+            <TableBody
+              data={categories}
+              render={(category: Category) => (
                 <TableRow key={category._id}>
-                  <div className="font-semibold tracking-wide">
-                    {category.title}
-                  </div>
+                  <ItemTitle>{category.title}</ItemTitle>
                   <AdminActions />
                 </TableRow>
-              ))}
-            </TableBody>
+              )}
+            />
           </Table>
         </TableContainer>
       </section>
