@@ -27,7 +27,9 @@ export default function RootLayout({
                   &larr; Back to shop
                 </Button>
               </div>
-              {children}
+              <div className="bg-white px-24 py-12 mob-lg:p-12 mob-sm:p-6">
+                {children}
+              </div>
             </section>
           </main>
           <div id="overlay" />

@@ -2,9 +2,10 @@
 
 import * as actions from "@/actions";
 import { useFormState } from "react-dom";
-import AuthForm from "./AuthForm";
-import FormInputGroup from "../ui/FormInputGroup";
-import FormError from "../ui/FormError";
+import Form from "../ui/Form";
+import GoogleLoginButton from "./GoogleLoginButton";
+import Link from "next/link";
+import paths from "@/lib/paths";
 
 export default function LoginForm() {
   const [formState, action] = useFormState(actions.signInWithCredentials, {
@@ -12,24 +13,35 @@ export default function LoginForm() {
   });
 
   return (
-    <AuthForm type="login" formAction={action}>
-      <FormInputGroup
-        name="email"
-        inputType="email"
-        error={formState.errors.email}
-      >
-        E-mail
-      </FormInputGroup>
-      <FormInputGroup
-        name="password"
-        inputType="password"
-        error={formState.errors.password}
-      >
-        Password
-      </FormInputGroup>
-      {formState.errors._form ? (
-        <FormError>{formState.errors._form?.join(" | ")}</FormError>
-      ) : null}
-    </AuthForm>
+    <div className="flex flex-col gap-8 divide-y-2">
+      <Form formAction={action}>
+        <Form.Title textAlign="left">Welcome back!</Form.Title>
+        <Form.InputGroup
+          name="email"
+          inputType="email"
+          error={formState.errors.email}
+        >
+          E-mail
+        </Form.InputGroup>
+        <Form.InputGroup
+          name="password"
+          inputType="password"
+          error={formState.errors.password}
+        >
+          Password
+        </Form.InputGroup>
+        {formState.errors._form ? (
+          <Form.Error>{formState.errors._form?.join(" | ")}</Form.Error>
+        ) : null}
+        <Form.Button>Login</Form.Button>
+        <p>
+          <Link className="underline" href={paths.register()}>
+            Don&apos;t have an account yet? Create one here
+          </Link>
+        </p>
+      </Form>
+
+      <GoogleLoginButton />
+    </div>
   );
 }

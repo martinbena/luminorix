@@ -25,11 +25,12 @@ function Form({ children, formAction, formRef }: FormProps) {
 
 interface TitleProps {
   children: ReactNode;
+  textAlign?: string;
 }
 
-function Title({ children }: TitleProps) {
+function Title({ children, textAlign = "center" }: TitleProps) {
   return (
-    <div className="mb-8 text-center">
+    <div className={`mb-4 text-${textAlign}`}>
       <HeadingSecondary>{children}</HeadingSecondary>
     </div>
   );
@@ -58,6 +59,20 @@ function SubmitButton({ children, width }: SubmitButtonProps) {
           </div>
         )}
       </Button>
+    </div>
+  );
+}
+
+interface ContainerProps {
+  children: ReactNode;
+}
+
+function Container({ children }: ContainerProps) {
+  return (
+    <div className="flex justify-center">
+      <div className="px-6 py-8 rounded-md shadow-form max-w-2xl w-full">
+        {children}
+      </div>
     </div>
   );
 }
@@ -117,10 +132,11 @@ function Row({ numColumns, children }: RowProps) {
   <div className={`grid grid-cols-${numColumns}`}>{children}</div>;
 }
 
+Form.Container = Container;
 Form.Title = Title;
-Form.Button = SubmitButton;
+Form.Row = Row;
 Form.InputGroup = InputGroup;
 Form.Error = Error;
-Form.Row = Row;
+Form.Button = SubmitButton;
 
 export default Form;

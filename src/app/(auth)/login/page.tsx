@@ -1,8 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import HeadingSecondary from "@/components/ui/HeadingSecondary";
 import LoginForm from "@/components/auth/LoginForm";
-import AuthFormContainer from "@/components/auth/AuthFormContainer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -18,10 +16,7 @@ export default async function LoginPage() {
     return redirect("/");
   }
 
-  return (
-    <AuthFormContainer>
-      <HeadingSecondary>Welcome back!</HeadingSecondary>
-      <LoginForm />
-    </AuthFormContainer>
+  return (   
+      <LoginForm />   
   );
 }

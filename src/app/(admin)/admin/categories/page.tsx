@@ -31,25 +31,23 @@ export default function AdminCategoriesPage() {
     <>
       <HeadingSecondary>Manage all categories</HeadingSecondary>
       <section className="mt-12 py-8">
-        <div className="flex justify-center">
-          <div className="px-6 py-8 rounded-md shadow-form max-w-2xl w-full">
-            <Form formAction={action} formRef={formRef}>
-              <Form.Title>Add category</Form.Title>
-              <Form.InputGroup
-                inputType="text"
-                name="title"
-                placeholder="Women's fashion"
-                error={formState.errors.title}
-              >
-                Category title
-              </Form.InputGroup>
-              {formState.errors._form ? (
-                <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
-              ) : null}
-              <Form.Button width="w-1/2">Create category</Form.Button>
-            </Form>
-          </div>
-        </div>
+        <Form.Container>
+          <Form formAction={action} formRef={formRef}>
+            <Form.Title>Add category</Form.Title>
+            <Form.InputGroup
+              inputType="text"
+              name="title"
+              placeholder="Women's fashion"
+              error={formState.errors.title}
+            >
+              Category title
+            </Form.InputGroup>
+            {formState.errors._form ? (
+              <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
+            ) : null}
+            <Form.Button width="w-1/2">Create category</Form.Button>
+          </Form>
+        </Form.Container>
 
         <div className="max-w-4xl flex justify-center mx-auto">
           <div
