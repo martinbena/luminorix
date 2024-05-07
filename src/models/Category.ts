@@ -1,6 +1,6 @@
 import mongoose, { Document } from "mongoose";
 
-interface Category extends Document {
+export interface Category extends Document {
   title: string;
   slug: string;
 }

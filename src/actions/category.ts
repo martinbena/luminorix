@@ -1,8 +1,10 @@
 "use server";
 
 import { auth } from "@/auth";
-import ConnectDB from "@/lib/connectDB";
+import ConnectDB from "@/db/connectDB";
+import paths from "@/lib/paths";
 import Category from "@/models/Category";
+import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { z } from "zod";
 
@@ -53,6 +55,7 @@ export async function createCategory(
 
     await newCategory.save();
 
+    revalidatePath(paths.home(), "layout");
     return {
       errors: {},
       success: true,

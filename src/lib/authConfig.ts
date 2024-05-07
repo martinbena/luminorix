@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import User from "@/models/User";
 import type { User as UserType } from "next-auth";
-import ConnectDB from "./connectDB";
+import ConnectDB from "../db/connectDB";
 import { authorizeUser } from "./brcypt";
 import paths from "./paths";
 
@@ -70,7 +70,7 @@ export const authConfig: NextAuthConfig = {
       }
       return session;
     },
-  },  
+  },
   secret: process.env.NEXTAUTH_SECRET,
   pages: { signIn: paths.login() },
 };
