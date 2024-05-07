@@ -1,38 +1,54 @@
 "use client";
 
-import FormButton from "@/components/ui/FormButton";
-import FormInputGroup from "@/components/ui/FormInputGroup";
 import HeadingSecondary from "@/components/ui/HeadingSecondary";
 import Popover from "@/components/ui/Popover";
+import { useFormState } from "react-dom";
+import * as actions from "@/actions";
 import {
   PiDotsThreeVerticalLight,
   PiPencilSimpleLineThin,
   PiTrashThin,
 } from "react-icons/pi";
+import toast from "react-hot-toast";
+import { useEffect, useRef } from "react";
+import Form from "@/components/ui/Form";
 
 export default function AdminCategoriesPage() {
+  const [formState, action] = useFormState(actions.createCategory, {
+    errors: {},
+    success: false,
+  });
+
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (formState.success) {
+      toast.success("Category was successfully created");
+      formRef.current?.reset();
+    }
+  }, [formState.success]);
   return (
     <>
       <HeadingSecondary>Manage all categories</HeadingSecondary>
       <section className="mt-12 py-8">
         <div className="flex justify-center">
-          <form
-            className="[&>*:nth-child(1)]:mb-8 [&>*:nth-child(1)]:text-center px-6 py-8 rounded-md shadow-md max-w-2xl w-full"
-            action=""
-          >
-            <HeadingSecondary>Add category</HeadingSecondary>
-            <FormInputGroup
-              inputType="text"
-              name="title"
-              placeholder="Women's fashion"
-              error={undefined}
-            >
-              Category title
-            </FormInputGroup>
-            <div className="mt-8 text-center child:w-full w-1/2">
-              <FormButton>Create category</FormButton>
-            </div>
-          </form>
+          <div className="px-6 py-8 rounded-md shadow-form max-w-2xl w-full">
+            <Form formAction={action} formRef={formRef}>
+              <Form.Title>Add category</Form.Title>
+              <Form.InputGroup
+                inputType="text"
+                name="title"
+                placeholder="Women's fashion"
+                error={formState.errors.title}
+              >
+                Category title
+              </Form.InputGroup>
+              {formState.errors._form ? (
+                <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
+              ) : null}
+              <Form.Button width="w-1/2">Create category</Form.Button>
+            </Form>
+          </div>
         </div>
 
         <div className="max-w-4xl flex justify-center mx-auto">

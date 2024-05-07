@@ -37,6 +37,9 @@ const config: Config = {
         mob: { max: "544px" },
         "mob-sm": { max: "440px" },
       },
+      boxShadow: {
+        form: "0 0 6px rgba(0, 0, 0, 0.1)",
+      },
     },
   },
   plugins: [
