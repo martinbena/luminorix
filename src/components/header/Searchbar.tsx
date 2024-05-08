@@ -27,10 +27,6 @@ export default function Searchbar({
         searchInputRef.current?.focus();
       }, 100);
     }
-
-    if (!isVisible) {
-      document.body.style.overflow = "auto";
-    }
   }, [isVisible]);
 
   useCloseOnClickOutside(isVisible, onSetVisibility, searchBarContainerRef);
@@ -64,7 +60,11 @@ export default function Searchbar({
           <PiXThin />
         </ButtonIcon>
 
-        <Overlay isOpen={isVisible} zIndex="z-20" />
+        <Overlay
+          isOpen={isVisible}
+          onClose={() => onSetVisibility(false)}
+          zIndex="z-20"
+        />
       </div>
     </div>
   );

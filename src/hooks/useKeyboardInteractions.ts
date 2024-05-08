@@ -38,8 +38,7 @@ export default function useKeyboardInteractions(
 
       const handleEscapeKey = (e: KeyboardEvent): void => {
         if (e.key === "Escape") {
-          onSetVisibility(false);
-          document.body.style.overflow = "auto";
+          onSetVisibility(false);          
         }
       };
 

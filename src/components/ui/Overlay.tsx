@@ -1,10 +1,12 @@
 import { ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Modal from "./Modal";
+import useCloseOnClickOutside from "@/hooks/useCloseOnClickOutside";
+import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
 
 interface OverlayProps {
   isOpen: boolean;
-  onClose?: () => void;
+  onClose: () => void;
   zIndex: string;
   children?: ReactNode;
 }
@@ -17,20 +19,8 @@ export default function Overlay({
 }: OverlayProps) {
   const modalRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(e.target as Node) &&
-        onClose
-      )
-        onClose();
-    }
-
-    document.addEventListener("click", handleClick, true);
-
-    return () => document.removeEventListener("click", handleClick, true);
-  }, [onClose]);
+  useCloseOnClickOutside(isOpen, onClose, modalRef);
+  useKeyboardInteractions(isOpen, onClose, modalRef);
 
   useEffect(() => {
     if (isOpen) {

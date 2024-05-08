@@ -18,12 +18,10 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
 
   function toggleVisibility(nav: NavigationProps["mode"]): void {
     setActiveNav((prevNav) => (prevNav === nav ? null : nav));
-    document.body.style.overflow = activeNav === nav ? "auto" : "hidden";
   }
 
   function closeVisibleNavigation(): void {
     setActiveNav(null);
-    document.body.style.overflow = "auto";
   }
 
   return (
