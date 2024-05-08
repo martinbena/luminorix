@@ -59,7 +59,7 @@ function Content({ children }: ContentProps) {
   const { isOpen, setIsOpen } = useContext(PopoverContext);
   const popoverContentRef = useRef<HTMLDivElement>(null);
 
-  useCloseOnClickOutside(isOpen, setIsOpen, popoverContentRef);
+  useCloseOnClickOutside(isOpen, () => setIsOpen(false), popoverContentRef);
   useKeyboardInteractions(isOpen, setIsOpen, popoverContentRef);
 
   if (!isOpen) return null;

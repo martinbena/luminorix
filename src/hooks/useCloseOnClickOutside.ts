@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
-export default function useCloseOnClickOutside(
+export default function useCloseOnClickOutside<T>(
   isVisible: boolean,
-  onSetVisibility: (isVisible: boolean) => void,
+  onSetVisibility: (value: T) => void,
   containerRef: React.RefObject<HTMLElement>
 ) {
   useEffect(() => {
@@ -12,7 +12,7 @@ export default function useCloseOnClickOutside(
         containerRef.current &&
         !containerRef.current?.contains(e.target as Node)
       ) {
-        onSetVisibility(false);
+        onSetVisibility({} as T);
       }
     }
 

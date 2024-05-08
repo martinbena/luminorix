@@ -29,7 +29,11 @@ export default function Searchbar({
     }
   }, [isVisible]);
 
-  useCloseOnClickOutside(isVisible, onSetVisibility, searchBarContainerRef);
+  useCloseOnClickOutside(
+    isVisible,
+    () => onSetVisibility(false),
+    searchBarContainerRef
+  );
 
   useKeyboardInteractions(
     isVisible,
