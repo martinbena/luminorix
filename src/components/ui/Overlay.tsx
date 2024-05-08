@@ -19,7 +19,7 @@ export default function Overlay({ isOpen, onClose, zIndex }: OverlayProps) {
         >
           &nbsp;
         </div>,
-        document.body
+        overlayContainer
       )
     : null;
 }
