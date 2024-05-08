@@ -55,6 +55,17 @@ export default function RootLayout({
                   secondary: "#fef3c7",
                 },
               },
+              error: {
+                style: {
+                  padding: "16px",
+                  color: "#27272a",
+                  backgroundColor: "#fef3c7",
+                },
+                iconTheme: {
+                  primary: "#ef4444",
+                  secondary: "#fef3c7",
+                },
+              },
             }}
           />
         </Providers>

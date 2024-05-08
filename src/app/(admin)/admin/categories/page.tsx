@@ -9,6 +9,7 @@ import TableRow from "@/components/data-tables/TableRow";
 import { getAllCategories } from "@/db/queries/categories";
 import { Category } from "@/models/Category";
 import ItemTitle from "@/components/data-tables/ItemTitle";
+import * as actions from "@/actions";
 
 export default async function AdminCategoriesPage() {
   const categories = await getAllCategories();
@@ -27,7 +28,10 @@ export default async function AdminCategoriesPage() {
               render={(category: Category) => (
                 <TableRow key={category._id}>
                   <ItemTitle>{category.title}</ItemTitle>
-                  <AdminActions />
+                  <AdminActions
+                    item={category}
+                    onDelete={actions.deleteCategory.bind(null, category._id)}
+                  />
                 </TableRow>
               )}
             />

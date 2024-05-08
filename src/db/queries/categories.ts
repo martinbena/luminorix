@@ -4,5 +4,6 @@ import ConnectDB from "../connectDB";
 export async function getAllCategories(): Promise<CategoryType[]> {
   await ConnectDB();
   const categories = await Category.find({}).sort({ createdAt: -1 });
-  return categories;
+
+  return JSON.parse(JSON.stringify(categories));
 }

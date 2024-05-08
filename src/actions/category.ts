@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import ConnectDB from "@/db/connectDB";
 import paths from "@/lib/paths";
 import Category from "@/models/Category";
+import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { z } from "zod";
@@ -74,5 +75,32 @@ export async function createCategory(
         },
       };
     }
+  }
+}
+
+interface DeleteCategoryState {
+  error?: string;
+  success?: boolean;
+}
+
+export async function deleteCategory(
+  id: mongoose.Types.ObjectId
+): Promise<DeleteCategoryState> {
+  try {
+    await ConnectDB();
+    await Category.findByIdAndDelete(id);
+    revalidatePath("/", "layout");
+    return {
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+      };
+    }
+    return {
+      error: "Category could not be deleted. Please try again later",
+    };
   }
 }

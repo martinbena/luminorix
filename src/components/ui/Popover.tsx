@@ -81,22 +81,29 @@ type RowProps<T extends ElementType> = {
   as?: T;
   children: ReactNode;
   icon?: ReactNode;
+  onClick?: () => void;
 } & ComponentPropsWithoutRef<T>;
 
 function Row<C extends ElementType>({
   as,
   children,
   icon,
+  onClick,
   ...props
 }: RowProps<C>) {
   const MenuItem = as || "button";
   const { setIsOpen } = useContext(PopoverContext);
 
+  function handleClick() {
+    setIsOpen(false);
+    if (onClick) onClick();
+  }
+
   return (
     <MenuItem
       className="block w-full px-4 py-2 text-sm text-zinc-800 focus:outline-none focus:bg-amber-200 hover:bg-amber-200 transition-colors duration-200 ease-out"
       role="menuitem"
-      onClick={as === "button" ? undefined : () => setIsOpen(false)}
+      onClick={props.type === "submit" ? undefined : handleClick}
       {...props}
     >
       <p
