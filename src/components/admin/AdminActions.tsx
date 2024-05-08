@@ -41,7 +41,9 @@ export default function AdminActions<T>({
         isOpen={isOverlayOpen}
         onClose={() => setIsOverlayOpen(false)}
         zIndex="z-40"
-      />
+      >
+        <p>Test</p>
+      </Overlay>
     </>
   );
 }
