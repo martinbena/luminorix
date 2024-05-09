@@ -78,14 +78,14 @@ export async function createCategory(
   }
 }
 
-interface DeleteCategoryState {
+export interface DeleteItemState {
   error?: string;
   success?: boolean;
 }
 
 export async function deleteCategory(
   id: mongoose.Types.ObjectId
-): Promise<DeleteCategoryState> {
+): Promise<DeleteItemState> {
   try {
     await ConnectDB();
     await Category.findByIdAndDelete(id);

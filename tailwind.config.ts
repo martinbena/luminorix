@@ -39,6 +39,8 @@ const config: Config = {
       },
       boxShadow: {
         form: "0 0 6px rgba(0, 0, 0, 0.1)",
+        button: "inset 0 0 0 2px rgb(39, 39, 42, 1)",
+        "button-hover": "inset 0 0 0 2px rgb(161, 161, 170, 1)",
       },
     },
   },

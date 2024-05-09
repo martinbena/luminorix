@@ -39,15 +39,16 @@ function Title({ children, textAlign = "center" }: TitleProps) {
 interface SubmitButtonProps {
   children: ReactNode;
   width?: string;
+  type?: "primary" | "secondary" | "tertiary";
 }
 
-function SubmitButton({ children, width }: SubmitButtonProps) {
+function SubmitButton({ children, width, type }: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
     <div className={`child:w-full ${width}`}>
       <Button
-        type="primary"
+        type={type ?? "primary"}
         beforeBackground="before:bg-white"
         disabled={pending}
       >
