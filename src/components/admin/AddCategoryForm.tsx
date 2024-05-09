@@ -17,9 +17,12 @@ export default function AddCategoryForm() {
   useEffect(() => {
     if (formState.success) {
       toast.success("Category was successfully created");
+    }
+
+    if (Object.keys(formState.errors).length === 0) {
       formRef.current?.reset();
     }
-  }, [formState.success]);
+  }, [formState]);
   return (
     <Form.Container>
       <Form formAction={action} formRef={formRef}>
