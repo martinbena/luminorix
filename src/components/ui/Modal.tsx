@@ -1,5 +1,4 @@
 import {
-  MouseEventHandler,
   ReactElement,
   ReactNode,
   cloneElement,
@@ -59,12 +58,20 @@ function Open({ children, opens: opensWindowName }: OpenProps) {
 }
 
 interface ContentProps {
-  children: ReactElement;
+  children?: ReactElement;
+  onCloseOutsideContent?: () => void;
+  isOpenFromOutside?: boolean;
   name: string;
   zIndex?: string;
 }
 
-function Content({ children, name, zIndex = "z-40" }: ContentProps) {
+function Content({
+  children,
+  onCloseOutsideContent,
+  isOpenFromOutside,
+  name,
+  zIndex = "z-40",
+}: ContentProps) {
   const { openName, close } = useContext(ModalContext);
   const modalRef = useRef<HTMLDivElement | null>(null);
 
@@ -72,26 +79,28 @@ function Content({ children, name, zIndex = "z-40" }: ContentProps) {
   useKeyboardInteractions(name === openName, close, modalRef);
 
   useEffect(() => {
-    if (name === openName) {
+    if (name === openName || isOpenFromOutside) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
     }
-  }, [name, openName]);
+  }, [name, openName, isOpenFromOutside]);
 
-  if (name !== openName) return null;
+  if (children && name !== openName) return null;
+  if (!children && !isOpenFromOutside) return null;
 
-  const closeOverlay: MouseEventHandler<HTMLDivElement> = (event) => {
+  function handleCloseOnClick(event: React.MouseEvent<HTMLDivElement>): void {
     event.stopPropagation();
-    close;
-  };
+    onCloseOutsideContent?.();
+    close("");
+  }
 
   const overlayContainer = document.getElementById("overlay");
 
   return overlayContainer
     ? createPortal(
         <div
-          onClick={children ? undefined : closeOverlay}
+          onClick={children ? undefined : handleCloseOnClick}
           className={`bg-zinc-800/50 h-full w-full fixed top-0 left-0 flex justify-center items-center ${zIndex}`}
         >
           {children ? (
@@ -104,9 +113,7 @@ function Content({ children, name, zIndex = "z-40" }: ContentProps) {
               </ButtonIcon>
               <div>{cloneElement(children, { onCloseModal: close })}</div>
             </div>
-          ) : (
-            "&nbsp;"
-          )}
+          ) : null}
         </div>,
         overlayContainer
       )

@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import { PiMagnifyingGlassThin, PiXThin } from "react-icons/pi";
-import Overlay from "../ui/Overlay";
 import ButtonIcon from "../ui/ButtonIcon";
 import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
 import useCloseOnClickOutside from "@/hooks/useCloseOnClickOutside";
+import Modal from "../ui/Modal";
 
 interface SearchbarProps {
   isVisible: boolean;
@@ -63,12 +63,14 @@ export default function Searchbar({
         <ButtonIcon variant="small" onClick={() => onToggleVisibility()}>
           <PiXThin />
         </ButtonIcon>
-
-        <Overlay
-          isOpen={isVisible}
-          onClose={() => onSetVisibility(false)}
-          zIndex="z-20"
-        />
+        <Modal>
+          <Modal.Content
+            name="overlay"
+            isOpenFromOutside={isVisible}
+            onCloseOutsideContent={() => onSetVisibility(false)}
+            zIndex="z-20"
+          />
+        </Modal>
       </div>
     </div>
   );

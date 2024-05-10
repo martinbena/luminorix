@@ -3,9 +3,9 @@
 import { useState } from "react";
 import ButtonIcon from "../ui/ButtonIcon";
 import { PiCrownSimpleLight, PiListThin, PiUserListThin } from "react-icons/pi";
-import Overlay from "../ui/Overlay";
 import MobileNavigation from "./MobileNavigation";
 import Navigation, { NavigationProps } from "./Navigation";
+import Modal from "../ui/Modal";
 
 interface MobileControlPanelProps {
   mode?: "user" | "admin";
@@ -36,6 +36,7 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
           >
             <PiListThin />
           </ButtonIcon>
+
           {(mode === "user" || mode === "admin") && (
             <ButtonIcon
               variant="large"
@@ -61,11 +62,13 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
           </div>
         )}
 
-        <Overlay
-          isOpen={activeNav !== null}
-          onClose={() => closeVisibleNavigation()}
-          zIndex="z-40"
-        />
+        <Modal>
+          <Modal.Content
+            name="overlay"
+            isOpenFromOutside={activeNav !== null}
+            onCloseOutsideContent={() => closeVisibleNavigation()}
+          />
+        </Modal>
       </section>
 
       <MobileNavigation
