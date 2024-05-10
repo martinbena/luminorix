@@ -6,8 +6,6 @@ import {
   PiTrashThin,
 } from "react-icons/pi";
 import Popover from "../ui/Popover";
-import Overlay from "../ui/Overlay";
-import { useState } from "react";
 import Modal from "../ui/Modal";
 import ConfirmDelete from "./ConfirmDelete";
 import { Document } from "mongoose";
@@ -22,7 +20,6 @@ export default function AdminActions<T extends Document>({
   item,
   onDelete,
 }: AdminActionsProps<T>) {
-  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   return (
     <>
       <Modal>
@@ -31,30 +28,20 @@ export default function AdminActions<T extends Document>({
             <PiDotsThreeVerticalLight className="w-8 h-8" />
           </Popover.Button>
           <Popover.Content>
-            <Popover.Row icon={<PiPencilSimpleLineThin />}>Edit</Popover.Row>
+            <Modal.Open opens="edit">
+              <Popover.Row icon={<PiPencilSimpleLineThin />}>Edit</Popover.Row>
+            </Modal.Open>
             <Modal.Open opens="delete">
-              <Popover.Row
-                icon={<PiTrashThin />}
-                onClick={() => setIsOverlayOpen(true)}
-              >
-                Delete
-              </Popover.Row>
+              <Popover.Row icon={<PiTrashThin />}>Delete</Popover.Row>
             </Modal.Open>
           </Popover.Content>
         </Popover>
-        <Overlay
-          isOpen={isOverlayOpen}
-          onClose={() => setIsOverlayOpen(false)}
-          zIndex="z-40"
-        >
-          <Modal.Content name="delete">
-            <ConfirmDelete
-              resourceName={item.title}
-              onConfirm={onDelete}
-              onClose={() => setIsOverlayOpen(false)}
-            />
-          </Modal.Content>
-        </Overlay>
+        <Modal.Content name="edit">
+          <p>edit form</p>
+        </Modal.Content>
+        <Modal.Content name="delete">
+          <ConfirmDelete resourceName={item.title} onConfirm={onDelete} />
+        </Modal.Content>
       </Modal>
     </>
   );

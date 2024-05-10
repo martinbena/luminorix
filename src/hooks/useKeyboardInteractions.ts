@@ -1,8 +1,8 @@
 import { RefObject, useEffect } from "react";
 
-export default function useKeyboardInteractions(
+export default function useKeyboardInteractions<T>(
   isVisible: boolean,
-  onSetVisibility: (isVisible: boolean) => void,
+  onSetVisibility: (value: T) => void,
   containerRef: RefObject<HTMLElement>,
   customQuerySelector?: string
 ) {
@@ -38,7 +38,7 @@ export default function useKeyboardInteractions(
 
       const handleEscapeKey = (e: KeyboardEvent): void => {
         if (e.key === "Escape") {
-          onSetVisibility(false);          
+          onSetVisibility({} as T);
         }
       };
 

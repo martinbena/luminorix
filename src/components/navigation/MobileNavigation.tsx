@@ -21,7 +21,11 @@ export default function MobileNavigation({
 }: MobileNavigationProps) {
   const mobileNavContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useKeyboardInteractions(isVisible, onSetVisibility, mobileNavContainerRef);
+  useKeyboardInteractions(
+    isVisible,
+    () => onSetVisibility(false),
+    mobileNavContainerRef
+  );
   useClickInteraction(isVisible, onSetVisibility, mobileNavContainerRef);
 
   return (

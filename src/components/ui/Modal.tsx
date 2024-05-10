@@ -1,14 +1,19 @@
 import {
+  MouseEventHandler,
   ReactElement,
   ReactNode,
   cloneElement,
   createContext,
   useContext,
+  useEffect,
+  useRef,
   useState,
 } from "react";
 import ButtonIcon from "./ButtonIcon";
 import { PiXThin } from "react-icons/pi";
-
+import useCloseOnClickOutside from "@/hooks/useCloseOnClickOutside";
+import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
+import { createPortal } from "react-dom";
 
 interface ModalContextProps {
   openName: string;
@@ -56,21 +61,56 @@ function Open({ children, opens: opensWindowName }: OpenProps) {
 interface ContentProps {
   children: ReactElement;
   name: string;
+  zIndex?: string;
 }
 
-function Content({ children, name }: ContentProps) {
+function Content({ children, name, zIndex = "z-40" }: ContentProps) {
   const { openName, close } = useContext(ModalContext);
+  const modalRef = useRef<HTMLDivElement | null>(null);
+
+  useCloseOnClickOutside(name === openName, close, modalRef);
+  useKeyboardInteractions(name === openName, close, modalRef);
+
+  useEffect(() => {
+    if (name === openName) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+  }, [name, openName]);
 
   if (name !== openName) return null;
 
-  return (
-    <div className="min-w-96 pb-8 px-12 pt-10 bg-white shadow-form rounded-md text-zinc-800 relative [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:top-4 [&>*:nth-child(1)]:right-4">
-      <ButtonIcon variant="small" onClick={close}>
-        <PiXThin />
-      </ButtonIcon>
-      <div>{cloneElement(children, { onCloseModal: close })}</div>
-    </div>
-  );
+  const closeOverlay: MouseEventHandler<HTMLDivElement> = (event) => {
+    event.stopPropagation();
+    close;
+  };
+
+  const overlayContainer = document.getElementById("overlay");
+
+  return overlayContainer
+    ? createPortal(
+        <div
+          onClick={children ? undefined : closeOverlay}
+          className={`bg-zinc-800/50 h-full w-full fixed top-0 left-0 flex justify-center items-center ${zIndex}`}
+        >
+          {children ? (
+            <div
+              ref={modalRef}
+              className="min-w-96 pb-8 px-12 pt-10 bg-white shadow-form rounded-md text-zinc-800 relative [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:top-4 [&>*:nth-child(1)]:right-4"
+            >
+              <ButtonIcon variant="small" onClick={close}>
+                <PiXThin />
+              </ButtonIcon>
+              <div>{cloneElement(children, { onCloseModal: close })}</div>
+            </div>
+          ) : (
+            "&nbsp;"
+          )}
+        </div>,
+        overlayContainer
+      )
+    : null;
 }
 
 Modal.Open = Open;

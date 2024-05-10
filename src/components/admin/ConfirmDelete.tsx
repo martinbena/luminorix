@@ -11,14 +11,12 @@ import HeadingSecondary from "../ui/HeadingSecondary";
 interface ConfirmDeleteProps {
   resourceName: string;
   onCloseModal?: () => void;
-  onClose: () => void;
   onConfirm: () => Promise<DeleteItemState>;
 }
 
 export default function ConfirmDelete({
   resourceName,
   onCloseModal,
-  onClose,
   onConfirm,
 }: ConfirmDeleteProps) {
   const [storedName, setStoredName] = useState<string>("");
@@ -38,14 +36,13 @@ export default function ConfirmDelete({
   useEffect(() => {
     if (formState.success) {
       onCloseModal?.();
-      onClose();
       toast.success(`${storedName} successfully deleted`);
     }
 
     if (formState.error) {
       toast.error(formState.error);
     }
-  }, [formState, onCloseModal, onClose, storedName]);
+  }, [formState, onCloseModal, storedName]);
 
   return (
     <div className="flex flex-col gap-5">

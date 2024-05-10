@@ -37,7 +37,7 @@ export default function Searchbar({
 
   useKeyboardInteractions(
     isVisible,
-    onSetVisibility,
+    () => onSetVisibility(false),
     searchBarContainerRef,
     "input, button"
   );
