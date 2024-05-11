@@ -10,15 +10,18 @@ import Modal from "../ui/Modal";
 import ConfirmDelete from "./ConfirmDelete";
 import { Document } from "mongoose";
 import { DeleteItemState } from "@/actions/category";
+import { ReactElement } from "react";
 
 interface AdminActionsProps<T extends Document> {
   item: T & { title: string };
   onDelete: () => Promise<DeleteItemState>;
+  editForm: ReactElement;
 }
 
 export default function AdminActions<T extends Document>({
   item,
   onDelete,
+  editForm,
 }: AdminActionsProps<T>) {
   return (
     <>
@@ -35,13 +38,11 @@ export default function AdminActions<T extends Document>({
               <Popover.Row icon={<PiTrashThin />}>Delete</Popover.Row>
             </Modal.Open>
           </Popover.Content>
+          <Modal.Content name="edit">{editForm}</Modal.Content>
+          <Modal.Content name="delete">
+            <ConfirmDelete resourceName={item.title} onConfirm={onDelete} />
+          </Modal.Content>
         </Popover>
-        <Modal.Content name="edit">
-          <p>edit form</p>
-        </Modal.Content>
-        <Modal.Content name="delete">
-          <ConfirmDelete resourceName={item.title} onConfirm={onDelete} />
-        </Modal.Content>
       </Modal>
     </>
   );

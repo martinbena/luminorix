@@ -63,6 +63,74 @@ export async function createCategory(
     };
   } catch (error: unknown) {
     if (error instanceof Error) {
+      if (error.message.includes("duplicate key")) {
+        return {
+          errors: {
+            _form: ["This category already exists"],
+          },
+        };
+      }
+      return {
+        errors: {
+          _form: [error.message],
+        },
+      };
+    } else {
+      return {
+        errors: {
+          _form: ["Something went wrong"],
+        },
+      };
+    }
+  }
+}
+
+export async function editCategory(
+  id: mongoose.Types.ObjectId,
+  formState: CreateCategoryFormState,
+  formData: FormData
+): Promise<CreateCategoryFormState> {
+  const result = createCategorySchema.safeParse({
+    title: formData.get("edit-title"),
+  });
+
+  if (!result.success) {
+    return {
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  const session = await auth();
+  if (!session || !session.user || session.user.role !== "admin") {
+    return {
+      errors: {
+        _form: ["You are not authorized to do this"],
+      },
+    };
+  }
+
+  try {
+    await ConnectDB();
+
+    await Category.findByIdAndUpdate(id, {
+      title: result.data.title,
+      slug: slugify(result.data.title.replace(/'/g, "")),
+    });
+
+    revalidatePath(paths.home(), "layout");
+    return {
+      errors: {},
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message.includes("duplicate key")) {
+        return {
+          errors: {
+            _form: ["This category already exists"],
+          },
+        };
+      }
       return {
         errors: {
           _form: [error.message],

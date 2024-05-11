@@ -94,6 +94,8 @@ interface InputGroupProps {
   placeholder?: string;
   error: string[] | undefined;
   children: ReactNode;
+  value?: string;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 function InputGroup({
@@ -102,10 +104,16 @@ function InputGroup({
   placeholder,
   error,
   children,
+  value,
+  inputRef,
 }: InputGroupProps) {
   return (
     <div className="flex flex-col gap-4">
-      <label className={`${error ? "text-red-600" : ""}`} htmlFor={name}>
+      <label
+        className={`${error ? "text-red-600" : ""}`}
+        onClick={(e) => e.stopPropagation()}
+        htmlFor={name}
+      >
         {children}
       </label>{" "}
       <input
@@ -113,7 +121,9 @@ function InputGroup({
         name={name}
         type={inputType}
         placeholder={placeholder}
-        className={`auth-form__input border text-base focus:outline-none max-w-full min-w-96 mob-lg:min-w-0 px-4 py-3 ${
+        defaultValue={value}
+        ref={inputRef}
+        className={`border text-base focus:outline-none max-w-full min-w-96 mob-lg:min-w-0 px-4 py-3 ${
           error
             ? "border-red-600 focus:border-red-600"
             : "border-zinc-300 focus:border-zinc-700"

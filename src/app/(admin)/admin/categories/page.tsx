@@ -1,5 +1,5 @@
 import HeadingSecondary from "@/components/ui/HeadingSecondary";
-import AddCategoryForm from "@/components/admin/AddCategoryForm";
+import AddEditCategoryForm from "@/components/admin/AddEditCategoryForm";
 import AdminActions from "@/components/admin/AdminActions";
 import TableContainer from "@/components/data-tables/TableContainer";
 import Table from "@/components/data-tables/Table";
@@ -18,7 +18,7 @@ export default async function AdminCategoriesPage() {
     <>
       <HeadingSecondary>Manage all categories</HeadingSecondary>
       <section className="mt-12 py-8">
-        <AddCategoryForm />
+        <AddEditCategoryForm />
 
         <TableContainer>
           <Table>
@@ -31,6 +31,12 @@ export default async function AdminCategoriesPage() {
                   <AdminActions
                     item={category}
                     onDelete={actions.deleteCategory.bind(null, category._id)}
+                    editForm={
+                      <AddEditCategoryForm
+                        isEditSession={true}
+                        category={category}
+                      />
+                    }
                   />
                 </TableRow>
               )}

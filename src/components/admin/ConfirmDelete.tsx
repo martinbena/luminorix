@@ -45,7 +45,7 @@ export default function ConfirmDelete({
   }, [formState, onCloseModal, storedName]);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 min-w-96 pb-8 px-12 pt-10 shadow-form">
       <HeadingSecondary>Delete {resourceName}</HeadingSecondary>
 
       <p className="text-base font-sans">

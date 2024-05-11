@@ -75,16 +75,16 @@ function Content({
   const { openName, close } = useContext(ModalContext);
   const modalRef = useRef<HTMLDivElement | null>(null);
 
-  useCloseOnClickOutside(name === openName, close, modalRef);
-  useKeyboardInteractions(name === openName, close, modalRef);
+  useCloseOnClickOutside(openName.length > 0, close, modalRef);
+  useKeyboardInteractions(openName.length > 0, close, modalRef);
 
   useEffect(() => {
-    if (name === openName || isOpenFromOutside) {
+    if (openName.length > 0 || isOpenFromOutside) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "auto";
     }
-  }, [name, openName, isOpenFromOutside]);
+  }, [openName, isOpenFromOutside]);
 
   if (children && name !== openName) return null;
   if (!children && !isOpenFromOutside) return null;
@@ -106,12 +106,12 @@ function Content({
           {children ? (
             <div
               ref={modalRef}
-              className="min-w-96 pb-8 px-12 pt-10 bg-white shadow-form rounded-md text-zinc-800 relative [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:top-4 [&>*:nth-child(1)]:right-4"
+              className="bg-white rounded-md text-zinc-800 relative max-w-2xl w-full [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:top-4 [&>*:nth-child(1)]:right-4"
             >
               <ButtonIcon variant="small" onClick={close}>
                 <PiXThin />
               </ButtonIcon>
-              <div>{cloneElement(children, { onCloseModal: close })}</div>
+              {cloneElement(children, { onCloseModal: close })}
             </div>
           ) : null}
         </div>,

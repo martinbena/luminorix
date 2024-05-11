@@ -23,7 +23,7 @@ export default function ButtonIcon({
           : variant === "large"
           ? "child:h-12 child:w-12"
           : ""
-      } ${additionalClasses}`}
+      } ${additionalClasses ?? ""}`}
       onClick={onClick}
       tabIndex={tabIndex}
     >
