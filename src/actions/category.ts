@@ -12,7 +12,8 @@ import { z } from "zod";
 const createCategorySchema = z.object({
   title: z
     .string()
-    .min(3, { message: "Category title must be at least 3 characters long" }),
+    .min(3, { message: "Category title must be at least 3 characters long" })
+    .max(30),
 });
 
 interface CreateCategoryFormState {

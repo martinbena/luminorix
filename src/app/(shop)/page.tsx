@@ -23,7 +23,7 @@ export default function Home() {
       <ProductRow
         title="Top discounts"
         hasLink={true}
-        linkTo={paths.tagShow("discounts")}
+        linkTo={paths.discountShowAll()}
       >
         <Product />
         <Product />

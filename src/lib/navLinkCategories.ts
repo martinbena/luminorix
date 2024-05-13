@@ -29,15 +29,15 @@ export const categoryLinks = [
 
 export const tagLinks = [
   {
-    href: paths.tagShow("discounts"),
+    href: paths.discountShowAll(),
     description: "Discounts",
   },
   {
-    href: paths.tagShow("market"),
+    href: paths.marketItemShowAll(),
     description: "Market",
   },
   {
-    href: paths.tagShow("free-shipping"),
+    href: paths.freeShippingShowAll(),
     description: "Free Shipping",
   },
 ];
@@ -85,10 +85,6 @@ export const adminLinks = [
   {
     href: paths.adminCategoryShow(),
     description: "Categories",
-  },
-  {
-    href: paths.adminTagShow(),
-    description: "Tags",
   },
   {
     href: paths.adminOrderShow(),

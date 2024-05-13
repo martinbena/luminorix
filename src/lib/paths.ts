@@ -17,11 +17,11 @@ const paths = {
   marketItemCreate() {
     return `/market/add-item`;
   },
-  tagsShowAll() {
-    return "/tags";
+  discountShowAll() {
+    return `/discounts`;
   },
-  tagShow(tagSlug: string) {
-    return `/tags/${tagSlug}`;
+  freeShippingShowAll() {
+    return `/free-shipping`;
   },
   userProfile() {
     return "/profile";
@@ -58,9 +58,6 @@ const paths = {
   },
   adminCategoryShow() {
     return "/admin/categories";
-  },
-  adminTagShow() {
-    return "/admin/tags";
   },
   adminOrderShow() {
     return "/admin/orders";
