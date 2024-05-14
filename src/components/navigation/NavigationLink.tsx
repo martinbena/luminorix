@@ -15,7 +15,10 @@ export default function NavigationLink({
   activeClasses = "bg-amber-200",
 }: NavigationLinkProps) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isActive =
+    pathname === href ||
+    (pathname.includes(`${href}/`) && href.split("/").length > 2);
+
   return (
     <li className="child:flex child:flex-1 child:py-2.5 child:pl-12">
       <Link className={`${isActive ? `${activeClasses}` : ""}`} href={href}>

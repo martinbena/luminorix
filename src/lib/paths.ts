@@ -51,7 +51,7 @@ const paths = {
     return "/admin";
   },
   adminProductCreate() {
-    return "/admin/add-product";
+    return "/admin/products/add-product";
   },
   adminProductShow() {
     return "/admin/products";

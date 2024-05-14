@@ -13,7 +13,7 @@ export default function LoginForm() {
   });
 
   return (
-    <div className="flex flex-col gap-8 divide-y-2">
+    <div className="flex flex-col gap-8 divide-y-2 child:min-w-96 child:mob:min-w-0">
       <Form formAction={action}>
         <Form.Title textAlign="left">Welcome back!</Form.Title>
         <Form.InputGroup

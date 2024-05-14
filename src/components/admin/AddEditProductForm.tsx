@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
 import { Product } from "@/models/Product";
+import HeadingTertiary from "../ui/HeadingTertiary";
 
 interface AddEditProductFormProps {
   onCloseModal?: () => void;
@@ -63,6 +64,97 @@ export default function AddEditProductForm({
         >
           Title
         </Form.InputGroup>
+        <Form.InputGroup
+          inputType="textarea"
+          name={isEditSession ? "edit-description" : "description"}
+          placeholder="Add a description of the product"
+          error={formState.errors.title}
+          value={product?.title}
+          inputRef={firstInputRef}
+        >
+          Description
+        </Form.InputGroup>
+        <Form.InputGroup
+          inputType="checkbox"
+          name={isEditSession ? "edit-shipping" : "shipping"}
+          placeholder="20"
+          error={formState.errors.title}
+          value={product?.title}
+          inputRef={firstInputRef}
+        >
+          Free shipping
+        </Form.InputGroup>
+
+        <HeadingTertiary>Default variant</HeadingTertiary>
+
+        <div className="grid grid-cols-3 gap-6">
+          <Form.InputGroup
+            inputType="text"
+            name={isEditSession ? "edit-sku" : "sku"}
+            placeholder="WA-01-01"
+            error={formState.errors.title}
+            value={product?.title}
+            inputRef={firstInputRef}
+          >
+            SKU
+          </Form.InputGroup>
+
+          <Form.InputGroup
+            inputType="number"
+            name={isEditSession ? "edit-price" : "price"}
+            placeholder="129.99"
+            error={formState.errors.title}
+            value={product?.title}
+            inputRef={firstInputRef}
+          >
+            Price
+          </Form.InputGroup>
+          <Form.InputGroup
+            inputType="number"
+            name={isEditSession ? "edit-previous-price" : "previous-price"}
+            placeholder="199.99"
+            error={formState.errors.title}
+            value={product?.title}
+            inputRef={firstInputRef}
+          >
+            Previous price
+          </Form.InputGroup>
+
+          <Form.InputGroup
+            inputType="number"
+            name={isEditSession ? "edit-stock" : "stock"}
+            placeholder="20"
+            error={formState.errors.title}
+            value={product?.title}
+            inputRef={firstInputRef}
+          >
+            Stock
+          </Form.InputGroup>
+
+          <Form.InputGroup
+            inputType="text"
+            name={isEditSession ? "edit-color" : "color"}
+            placeholder="Gold"
+            error={formState.errors.title}
+            value={product?.title}
+            inputRef={firstInputRef}
+          >
+            Color
+          </Form.InputGroup>
+
+          <Form.InputGroup
+            inputType="text"
+            name={isEditSession ? "edit-size" : "size"}
+            placeholder="32"
+            error={formState.errors.title}
+            value={product?.title}
+            inputRef={firstInputRef}
+          >
+            Size
+          </Form.InputGroup>
+        </div>
+        <Form.ImagePicker name="image" />
+
         {formState.errors._form ? (
           <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
         ) : null}
