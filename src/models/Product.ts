@@ -54,17 +54,17 @@ const variantSchema = new mongoose.Schema<Variant>(
     previousPrice: Number,
     color: String,
     size: String,
-    stock: Number,
-    sold: Number,
+    stock: {
+      type: Number,
+      required: true,
+    },
+    sold: {
+      type: Number,
+      default: 0,
+    },
     image: {
-      public_id: {
-        type: String,
-        default: "",
-      },
-      secure_url: {
-        type: String,
-        default: "",
-      },
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }
@@ -114,6 +114,7 @@ const productSchema = new mongoose.Schema<Product>(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
+      required: true,
     },
     soldTotal: {
       type: Number,

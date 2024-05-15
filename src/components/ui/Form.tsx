@@ -191,7 +191,7 @@ function ImagePicker({
   optionalField = false,
   isReset,
 }: ImagePickerProps) {
-  const [pickedImage, setPickedImage] = useState<string | null>(null); 
+  const [pickedImage, setPickedImage] = useState<string | null>(null);
   const imageInput = useRef<HTMLInputElement>(null);
   function handlePickClick() {
     imageInput.current?.click();
@@ -202,18 +202,12 @@ function ImagePicker({
       handleReset();
     }
   }, [isReset]);
- 
-  if (pickedImage) {
-    console.log("Image is picked", imageInput.current?.value);
-  } else {
-    console.log("Image IS NOT picked", imageInput.current?.value);
-  }
 
   function handleImageChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
 
     if (!file) {
-      setPickedImage(null);     
+      setPickedImage(null);
       return;
     }
 
@@ -279,7 +273,7 @@ function ImagePicker({
           id={name}
           accept="image/png, image/jpeg"
           name={name}
-          ref={imageInput}        
+          ref={imageInput}
           onChange={handleImageChange}
         />
         <Button type="secondary" onClick={handlePickClick}>

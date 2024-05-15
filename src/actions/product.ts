@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import ConnectDB from "@/db/connectDB";
+import cloudinary from "@/lib/cloudinary";
 import paths from "@/lib/paths";
 import Product from "@/models/Product";
 import { revalidatePath } from "next/cache";
@@ -101,6 +102,19 @@ export async function createProduct(
   try {
     await ConnectDB();
 
+    ///////// Upload Image ////////////
+    const imageBuffer = await result.data.image.arrayBuffer();
+    const imageArray = Array.from(new Uint8Array(imageBuffer));
+    const imageData = Buffer.from(imageArray);
+
+    const imageBase64 = imageData.toString("base64");
+
+    const uploadResult = await cloudinary.uploader.upload(
+      `data:image/png;base64,${imageBase64}`,
+      { folder: "luminorix" }
+    );
+    //////////////////////////////////
+
     const newProduct = new Product({
       category: result.data.category,
       title: result.data.title,
@@ -118,6 +132,7 @@ export async function createProduct(
           color: result.data.color,
           size: result.data.size,
           stock: result.data.stock,
+          image: uploadResult.secure_url,
         },
       ],
     });
