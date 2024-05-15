@@ -41,6 +41,7 @@ const variantSchema = new mongoose.Schema<Variant>(
   {
     sku: {
       type: String,
+      minlength: 3,
       maxlength: 50,
       unique: true,
     },
@@ -88,6 +89,7 @@ const productSchema = new mongoose.Schema<Product>(
       trim: true,
       required: true,
       unique: true,
+      minlength: 3,
       maxlength: 160,
       text: true,
     },
@@ -100,7 +102,7 @@ const productSchema = new mongoose.Schema<Product>(
       type: String,
       trim: true,
       required: true,
-      minlength: 100,
+      minlength: 50,
       maxlength: 2000,
       text: true,
     },

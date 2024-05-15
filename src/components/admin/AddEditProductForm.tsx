@@ -3,31 +3,36 @@
 import * as actions from "@/actions";
 import { useFormState } from "react-dom";
 import Form from "../ui/Form";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
 import { Product } from "@/models/Product";
 import HeadingTertiary from "../ui/HeadingTertiary";
+import { Category } from "@/models/Category";
 
 interface AddEditProductFormProps {
   onCloseModal?: () => void;
   isEditSession?: boolean;
   product?: Product;
+  categories: Category[];
 }
 
 export default function AddEditProductForm({
   onCloseModal,
   isEditSession = false,
   product,
+  categories,
 }: AddEditProductFormProps) {
   const formAction = isEditSession
     ? actions.editCategory.bind(null, product?._id)
-    : actions.createCategory;
+    : actions.createProduct;
 
-  const [formState, action] = useFormState(formAction, {
+  const [formState, action] = useFormState(actions.createProduct, {
     errors: {},
     success: false,
   });
+
+  const [resetImage, setResetImage] = useState<boolean>(false);
 
   const formRef = useRef<HTMLFormElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
@@ -38,10 +43,12 @@ export default function AddEditProductForm({
     }
 
     if (formState.success) {
+      setResetImage(true);
       toast.success(
         `Product was successfully ${isEditSession ? "edited" : "created"}`
       );
       onCloseModal?.();
+      setTimeout(() => setResetImage(false), 100);
     }
 
     if (Object.keys(formState.errors).length === 0) {
@@ -55,8 +62,17 @@ export default function AddEditProductForm({
           {isEditSession ? `Edit ${product?.title}` : "Add product"}
         </Form.Title>
         <Form.InputGroup
+          inputType="select"
+          name="category"
+          error={formState.errors.category}
+          value={product?.title}
+          options={categories}
+        >
+          Category
+        </Form.InputGroup>
+        <Form.InputGroup
           inputType="text"
-          name={isEditSession ? "edit-title" : "title"}
+          name="title"
           placeholder="Rolex chronometer"
           error={formState.errors.title}
           value={product?.title}
@@ -66,94 +82,108 @@ export default function AddEditProductForm({
         </Form.InputGroup>
         <Form.InputGroup
           inputType="textarea"
-          name={isEditSession ? "edit-description" : "description"}
+          name="description"
           placeholder="Add a description of the product"
-          error={formState.errors.title}
-          value={product?.title}
-          inputRef={firstInputRef}
+          error={formState.errors.description}
+          value={product?.description}
         >
           Description
         </Form.InputGroup>
-        <Form.InputGroup
-          inputType="checkbox"
-          name={isEditSession ? "edit-shipping" : "shipping"}
-          placeholder="20"
-          error={formState.errors.title}
-          value={product?.title}
-          inputRef={firstInputRef}
-        >
-          Free shipping
-        </Form.InputGroup>
+
+        <div className="flex justify-between items-center">
+          <Form.InputGroup
+            inputType="text"
+            name="brand"
+            placeholder="Rolex"
+            error={formState.errors.brand}
+            value={product?.brand}
+          >
+            Brand
+          </Form.InputGroup>
+          <Form.InputGroup
+            inputType="checkbox"
+            name="shipping"
+            placeholder="20"
+            error={undefined}
+            value={product?.title}
+            optionalField={true}
+          >
+            Free shipping
+          </Form.InputGroup>
+        </div>
 
         <HeadingTertiary>Default variant</HeadingTertiary>
 
         <div className="grid grid-cols-3 gap-6">
           <Form.InputGroup
             inputType="text"
-            name={isEditSession ? "edit-sku" : "sku"}
+            name="sku"
             placeholder="WA-01-01"
-            error={formState.errors.title}
+            error={formState.errors.sku}
             value={product?.title}
-            inputRef={firstInputRef}
           >
             SKU
           </Form.InputGroup>
 
           <Form.InputGroup
             inputType="number"
-            name={isEditSession ? "edit-price" : "price"}
+            step={0.01}
+            name="price"
             placeholder="129.99"
-            error={formState.errors.title}
+            error={formState.errors.price}
             value={product?.title}
-            inputRef={firstInputRef}
           >
             Price
           </Form.InputGroup>
           <Form.InputGroup
             inputType="number"
-            name={isEditSession ? "edit-previous-price" : "previous-price"}
+            step={0.01}
+            name="previous-price"
             placeholder="199.99"
-            error={formState.errors.title}
+            error={formState.errors.previousPrice}
             value={product?.title}
-            inputRef={firstInputRef}
+            optionalField={true}
           >
             Previous price
           </Form.InputGroup>
 
           <Form.InputGroup
             inputType="number"
-            name={isEditSession ? "edit-stock" : "stock"}
+            name="stock"
             placeholder="20"
-            error={formState.errors.title}
+            error={formState.errors.stock}
             value={product?.title}
-            inputRef={firstInputRef}
           >
             Stock
           </Form.InputGroup>
 
           <Form.InputGroup
             inputType="text"
-            name={isEditSession ? "edit-color" : "color"}
+            name="color"
             placeholder="Gold"
-            error={formState.errors.title}
+            error={formState.errors.color}
             value={product?.title}
-            inputRef={firstInputRef}
+            optionalField={true}
           >
             Color
           </Form.InputGroup>
 
           <Form.InputGroup
             inputType="text"
-            name={isEditSession ? "edit-size" : "size"}
+            name="size"
             placeholder="32"
-            error={formState.errors.title}
+            error={formState.errors.size}
             value={product?.title}
-            inputRef={firstInputRef}
+            optionalField={true}
           >
             Size
           </Form.InputGroup>
         </div>
-        <Form.ImagePicker name="image" />
+        <Form.ImagePicker
+          name="image"
+          error={formState.errors.image}
+          isReset={resetImage}
+        />
 
         {formState.errors._form ? (
           <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>

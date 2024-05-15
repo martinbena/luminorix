@@ -5,3 +5,4 @@ export { registerUser } from "./register-user";
 export { createCategory } from "./category";
 export { editCategory } from "./category";
 export { deleteCategory } from "./category";
+export { createProduct } from "./product";
