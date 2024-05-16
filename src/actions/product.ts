@@ -8,6 +8,8 @@ import Product from "@/models/Product";
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { z } from "zod";
+import { DeleteItemState } from "./category";
+import mongoose from "mongoose";
 
 const productVariantSchema = z.object({
   color: z.string().optional(),
@@ -165,5 +167,27 @@ export async function createProduct(
         },
       };
     }
+  }
+}
+
+export async function deleteProduct(
+  id: mongoose.Types.ObjectId
+): Promise<DeleteItemState> {
+  try {
+    await ConnectDB();
+    await Product.findByIdAndDelete(id);
+    revalidatePath("/", "layout");
+    return {
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+      };
+    }
+    return {
+      error: "Product could not be deleted. Please try again later",
+    };
   }
 }

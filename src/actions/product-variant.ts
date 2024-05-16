@@ -5,8 +5,10 @@ import ConnectDB from "@/db/connectDB";
 import cloudinary from "@/lib/cloudinary";
 import paths from "@/lib/paths";
 import Product from "@/models/Product";
+import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { DeleteItemState } from "./category";
 
 const productVariantSchema = z.object({
   color: z.string().optional(),
@@ -137,5 +139,35 @@ export async function addVariantToProduct(
         },
       };
     }
+  }
+}
+
+export async function removeVariantFromProduct(
+  id: mongoose.Types.ObjectId,
+  sku: string
+): Promise<DeleteItemState> {
+  try {
+    await ConnectDB();
+    await Product.findByIdAndUpdate(id, {
+      $pull: {
+        variants: {
+          sku,
+        },
+      },
+    });
+
+    revalidatePath("/", "layout");
+    return {
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+      };
+    }
+    return {
+      error: "Product variant could not be deleted. Please try again later",
+    };
   }
 }

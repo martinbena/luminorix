@@ -69,7 +69,11 @@ export default async function AdminAllProductsPage() {
                   </div>
                   <AdminActions
                     item={product}
-                    onDelete={actions.deleteCategory.bind(null, product._id)}
+                    onDelete={actions.removeVariantFromProduct.bind(
+                      null,
+                      product._id,
+                      product.sku
+                    )}
                     editForm={
                       <AddEditProductForm
                         isEditSession={true}
