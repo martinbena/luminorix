@@ -26,7 +26,7 @@ const ratingSchema = new mongoose.Schema<Rating>(
   { timestamps: true }
 );
 
-interface Variant extends Document {
+export interface Variant extends Document {
   sku: string;
   price: number;
   previousPrice: number;
@@ -81,6 +81,8 @@ export interface Product extends Document {
   variants: Variant[];
   ratings: Rating[];
 }
+
+export interface ProductWithVariant extends Product, Variant {}
 
 const productSchema = new mongoose.Schema<Product>(
   {

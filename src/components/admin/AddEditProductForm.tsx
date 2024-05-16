@@ -6,14 +6,14 @@ import Form from "../ui/Form";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import Button from "../ui/Button";
-import { Product } from "@/models/Product";
+import { ProductWithVariant } from "@/models/Product";
 import HeadingTertiary from "../ui/HeadingTertiary";
 import { Category } from "@/models/Category";
 
 interface AddEditProductFormProps {
   onCloseModal?: () => void;
   isEditSession?: boolean;
-  product?: Product;
+  product?: ProductWithVariant;
   categories: Category[];
 }
 

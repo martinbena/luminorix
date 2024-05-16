@@ -21,7 +21,7 @@ export default async function AdminCategoriesPage() {
         <AddEditCategoryForm />
 
         <TableContainer>
-          <Table>
+          <Table maxWidth="max-w-2xl">
             <TableHeader>Categories</TableHeader>
             <TableBody
               data={categories}
