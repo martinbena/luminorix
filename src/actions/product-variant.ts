@@ -182,20 +182,19 @@ export async function removeVariantFromProduct(
     }
 
     if (!result) {
+      ////////// Delete image from cloudinary //////////
+
+      const variant = product.variants.find((v: VariantType) => v.sku === sku);
+
+      const imageUrlParts = variant.image.split("/");
+      const imagePublicId = imageUrlParts.at(-1).split(".").at(0);
+
+      if (imagePublicId) {
+        await cloudinary.uploader.destroy("luminorix/" + imagePublicId);
+      }
+      //////////////////////////////////////////////////
       throw new Error("Failed to remove the variant from the product");
     }
-
-    ////////// Delete image from cloudinary //////////
-
-    const variant = product.variants.find((v: VariantType) => v.sku === sku);
-
-    const imageUrlParts = variant.image.split("/");
-    const imagePublicId = imageUrlParts.at(-1).split(".").at(0);
-
-    if (imagePublicId) {
-      await cloudinary.uploader.destroy("luminorix/" + imagePublicId);
-    }
-    //////////////////////////////////////////////////
 
     revalidatePath("/", "layout");
     return {
