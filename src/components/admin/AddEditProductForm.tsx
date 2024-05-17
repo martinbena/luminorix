@@ -9,6 +9,8 @@ import Button from "../ui/Button";
 import { ProductWithVariant } from "@/models/Product";
 import HeadingTertiary from "../ui/HeadingTertiary";
 import { Category } from "@/models/Category";
+import { DiVim } from "react-icons/di";
+import Image from "next/image";
 
 interface AddEditProductFormProps {
   onCloseModal?: () => void;
@@ -59,13 +61,19 @@ export default function AddEditProductForm({
     <Form.Container>
       <Form formAction={action} formRef={formRef}>
         <Form.Title>
-          {isEditSession ? `Edit ${product?.title}` : "Add product"}
+          {isEditSession
+            ? `Edit ${product?.title}${
+                product?.color || product?.size ? ", " : ""
+              }${product?.color ? `${product.color} ` : ""}${
+                product?.size ? product.size : ""
+              }`
+            : "Add product"}
         </Form.Title>
         <Form.InputGroup
           inputType="select"
           name="category"
           error={formState.errors.category}
-          value={product?.title}
+          value={product?.category.toString()}
           options={categories}
         >
           Category
@@ -105,7 +113,7 @@ export default function AddEditProductForm({
             name="shipping"
             placeholder="20"
             error={undefined}
-            value={product?.title}
+            checked={product?.freeShipping}
             optionalField={true}
           >
             Free shipping
@@ -120,7 +128,7 @@ export default function AddEditProductForm({
             name="sku"
             placeholder="WA-01-01"
             error={formState.errors.sku}
-            value={product?.title}
+            value={product?.sku}
           >
             SKU
           </Form.InputGroup>
@@ -131,7 +139,7 @@ export default function AddEditProductForm({
             name="price"
             placeholder="129.99"
             error={formState.errors.price}
-            value={product?.title}
+            value={product?.price}
           >
             Price
           </Form.InputGroup>
@@ -141,7 +149,7 @@ export default function AddEditProductForm({
             name="previous-price"
             placeholder="199.99"
             error={formState.errors.previousPrice}
-            value={product?.title}
+            value={product?.previousPrice}
             optionalField={true}
           >
             Previous price
@@ -152,7 +160,7 @@ export default function AddEditProductForm({
             name="stock"
             placeholder="20"
             error={formState.errors.stock}
-            value={product?.title}
+            value={product?.stock}
           >
             Stock
           </Form.InputGroup>
@@ -162,7 +170,7 @@ export default function AddEditProductForm({
             name="color"
             placeholder="Gold"
             error={formState.errors.color}
-            value={product?.title}
+            value={product?.color}
             optionalField={true}
           >
             Color
@@ -173,17 +181,36 @@ export default function AddEditProductForm({
             name="size"
             placeholder="32"
             error={formState.errors.size}
-            value={product?.title}
+            value={product?.size}
             optionalField={true}
           >
             Size
           </Form.InputGroup>
         </div>
-        <Form.ImagePicker
-          name="image"
-          error={formState.errors.image}
-          isReset={resetImage}
-        />
+        <div className="flex gap-6">
+          <Form.ImagePicker
+            name="image"
+            optionalField={isEditSession ? true : false}
+            error={formState.errors.image}
+            isReset={resetImage}
+          />
+
+          {isEditSession && product ? (
+            <div className="flex flex-col gap-2">
+              <p>Current image</p>
+              <div className="h-40 w-40 overflow-hidden">
+                <Image
+                  src={product?.image}
+                  alt="Image of the product"
+                  height={0}
+                  width={0}
+                  sizes="100vw"
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          ) : null}
+        </div>
 
         {formState.errors._form ? (
           <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>

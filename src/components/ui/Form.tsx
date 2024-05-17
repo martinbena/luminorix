@@ -101,11 +101,12 @@ interface InputGroupProps {
   placeholder?: string;
   error: string[] | undefined;
   children: ReactNode;
-  value?: string;
+  value?: string | number;
   inputRef?: React.RefObject<HTMLInputElement>;
   options?: Option[];
   optionalField?: boolean;
   step?: number;
+  checked?: boolean;
 }
 
 function InputGroup({
@@ -119,6 +120,7 @@ function InputGroup({
   options,
   optionalField = false,
   step,
+  checked,
 }: InputGroupProps) {
   const commonProps = {
     id: name,
@@ -171,6 +173,7 @@ function InputGroup({
           step={inputType === "number" ? step : undefined}
           {...commonProps}
           ref={inputRef}
+          {...(inputType === "checkbox" ? { checked: checked } : {})}
         />
       )}
       {error && <Error>{error?.join(" | ")}</Error>}
