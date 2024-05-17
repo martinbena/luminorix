@@ -104,6 +104,16 @@ export async function createProduct(
   try {
     await ConnectDB();
 
+    const skuCount = await Product.countDocuments({
+      "variants.sku": result.data.sku,
+    });
+    const titleCount = await Product.countDocuments({
+      title: result.data.title,
+    });
+    if (skuCount !== 0 || titleCount !== 0) {
+      throw new Error("duplicate key");
+    }
+
     ///////// Upload Image ////////////
     const imageBuffer = await result.data.image.arrayBuffer();
     const imageArray = Array.from(new Uint8Array(imageBuffer));
@@ -139,6 +149,12 @@ export async function createProduct(
       ],
     });
 
+    if (!newProduct && uploadResult) {
+      const imageUrlParts = uploadResult.secure_url.split("/");
+      const imagePublicId = imageUrlParts?.at(-1)?.split(".").at(0);
+      await cloudinary.uploader.destroy("luminorix/" + imagePublicId);
+    }
+
     await newProduct.save();
 
     revalidatePath(paths.home(), "layout");
@@ -151,7 +167,7 @@ export async function createProduct(
       if (error.message.includes("duplicate key")) {
         return {
           errors: {
-            _form: ["This product already exists"],
+            _form: ["The product with this title or SKU already exists"],
           },
         };
       }

@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import ConnectDB from "@/db/connectDB";
 import cloudinary from "@/lib/cloudinary";
 import paths from "@/lib/paths";
-import Product from "@/models/Product";
+import Product, { Variant as VariantType } from "@/models/Product";
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -84,6 +84,14 @@ export async function addVariantToProduct(
   try {
     await ConnectDB();
 
+    const skuCount = await Product.countDocuments({
+      "variants.sku": result.data.sku,
+    });
+
+    if (skuCount !== 0) {
+      throw new Error("duplicate key - SKU");
+    }
+
     ///////// Upload Image ////////////
     const imageBuffer = await result.data.image.arrayBuffer();
     const imageArray = Array.from(new Uint8Array(imageBuffer));
@@ -97,7 +105,7 @@ export async function addVariantToProduct(
     );
     //////////////////////////////////
 
-    await Product.findByIdAndUpdate(result.data.product, {
+    const variantResult = await Product.findByIdAndUpdate(result.data.product, {
       $push: {
         variants: {
           sku: result.data.sku,
@@ -113,6 +121,12 @@ export async function addVariantToProduct(
       },
     });
 
+    if (!variantResult && uploadResult) {
+      const imageUrlParts = uploadResult.secure_url.split("/");
+      const imagePublicId = imageUrlParts?.at(-1)?.split(".").at(0);
+      await cloudinary.uploader.destroy("luminorix/" + imagePublicId);
+    }
+
     revalidatePath(paths.home(), "layout");
     return {
       errors: {},
@@ -123,7 +137,7 @@ export async function addVariantToProduct(
       if (error.message.includes("duplicate key")) {
         return {
           errors: {
-            _form: ["This variant already exists"],
+            _form: ["Variant with this SKU already exists"],
           },
         };
       }
@@ -148,13 +162,40 @@ export async function removeVariantFromProduct(
 ): Promise<DeleteItemState> {
   try {
     await ConnectDB();
-    await Product.findByIdAndUpdate(id, {
-      $pull: {
-        variants: {
-          sku,
+
+    const product = await Product.findById(id);
+    const isLastVariant = product.variants.length === 1;
+
+    let result;
+    if (isLastVariant) {
+      result = await Product.findByIdAndDelete(id);
+    }
+
+    if (!isLastVariant) {
+      result = await Product.findByIdAndUpdate(id, {
+        $pull: {
+          variants: {
+            sku,
+          },
         },
-      },
-    });
+      });
+    }
+
+    if (!result) {
+      throw new Error("Failed to remove the variant from the product");
+    }
+
+    ////////// Delete image from cloudinary //////////
+
+    const variant = product.variants.find((v: VariantType) => v.sku === sku);
+
+    const imageUrlParts = variant.image.split("/");
+    const imagePublicId = imageUrlParts.at(-1).split(".").at(0);
+
+    if (imagePublicId) {
+      await cloudinary.uploader.destroy("luminorix/" + imagePublicId);
+    }
+    //////////////////////////////////////////////////
 
     revalidatePath("/", "layout");
     return {
