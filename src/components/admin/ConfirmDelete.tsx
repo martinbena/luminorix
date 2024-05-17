@@ -34,7 +34,9 @@ export default function ConfirmDelete({
   }, [resourceName]);
 
   useEffect(() => {
+    document.body.style.overflow = "hidden";
     if (formState.success) {
+      console.log(formState.success);
       onCloseModal?.();
       toast.success(`${storedName} successfully deleted`);
     }
@@ -42,6 +44,10 @@ export default function ConfirmDelete({
     if (formState.error) {
       toast.error(formState.error);
     }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
   }, [formState, onCloseModal, storedName]);
 
   return (
