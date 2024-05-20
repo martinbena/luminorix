@@ -106,7 +106,7 @@ function Content({
           {children ? (
             <div
               ref={modalRef}
-              className="bg-white rounded-md text-zinc-800 relative max-w-2xl w-full [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:top-4 [&>*:nth-child(1)]:right-4"
+              className="bg-white rounded-md text-zinc-800 relative max-w-2xl w-full overflow-auto [&>*:nth-child(1)]:absolute [&>*:nth-child(1)]:top-4 [&>*:nth-child(1)]:right-4"
             >
               <ButtonIcon variant="small" onClick={close}>
                 <PiXThin />

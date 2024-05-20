@@ -8,7 +8,6 @@ import Product, { Variant as VariantType } from "@/models/Product";
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-// import { DeleteItemState } from "./category";
 
 const productVariantSchema = z.object({
   color: z.string().optional(),

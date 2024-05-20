@@ -9,7 +9,6 @@ import Button from "../ui/Button";
 import { ProductWithVariant } from "@/models/Product";
 import HeadingTertiary from "../ui/HeadingTertiary";
 import { Category } from "@/models/Category";
-import { DiVim } from "react-icons/di";
 import Image from "next/image";
 
 interface AddEditProductFormProps {
@@ -26,10 +25,10 @@ export default function AddEditProductForm({
   categories,
 }: AddEditProductFormProps) {
   const formAction = isEditSession
-    ? actions.editCategory.bind(null, product?._id)
+    ? actions.editProductWithVariant.bind(null, product?._id, product?.sku!)
     : actions.createProduct;
 
-  const [formState, action] = useFormState(actions.createProduct, {
+  const [formState, action] = useFormState(formAction, {
     errors: {},
     success: false,
   });
@@ -63,9 +62,9 @@ export default function AddEditProductForm({
         <Form.Title>
           {isEditSession
             ? `Edit ${product?.title}${
-                product?.color || product?.size ? ", " : ""
-              }${product?.color ? `${product.color} ` : ""}${
-                product?.size ? product.size : ""
+                product?.color || product?.size ? "," : ""
+              }${product?.color ? ` ${product.color}` : ""}${
+                product?.size ? ` ${product.size}` : ""
               }`
             : "Add product"}
         </Form.Title>
@@ -120,14 +119,17 @@ export default function AddEditProductForm({
           </Form.InputGroup>
         </div>
 
-        <HeadingTertiary>Default variant</HeadingTertiary>
+        <HeadingTertiary>
+          {isEditSession ? "Selected" : "Default"} variant
+        </HeadingTertiary>
 
         <div className="grid grid-cols-3 gap-6">
           <Form.InputGroup
             inputType="text"
             name="sku"
             placeholder="WA-01-01"
-            error={formState.errors.sku}
+            error={undefined}
+            isReadOnly={isEditSession}
             value={product?.sku}
           >
             SKU

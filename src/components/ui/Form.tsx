@@ -107,6 +107,7 @@ interface InputGroupProps {
   optionalField?: boolean;
   step?: number;
   checked?: boolean;
+  isReadOnly?: boolean;
 }
 
 function InputGroup({
@@ -121,14 +122,15 @@ function InputGroup({
   optionalField = false,
   step,
   checked,
+  isReadOnly,
 }: InputGroupProps) {
   const commonProps = {
     id: name,
     name,
     placeholder,
     defaultValue: value,
-    className: `${
-      inputType === "checkbox" ? "accent-amber-400 h-4 w-4" : ""
+    className: `${inputType === "checkbox" ? "accent-amber-400 h-4 w-4" : ""} ${
+      isReadOnly ? "cursor-not-allowed bg-zinc-100" : ""
     } border text-base focus:outline-none max-w-full px-4 py-3 ${
       error
         ? "border-red-600 focus:border-red-600"
@@ -173,7 +175,8 @@ function InputGroup({
           step={inputType === "number" ? step : undefined}
           {...commonProps}
           ref={inputRef}
-          {...(inputType === "checkbox" ? { checked: checked } : {})}
+          {...(inputType === "checkbox" ? { defaultChecked: checked } : {})}
+          {...(inputType === "text" && isReadOnly ? { readOnly: true } : {})}
         />
       )}
       {error && <Error>{error?.join(" | ")}</Error>}

@@ -53,7 +53,13 @@ export default async function AdminAllProductsPage() {
                       width={0}
                     />
                   </div>
-                  <ItemTitle>{product.title}</ItemTitle>
+                  <ItemTitle>
+                    {`${product?.title}${
+                      product?.color || product?.size ? "," : ""
+                    }${product?.color ? ` ${product.color}` : ""}${
+                      product?.size ? ` ${product.size}` : ""
+                    }`}
+                  </ItemTitle>
                   <div>{product.brand}</div>
                   <div className="font-semibold">
                     {formatCurrency(product.price)}
