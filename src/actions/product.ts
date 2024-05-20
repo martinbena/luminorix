@@ -31,6 +31,10 @@ const productVariantSchema = z.object({
     .refine(
       (file) => file.size < 5 * 1024 * 1024,
       "Image size must be less than 5MB"
+    )
+    .refine(
+      (file) => ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
+      { message: "Invalid image format. Accepted formats: jpg, jpeg, png" }
     ),
   sku: z
     .string()
@@ -64,9 +68,16 @@ const editProductWithVariantSchema = z.object({
   ...productVariantEditSchema.shape,
   image: z
     .instanceof(File)
+    .optional()
+    .refine((file) => !file || file.size < 5 * 1024 * 1024, {
+      message: "Image size must be less than 5MB",
+    })
     .refine(
-      (file) => file.size < 5 * 1024 * 1024,
-      "Image size must be less than 5MB"
+      (file) =>
+        !file ||
+        (file.size === 0 && file.type === "application/octet-stream") ||
+        ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
+      { message: "Invalid image format. Accepted formats: jpg, jpeg, png" }
     ),
 });
 
@@ -280,7 +291,7 @@ export async function editProductWithVariant(
 
     let newImageUrl;
 
-    if (result.data.image.size > 0) {
+    if (result.data.image && result.data.image.size > 0) {
       newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
     }
 
@@ -306,12 +317,18 @@ export async function editProductWithVariant(
           "variants.$.size": result.data.size,
           "variants.$.stock": result.data.stock,
           "variants.$.image":
-            result.data.image.size > 0 ? newImageUrl : oldImageUrl,
+            result.data.image && result.data.image.size > 0
+              ? newImageUrl
+              : oldImageUrl,
         },
       }
     ).exec();
 
-    if (result.data.image.size > 0 && editResult.modifiedCount !== 0) {
+    if (
+      result.data.image &&
+      result.data.image.size > 0 &&
+      editResult.modifiedCount !== 0
+    ) {
       await removeImageFromCloudinary(oldImageUrl);
     }
 

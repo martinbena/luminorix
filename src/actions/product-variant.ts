@@ -24,6 +24,10 @@ const productVariantSchema = z.object({
     .refine(
       (file) => file.size < 5 * 1024 * 1024,
       "Image size must be less than 5MB"
+    )
+    .refine(
+      (file) => ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
+      { message: "Invalid image format. Accepted formats: jpg, jpeg, png" }
     ),
   stock: z
     .string()
