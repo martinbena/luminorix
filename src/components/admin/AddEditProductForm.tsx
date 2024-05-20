@@ -97,7 +97,7 @@ export default function AddEditProductForm({
           Description
         </Form.InputGroup>
 
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center mob-sm:flex-col mob-sm:items-start mob-sm:gap-8">
           <Form.InputGroup
             inputType="text"
             name="brand"
@@ -123,7 +123,7 @@ export default function AddEditProductForm({
           {isEditSession ? "Selected" : "Default"} variant
         </HeadingTertiary>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 gap-6 mob:grid-cols-2 mob:gap-3">
           <Form.InputGroup
             inputType="text"
             name="sku"
@@ -189,7 +189,7 @@ export default function AddEditProductForm({
             Size
           </Form.InputGroup>
         </div>
-        <div className="flex gap-6">
+        <div className="flex gap-6 mob:flex-col">
           <Form.ImagePicker
             name="image"
             optionalField={isEditSession ? true : false}
@@ -217,8 +217,8 @@ export default function AddEditProductForm({
         {formState.errors._form ? (
           <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
         ) : null}
-        <div className="flex justify-between">
-          <Form.Button width="w-1/2">
+        <div className="flex justify-between mob:flex-col gap-5">
+          <Form.Button width="w-1/2 mob:w-full">
             {isEditSession ? "Edit" : "Create"} product
           </Form.Button>
           {isEditSession ? (

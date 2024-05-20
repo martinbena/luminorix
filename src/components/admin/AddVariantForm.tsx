@@ -9,22 +9,10 @@ import Button from "../ui/Button";
 import { Product } from "@/models/Product";
 
 interface AddEditProductFormProps {
-  onCloseModal?: () => void;
-  isEditSession?: boolean;
-  product?: Product;
   products: Product[];
 }
 
-export default function AddVariantForm({
-  onCloseModal,
-  isEditSession = false,
-  product,
-  products,
-}: AddEditProductFormProps) {
-  const formAction = isEditSession
-    ? actions.editCategory.bind(null, product?._id)
-    : actions.createProduct;
-
+export default function AddVariantForm({ products }: AddEditProductFormProps) {
   const [formState, action] = useFormState(actions.addVariantToProduct, {
     errors: {},
     success: false,
@@ -33,51 +21,37 @@ export default function AddVariantForm({
   const [resetImage, setResetImage] = useState<boolean>(false);
 
   const formRef = useRef<HTMLFormElement>(null);
-  const firstInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isEditSession) {
-      firstInputRef.current?.focus();
-    }
-
     if (formState.success) {
       setResetImage(true);
-      toast.success(
-        `Product variant was successfully ${
-          isEditSession ? "edited" : "created"
-        }`
-      );
-      onCloseModal?.();
+      toast.success("Product variant was successfully created");
       setTimeout(() => setResetImage(false), 100);
     }
 
     if (Object.keys(formState.errors).length === 0) {
       formRef.current?.reset();
     }
-  }, [formState, onCloseModal, isEditSession]);
+  }, [formState]);
   return (
     <Form.Container>
       <Form formAction={action} formRef={formRef}>
-        <Form.Title>
-          {isEditSession ? `Edit ${product?.title}` : "Add variant"}
-        </Form.Title>
+        <Form.Title>Add variant</Form.Title>
         <Form.InputGroup
           inputType="select"
           name="product"
           error={formState.errors.product}
-          value={product?.title}
           options={products}
         >
           Product
         </Form.InputGroup>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-3 gap-6 mob:grid-cols-2 mob:gap-3">
           <Form.InputGroup
             inputType="text"
             name="sku"
             placeholder="WA-01-01"
             error={formState.errors.sku}
-            value={product?.title}
           >
             SKU
           </Form.InputGroup>
@@ -88,7 +62,6 @@ export default function AddVariantForm({
             name="price"
             placeholder="129.99"
             error={formState.errors.price}
-            value={product?.title}
           >
             Price
           </Form.InputGroup>
@@ -98,7 +71,6 @@ export default function AddVariantForm({
             name="previous-price"
             placeholder="199.99"
             error={formState.errors.previousPrice}
-            value={product?.title}
             optionalField={true}
           >
             Previous price
@@ -109,7 +81,6 @@ export default function AddVariantForm({
             name="stock"
             placeholder="20"
             error={formState.errors.stock}
-            value={product?.title}
           >
             Stock
           </Form.InputGroup>
@@ -119,7 +90,6 @@ export default function AddVariantForm({
             name="color"
             placeholder="Gold"
             error={formState.errors.color}
-            value={product?.title}
             optionalField={true}
           >
             Color
@@ -130,7 +100,6 @@ export default function AddVariantForm({
             name="size"
             placeholder="32"
             error={formState.errors.size}
-            value={product?.title}
             optionalField={true}
           >
             Size
@@ -146,14 +115,7 @@ export default function AddVariantForm({
           <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
         ) : null}
         <div className="flex justify-between">
-          <Form.Button width="w-1/2">
-            {isEditSession ? "Edit" : "Add"} variant
-          </Form.Button>
-          {isEditSession ? (
-            <Button onClick={onCloseModal} type="tertiary">
-              Cancel
-            </Button>
-          ) : null}
+          <Form.Button width="w-1/2 mob:w-full">Add variant</Form.Button>
         </div>
       </Form>
     </Form.Container>

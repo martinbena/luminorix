@@ -250,7 +250,7 @@ function ImagePicker({
           </span>
         ) : null}
       </label>
-      <div className=" flex items-start gap-6 mb-4">
+      <div className="flex items-start gap-6 mb-4 mob:flex-col">
         <div className="w-40 h-40 border-2 border-zinc-400 flex justify-center items-center text-center relative">
           {!pickedImage && (
             <p className={`${error ? "text-red-600" : ""} m-0 p-1`}>
