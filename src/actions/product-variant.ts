@@ -2,12 +2,16 @@
 
 import { auth } from "@/auth";
 import ConnectDB from "@/db/connectDB";
-import cloudinary from "@/lib/cloudinary";
 import paths from "@/lib/paths";
 import Product, { Variant as VariantType } from "@/models/Product";
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { DeleteItemState } from "./category";
+import {
+  removeImageFromCloudinary,
+  uploadIamgeToCloudinaryAndGetUrl,
+} from "@/lib/helpers";
 
 const productVariantSchema = z.object({
   color: z.string().optional(),
@@ -91,18 +95,7 @@ export async function addVariantToProduct(
       throw new Error("duplicate key - SKU");
     }
 
-    ///////// Upload Image ////////////
-    const imageBuffer = await result.data.image.arrayBuffer();
-    const imageArray = Array.from(new Uint8Array(imageBuffer));
-    const imageData = Buffer.from(imageArray);
-
-    const imageBase64 = imageData.toString("base64");
-
-    const uploadResult = await cloudinary.uploader.upload(
-      `data:image/png;base64,${imageBase64}`,
-      { folder: "luminorix" }
-    );
-    //////////////////////////////////
+    const imageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
 
     const variantResult = await Product.findByIdAndUpdate(result.data.product, {
       $push: {
@@ -115,15 +108,13 @@ export async function addVariantToProduct(
           color: result.data.color,
           size: result.data.size,
           stock: result.data.stock,
-          image: uploadResult.secure_url,
+          image: imageUrl,
         },
       },
     });
 
-    if (!variantResult && uploadResult) {
-      const imageUrlParts = uploadResult.secure_url.split("/");
-      const imagePublicId = imageUrlParts?.at(-1)?.split(".").at(0);
-      await cloudinary.uploader.destroy("luminorix/" + imagePublicId);
+    if (!variantResult && imageUrl) {
+      await removeImageFromCloudinary(imageUrl);
     }
 
     revalidatePath(paths.home(), "layout");
@@ -155,11 +146,6 @@ export async function addVariantToProduct(
   }
 }
 
-interface DeleteItemState {
-  error?: string;
-  success?: boolean;
-}
-
 export async function removeVariantFromProduct(
   id: mongoose.Types.ObjectId,
   sku: string
@@ -186,20 +172,13 @@ export async function removeVariantFromProduct(
     }
 
     if (!result) {
-      throw new Error("Failed to remove the variant from the product");
+      return {
+        error: "Failed to remove variant from the product",
+      };
     }
-
-    ////////// Delete image from cloudinary //////////
 
     const variant = product.variants.find((v: VariantType) => v.sku === sku);
-
-    const imageUrlParts = variant.image.split("/");
-    const imagePublicId = imageUrlParts.at(-1).split(".").at(0);
-
-    if (imagePublicId) {
-      await cloudinary.uploader.destroy("luminorix/" + imagePublicId);
-    }
-    //////////////////////////////////////////////////
+    await removeImageFromCloudinary(variant.image);
 
     revalidatePath("/", "layout");
     return {

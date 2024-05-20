@@ -36,7 +36,6 @@ export default function ConfirmDelete({
   useEffect(() => {
     document.body.style.overflow = "hidden";
     if (formState.success) {
-      console.log(formState.success);
       onCloseModal?.();
       toast.success(`${storedName} successfully deleted`);
     }
