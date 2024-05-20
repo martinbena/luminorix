@@ -101,7 +101,7 @@ function Content({
     ? createPortal(
         <div
           onClick={children ? undefined : handleCloseOnClick}
-          className={`bg-zinc-800/50 h-full w-full fixed top-0 left-0 flex justify-center items-center ${zIndex}`}
+          className={`bg-zinc-800/50 h-full w-full fixed top-0 left-0 flex p-4 justify-center items-center ${zIndex}`}
         >
           {children ? (
             <div

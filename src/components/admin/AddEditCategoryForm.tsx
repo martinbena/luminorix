@@ -66,8 +66,8 @@ export default function AddEditCategoryForm({
         {formState.errors._form ? (
           <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
         ) : null}
-        <div className="flex justify-between">
-          <Form.Button width="w-1/2">
+        <div className="flex justify-between mob:flex-col gap-5">
+          <Form.Button width="w-1/2 mob:w-full">
             {isEditSession ? "Edit" : "Create"} category
           </Form.Button>
           {isEditSession ? (
