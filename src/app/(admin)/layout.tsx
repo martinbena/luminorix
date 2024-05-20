@@ -33,7 +33,7 @@ export default function RootLayout({
                   <Navigation mode="admin" />
                 </aside>
               </Navbar>
-              <main className="bg-white text-zinc-800 p-8 min-h-[65vh]">
+              <main className="bg-white text-zinc-800 p-8 mob-lg:px-4 min-h-[65vh]">
                 {children}
               </main>
             </div>

@@ -20,7 +20,8 @@ export default async function AdminAllProductsPage() {
   const categories = await getAllCategories();
   const products = await getAllProductsWithVariants();
 
-  const tableColumns = "grid-cols-[0.6fr_2.5fr_1.5fr_1fr_1fr_0.4fr]";
+  const tableColumns =
+    "grid-cols-[0.6fr_2.5fr_1.2fr_1.5fr_1fr_0.4fr] mob-lg:grid-cols-[0.6fr_3fr_1.7fr_1.5fr_0.4fr] mob:grid-cols-[0.6fr_4fr_2.2fr_0.4fr] mob-sm:grid-cols-[0.6fr_6.2fr_0.4fr]";
   return (
     <>
       <HeadingSecondary>Manage all products</HeadingSecondary>
@@ -32,12 +33,12 @@ export default async function AdminAllProductsPage() {
         <TableContainer>
           <Table maxWidth="max-w-5xl">
             <TableHeader numColumns={tableColumns}>
-              <span>&nbsp;</span>
-              <span>Product</span>
-              <span>Brand</span>
-              <span>Price</span>
-              <span>Discount</span>
-              <span>&nbsp;</span>
+              <span className="mob-sm:hidden">&nbsp;</span>
+              <span className="mob-sm:col-span-3">Product</span>
+              <span className="mob:hidden">Brand</span>
+              <span className="mob-sm:hidden">Price</span>
+              <span className="mob-lg:hidden">Discount</span>
+              <span className="mob-sm:hidden">&nbsp;</span>
             </TableHeader>
             <TableBody
               data={products}
@@ -60,11 +61,11 @@ export default async function AdminAllProductsPage() {
                       product?.size ? ` ${product.size}` : ""
                     }`}
                   </ItemTitle>
-                  <div>{product.brand}</div>
-                  <div className="font-semibold">
+                  <div className="mob:hidden">{product.brand}</div>
+                  <div className="font-semibold mob-sm:hidden">
                     {formatCurrency(product.price)}
                   </div>
-                  <div className="font-semibold">
+                  <div className="font-semibold mob-lg:hidden">
                     {product.price < product.previousPrice ? (
                       <span className="text-green-600">
                         {formatCurrency(product.previousPrice - product.price)}
