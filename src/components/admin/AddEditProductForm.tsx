@@ -44,12 +44,12 @@ export default function AddEditProductForm({
     }
 
     if (formState.success) {
-      setResetImage(true);
+      !isEditSession && setResetImage(true);
       toast.success(
         `Product was successfully ${isEditSession ? "edited" : "created"}`
       );
       onCloseModal?.();
-      setTimeout(() => setResetImage(false), 100);
+      !isEditSession && setTimeout(() => setResetImage(false), 100);
     }
 
     if (Object.keys(formState.errors).length === 0) {

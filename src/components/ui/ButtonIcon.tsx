@@ -26,6 +26,7 @@ export default function ButtonIcon({
       } ${additionalClasses ?? ""}`}
       onClick={onClick}
       tabIndex={tabIndex}
+      type="button"
     >
       {children}
     </button>

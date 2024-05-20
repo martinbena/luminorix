@@ -226,7 +226,8 @@ function ImagePicker({
     fileReader.readAsDataURL(file);
   }
 
-  function handleReset() {
+  function handleReset(e?: React.MouseEvent<HTMLButtonElement>) {
+    e?.stopPropagation();
     setPickedImage(null);
     if (imageInput.current) {
       imageInput.current.value = "";
