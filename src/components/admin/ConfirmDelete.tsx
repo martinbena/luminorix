@@ -50,7 +50,7 @@ export default function ConfirmDelete({
   }, [formState, onCloseModal, storedName]);
 
   return (
-    <div className="flex flex-col gap-5 min-w-96 pb-8 px-12 pt-10 shadow-form">
+    <div className="flex flex-col gap-5 min-w-96 pb-8 px-12 pt-10 mob:px-6 mob:min-w-0 shadow-form">
       <HeadingSecondary>Delete {resourceName}</HeadingSecondary>
 
       <p className="text-base font-sans">
@@ -58,7 +58,7 @@ export default function ConfirmDelete({
         permanently? This action cannot be undone.
       </p>
 
-      <div className="flex items-center justify-end gap-4">
+      <div className="flex items-center justify-end gap-4 mob-sm:justify-center">
         <Button type="tertiary" onClick={onCloseModal}>
           Cancel
         </Button>
