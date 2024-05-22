@@ -10,6 +10,11 @@ import { getAllCategories } from "@/db/queries/categories";
 import { Category } from "@/models/Category";
 import ItemTitle from "@/components/data-tables/ItemTitle";
 import * as actions from "@/actions";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Categories",
+};
 
 export default async function AdminCategoriesPage() {
   const categories = await getAllCategories();

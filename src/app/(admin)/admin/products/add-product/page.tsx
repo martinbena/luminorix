@@ -4,6 +4,11 @@ import Button from "@/components/ui/Button";
 import { getAllCategories } from "@/db/queries/categories";
 import { getAllProducts } from "@/db/queries/products";
 import paths from "@/lib/paths";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Add Products",
+};
 
 export default async function AdminAddProductPage() {
   const categories = await getAllCategories();

@@ -6,9 +6,10 @@ import paths from "@/lib/paths";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Luminorix",
-  description:
-    "Discover a world of opulence and elegance at Luminorix, where luxury meets sophistication. Shop exquisite fashion, jewelry, home decor, and more from the world's most prestigious brands. Indulge in the finest selection of high-end products, curated for the discerning connoisseur. Elevate your lifestyle with Luminorix today.",
+  title: {
+    template: "%s | Luminorix",
+    default: "Authentication | Luminorix",
+  },
 };
 
 export default function RootLayout({

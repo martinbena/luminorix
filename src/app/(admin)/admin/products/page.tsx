@@ -15,6 +15,11 @@ import AddEditProductForm from "@/components/admin/AddEditProductForm";
 import { getAllCategories } from "@/db/queries/categories";
 import { formatCurrency } from "@/lib/helpers";
 import Image from "next/image";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Products",
+};
 
 export default async function AdminAllProductsPage() {
   const categories = await getAllCategories();

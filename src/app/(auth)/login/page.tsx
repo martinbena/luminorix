@@ -4,7 +4,7 @@ import LoginForm from "@/components/auth/LoginForm";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Luminorix | Login",
+  title: "Login",
   description:
     "Log in to your account to access your personalized dashboard. Enjoy seamless access to your account and stay connected with our platform.",
 };
