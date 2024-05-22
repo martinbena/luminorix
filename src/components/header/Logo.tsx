@@ -6,10 +6,7 @@ import logo from "/public/images/Logo.png";
 export default function Logo() {
   return (
     <div className="tab:justify-self-start">
-      <Link
-        href={paths.home()}
-       tabIndex={-1}
-      >
+      <Link href={paths.home()} tabIndex={-1}>
         <Image
           src={logo}
           width={128}

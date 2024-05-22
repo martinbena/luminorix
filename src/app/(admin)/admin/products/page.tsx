@@ -49,14 +49,12 @@ export default async function AdminAllProductsPage() {
               data={products}
               render={(product: ProductWithVariant) => (
                 <TableRow numColumns={tableColumns} key={product._id}>
-                  <div className="h-16 w-16 overflow-hidden">
+                  <div className="w-16 relative aspect-square overflow-hidden">
                     <Image
                       src={product.image}
                       alt={`Image of ${product.title}`}
-                      className="object-cover w-full h-auto"
-                      sizes="100vw"
-                      height={0}
-                      width={0}
+                      className="object-cover"
+                      fill
                     />
                   </div>
                   <ItemTitle>
