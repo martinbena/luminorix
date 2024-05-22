@@ -3,11 +3,8 @@ import "skeleton-elements/css";
 import type { Metadata } from "next";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import Navbar from "@/components/navigation/Navbar";
 import { Toaster } from "react-hot-toast";
 import Providers from "../providers";
-import MobileControlPanel from "@/components/navigation/MobileControlPanel";
-import Navigation from "@/components/navigation/Navigation";
 
 export const metadata: Metadata = {
   title: {
@@ -30,16 +27,7 @@ export default function RootLayout({
           <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy dt-lg:p-8 dt:p-0">
             <Header />
             <div className="grid grid-cols-[minmax(250px,_2fr)_minmax(550px,_11fr)] tab:grid-cols-1">
-              <Navbar>
-                <MobileControlPanel />
-                <aside className="tab:hidden">
-                  <Navigation mode="shop" />
-                </aside>
-              </Navbar>
-
-              <main className="bg-white text-zinc-800 py-8 min-h-[65vh]">
-                {children}
-              </main>
+              {children}
             </div>
             <Footer />
           </div>
