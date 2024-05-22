@@ -8,7 +8,7 @@ import Navigation, { NavigationProps } from "./Navigation";
 import Modal from "../ui/Modal";
 
 interface MobileControlPanelProps {
-  mode?: "user" | "admin";
+  mode?: "shop" | "user" | "admin";
 }
 
 export default function MobileControlPanel({ mode }: MobileControlPanelProps) {

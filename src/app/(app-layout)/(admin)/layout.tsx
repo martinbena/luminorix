@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/navigation/Navbar";
-import MobileControlPanel from "@/components/navigation/MobileControlPanel";
-import Navigation from "@/components/navigation/Navigation";
 
 export const metadata: Metadata = {
   title: {
@@ -19,12 +17,7 @@ export default function AdminLayout({
 }>) {
   return (
     <>
-      <Navbar>
-        <MobileControlPanel mode="admin" />
-        <aside className="tab:hidden">
-          <Navigation mode="admin" />
-        </aside>
-      </Navbar>
+      <Navbar mode="admin" />
       <main className="bg-white text-zinc-800 p-8 mob-lg:px-4 min-h-[65vh]">
         {children}
       </main>

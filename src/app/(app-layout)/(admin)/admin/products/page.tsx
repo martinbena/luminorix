@@ -55,6 +55,7 @@ export default async function AdminAllProductsPage() {
                       alt={`Image of ${product.title}`}
                       className="object-cover"
                       fill
+                      sizes="50vw"
                     />
                   </div>
                   <ItemTitle>
