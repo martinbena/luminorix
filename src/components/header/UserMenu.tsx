@@ -34,6 +34,7 @@ export default function UserMenu() {
                 height={64}
                 width={64}
                 className="rounded-full"
+                referrerPolicy="no-referrer"
               />
             ) : (
               <HiUser className="w-9 h-9 mob:w-7 mob:h-7 text-zinc-600" />

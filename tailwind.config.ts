@@ -8,8 +8,8 @@ const config: Config = {
   ],
   theme: {
     fontFamily: {
-      sans: "Raleway, sans-serif",
-      serif: "Playfair Display, serif",
+      sans: ["var(--font-raleway)"],
+      serif: ["var(--font-playfair-display)"],
     },
     extend: {
       backgroundImage: {
