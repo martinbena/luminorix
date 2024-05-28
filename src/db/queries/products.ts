@@ -3,9 +3,9 @@
 import Product, {
   Product as ProductType,
   ProductWithVariant,
-  Variant,
 } from "@/models/Product";
 import ConnectDB from "../connectDB";
+import { getSortOption } from "./sortOptions";
 
 export async function getAllProducts(): Promise<ProductType[]> {
   await ConnectDB();
@@ -14,31 +14,49 @@ export async function getAllProducts(): Promise<ProductType[]> {
   return JSON.parse(JSON.stringify(products));
 }
 
-export async function getAllProductsWithVariants(): Promise<
-  ProductWithVariant[]
-> {
+export async function getAllProductsWithVariants(
+  sortBy: string
+): Promise<ProductWithVariant[]> {
   await ConnectDB();
-  const products = await Product.find({});
 
-  const allVariants: ProductWithVariant[] = [];
-  products.forEach((product) => {
-    product.variants.forEach((variant: Variant) => {
-      const prod = { ...product.toObject() };
-      const { variants: _, ...rest } = prod;
-      allVariants.push({
-        ...rest,
-        _variantId: variant._id,
-        sku: variant.sku,
-        price: variant.price,
-        previousPrice: variant.previousPrice,
-        color: variant.color,
-        size: variant.size,
-        stock: variant.stock,
-        sold: variant.sold,
-        image: variant.image,
-      });
-    });
-  });
+  const sortOption = getSortOption(sortBy);
 
-  return JSON.parse(JSON.stringify(allVariants));
+  const products = await Product.aggregate([
+    { $unwind: "$variants" },
+    {
+      $addFields: {
+        lowercaseTitle: { $toLower: "$title" },
+        lowercaseBrand: { $toLower: "$brand" },
+      },
+    },
+    {
+      $sort: (sortOption as any) ?? { "variants.createdAt": -1 },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        slug: 1,
+        description: 1,
+        brand: 1,
+        freeShipping: 1,
+        category: 1,
+        soldTotal: 1,
+        ratings: 1,
+        _variantId: "$variants._id",
+        sku: "$variants.sku",
+        price: "$variants.price",
+        previousPrice: "$variants.previousPrice",
+        color: "$variants.color",
+        size: "$variants.size",
+        stock: "$variants.stock",
+        sold: "$variants.sold",
+        image: "$variants.image",
+        variantCreatedAt: "$variants.createdAt",
+      },
+    },
+    { $unset: ["lowercaseTitle", "lowercaseBrand"] },
+  ]);
+
+  return JSON.parse(JSON.stringify(products));
 }

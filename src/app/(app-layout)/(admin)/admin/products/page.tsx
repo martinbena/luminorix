@@ -16,14 +16,23 @@ import { getAllCategories } from "@/db/queries/categories";
 import { formatCurrency } from "@/lib/helpers";
 import Image from "next/image";
 import { Metadata } from "next";
+import SortBy from "@/components/ui/SortBy";
+import { productSortOptions } from "@/db/queries/sortOptions";
 
 export const metadata: Metadata = {
   title: "Products",
 };
 
-export default async function AdminAllProductsPage() {
+interface AdminAllProductsPageProps {
+  searchParams: { sortBy: string };
+}
+
+export default async function AdminAllProductsPage({
+  searchParams,
+}: AdminAllProductsPageProps) {
+  const sortBy = searchParams?.sortBy;
   const categories = await getAllCategories();
-  const products = await getAllProductsWithVariants();
+  const products = await getAllProductsWithVariants(sortBy);
 
   const tableColumns =
     "grid-cols-[0.6fr_2.5fr_1.2fr_1.5fr_1fr_0.4fr] mob-lg:grid-cols-[0.6fr_3fr_1.7fr_1.5fr_0.4fr] mob:grid-cols-[0.6fr_4fr_2.2fr_0.4fr] mob-sm:grid-cols-[0.6fr_6.2fr_0.4fr]";
@@ -31,9 +40,12 @@ export default async function AdminAllProductsPage() {
     <>
       <HeadingSecondary>Manage all products</HeadingSecondary>
       <section className="mt-12 py-8">
-        <Button type="secondary" href={paths.adminProductCreate()}>
-          Add new products
-        </Button>
+        <div className="flex justify-between">
+          <Button type="secondary" href={paths.adminProductCreate()}>
+            Add new products
+          </Button>
+          <SortBy options={productSortOptions} />
+        </div>
 
         <TableContainer>
           <Table maxWidth="max-w-5xl">
