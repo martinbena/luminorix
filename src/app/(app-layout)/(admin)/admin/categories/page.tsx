@@ -1,14 +1,16 @@
 import HeadingSecondary from "@/components/ui/HeadingSecondary";
 import AddEditCategoryForm from "@/components/admin/AddEditCategoryForm";
 import AdminActions from "@/components/admin/AdminActions";
-import TableContainer from "@/components/data-tables/TableContainer";
-import Table from "@/components/data-tables/Table";
-import TableHeader from "@/components/data-tables/TableHeader";
-import TableBody from "@/components/data-tables/TableBody";
-import TableRow from "@/components/data-tables/TableRow";
+import {
+  Table,
+  TableContainer,
+  TableBody,
+  TableHeader,
+  TableRow,
+  ItemTitle,
+} from "@/components/data-tables/Table";
 import { getAllCategories } from "@/db/queries/categories";
 import { Category } from "@/models/Category";
-import ItemTitle from "@/components/data-tables/ItemTitle";
 import * as actions from "@/actions";
 import { Metadata } from "next";
 
