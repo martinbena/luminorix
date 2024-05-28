@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import MobileControlPanel from "./MobileControlPanel";
 import Navigation from "./Navigation";
 
@@ -11,7 +10,7 @@ export default function Navbar({ mode }: NavbarProps) {
     <div className="bg-zinc-50 overflow-hidden">
       <MobileControlPanel mode={mode} />
       <aside className="tab:hidden">
-        <Navigation mode="shop" />
+        <Navigation mode={mode} />
       </aside>
     </div>
   );
