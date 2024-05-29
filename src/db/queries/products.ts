@@ -22,13 +22,19 @@ interface ProductsWithVatriantsProps {
 
 export async function getAllProductsWithVariants(
   sortBy?: string,
-  page: number = 1
+  page: number = 1,
+  limit?: number
 ): Promise<ProductsWithVatriantsProps> {
   await ConnectDB();
 
   const sortOption = getSortOption(sortBy ?? "");
 
   const skip = (page - 1) * PAGE_LIMIT;
+
+  const totalProducts = await Product.aggregate([
+    { $unwind: "$variants" },
+    { $count: "totalCount" },
+  ]);
 
   const products = await Product.aggregate([
     { $unwind: "$variants" },
@@ -46,12 +52,7 @@ export async function getAllProductsWithVariants(
     },
     { $unset: ["lowercaseTitle", "lowercaseBrand"] },
     { $skip: skip },
-    { $limit: PAGE_LIMIT },
-  ]);
-
-  const totalProducts = await Product.aggregate([
-    { $unwind: "$variants" },
-    { $count: "totalCount" },
+    { $limit: limit ?? (totalProducts[0]?.totalCount || 0) },
   ]);
 
   return {

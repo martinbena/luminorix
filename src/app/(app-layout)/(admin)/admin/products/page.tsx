@@ -22,6 +22,7 @@ import { Metadata } from "next";
 import SortBy from "@/components/ui/SortBy";
 import { productSortOptions } from "@/db/queries/queryOptions";
 import Pagination from "@/components/ui/Pagination";
+import { PAGE_LIMIT } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Products",
@@ -39,7 +40,8 @@ export default async function AdminAllProductsPage({
   const categories = await getAllCategories();
   const { products, totalCount } = await getAllProductsWithVariants(
     sortBy,
-    currentPage
+    currentPage,
+    PAGE_LIMIT
   );
 
   const tableColumns =
