@@ -1,9 +1,16 @@
 import DiscountSection from "@/components/home/DiscountSection";
 import Product from "@/components/products/Product";
 import ProductRow from "@/components/products/ProductRow";
+import {
+  getNewestProductsWithVariants,
+  getProductsWithDiscounts,
+} from "@/db/queries/products";
 import paths from "@/lib/paths";
 
-export default function Home() {
+export default async function Home() {
+  const newestProducts = await getNewestProductsWithVariants();
+  const topDiscounts = await getProductsWithDiscounts(4);
+
   return (
     <>
       <DiscountSection />
@@ -15,9 +22,9 @@ export default function Home() {
         sectionClasses="py-16 bg-white"
         gridSize="large"
       >
-        <Product />
-        <Product />
-        <Product />
+        {newestProducts.map((product) => (
+          <Product key={product.sku} />
+        ))}
       </ProductRow>
 
       <ProductRow
@@ -25,10 +32,9 @@ export default function Home() {
         hasLink={true}
         linkTo={paths.discountShowAll()}
       >
-        <Product />
-        <Product />
-        <Product />
-        <Product />
+        {topDiscounts.map((product) => (
+          <Product key={product.sku} />
+        ))}
       </ProductRow>
     </>
   );

@@ -20,7 +20,7 @@ import { formatCurrency } from "@/lib/helpers";
 import Image from "next/image";
 import { Metadata } from "next";
 import SortBy from "@/components/ui/SortBy";
-import { productSortOptions } from "@/db/queries/sortOptions";
+import { productSortOptions } from "@/db/queries/queryOptions";
 import Pagination from "@/components/ui/Pagination";
 
 export const metadata: Metadata = {

@@ -5,7 +5,7 @@ import Product, {
   ProductWithVariant,
 } from "@/models/Product";
 import ConnectDB from "../connectDB";
-import { getSortOption } from "./sortOptions";
+import { getSortOption, productWithVariantFormat } from "./queryOptions";
 import { PAGE_LIMIT } from "@/lib/constants";
 
 export async function getAllProducts(): Promise<ProductType[]> {
@@ -21,12 +21,12 @@ interface ProductsWithVatriantsProps {
 }
 
 export async function getAllProductsWithVariants(
-  sortBy: string,
+  sortBy?: string,
   page: number = 1
 ): Promise<ProductsWithVatriantsProps> {
   await ConnectDB();
 
-  const sortOption = getSortOption(sortBy);
+  const sortOption = getSortOption(sortBy ?? "");
 
   const skip = (page - 1) * PAGE_LIMIT;
 
@@ -42,27 +42,7 @@ export async function getAllProductsWithVariants(
       $sort: (sortOption as any) ?? { "variants.createdAt": -1 },
     },
     {
-      $project: {
-        _id: 1,
-        title: 1,
-        slug: 1,
-        description: 1,
-        brand: 1,
-        freeShipping: 1,
-        category: 1,
-        soldTotal: 1,
-        ratings: 1,
-        _variantId: "$variants._id",
-        sku: "$variants.sku",
-        price: "$variants.price",
-        previousPrice: "$variants.previousPrice",
-        color: "$variants.color",
-        size: "$variants.size",
-        stock: "$variants.stock",
-        sold: "$variants.sold",
-        image: "$variants.image",
-        variantCreatedAt: "$variants.createdAt",
-      },
+      $project: productWithVariantFormat,
     },
     { $unset: ["lowercaseTitle", "lowercaseBrand"] },
     { $skip: skip },
@@ -78,4 +58,65 @@ export async function getAllProductsWithVariants(
     products: JSON.parse(JSON.stringify(products)),
     totalCount: totalProducts[0]?.totalCount || 0,
   };
+}
+
+export async function getNewestProductsWithVariants(): Promise<
+  ProductWithVariant[]
+> {
+  await ConnectDB();
+
+  const products = await Product.aggregate([
+    { $unwind: "$variants" },
+    { $limit: 3 },
+    {
+      $sort: { "variants.createdAt": -1 },
+    },
+    {
+      $project: productWithVariantFormat,
+    },
+  ]);
+
+  return JSON.parse(JSON.stringify(products));
+}
+
+export async function getProductsWithDiscounts(
+  limit?: number
+): Promise<ProductWithVariant[]> {
+  await ConnectDB();
+
+  const products = await Product.aggregate([
+    { $unwind: "$variants" },
+    {
+      $addFields: {
+        discountPercentage: {
+          $cond: {
+            if: { $gt: ["$variants.previousPrice", 0] },
+            then: {
+              $multiply: [
+                {
+                  $divide: [
+                    {
+                      $subtract: ["$variants.previousPrice", "$variants.price"],
+                    },
+                    "$variants.previousPrice",
+                  ],
+                },
+                100,
+              ],
+            },
+            else: 0,
+          },
+        },
+      },
+    },
+    {
+      $sort: { discountPercentage: -1 },
+    },
+    { $limit: limit ?? 0 },
+    {
+      $project: productWithVariantFormat,
+    },
+  ]);
+
+  return JSON.parse(JSON.stringify(products));
 }

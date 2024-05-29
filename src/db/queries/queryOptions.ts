@@ -76,3 +76,25 @@ export const productSortOptions = [
 export function getSortOption(value: string) {
   return productSortOptions.find((option) => option.value === value)?.sort;
 }
+
+export const productWithVariantFormat = {
+  _id: 1,
+  title: 1,
+  slug: 1,
+  description: 1,
+  brand: 1,
+  freeShipping: 1,
+  category: 1,
+  soldTotal: 1,
+  ratings: 1,
+  _variantId: "$variants._id",
+  sku: "$variants.sku",
+  price: "$variants.price",
+  previousPrice: "$variants.previousPrice",
+  color: "$variants.color",
+  size: "$variants.size",
+  stock: "$variants.stock",
+  sold: "$variants.sold",
+  image: "$variants.image",
+  variantCreatedAt: "$variants.createdAt",
+};
