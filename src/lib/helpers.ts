@@ -1,3 +1,4 @@
+import { useSearchParams } from "next/navigation";
 import cloudinary from "./cloudinary";
 
 export const formatCurrency = (value: number) =>
@@ -29,3 +30,20 @@ export async function removeImageFromCloudinary(
   const imagePublicId = imageUrlParts?.at(-1)?.split(".").at(0);
   await cloudinary.uploader.destroy(`luminorix/${imagePublicId}`);
 }
+
+export const useMergedSearchParams = (href: string) => {
+  const searchParams = useSearchParams();
+
+  if (!href.includes("?")) {
+    return href;
+  }
+
+  const url = new URL(href, window.location.origin);
+  const currentParams = new URLSearchParams(searchParams.toString());
+
+  url.searchParams.forEach((value, key) => {
+    currentParams.set(key, value);
+  });
+
+  return `${url.pathname}?${currentParams.toString()}`;
+};

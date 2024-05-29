@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 interface NavigationLinkProps {
   href: string;
@@ -15,9 +15,13 @@ export default function NavigationLink({
   activeClasses = "bg-amber-200",
 }: NavigationLinkProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams().toString();
+
   const isActive =
-    pathname === href ||
-    (pathname.includes(`${href}/`) && href.split("/").length > 2);
+    (pathname === href &&
+      (!searchParams.length || href.split("/").length > 2)) ||
+    (pathname.includes(`${href}/`) && href.split("/").length > 2) ||
+    (searchParams.length && href.includes(searchParams.toString()));
 
   return (
     <li className="child:flex child:flex-1 child:py-2.5 child:pl-12">

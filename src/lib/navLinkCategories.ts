@@ -1,28 +1,46 @@
 import paths from "./paths";
 
+// export async function getCategoryLinks() {
+//   const categories = await getAllCategories();
+//   const categoryLinks = categories.map((category) => {
+//     return {
+//       href: `${paths.productShowAll()}?category=${category.slug}`,
+//       description: `${category.title}`,
+//     };
+//   });
+
+//   return [
+//     {
+//       href: `${paths.productShowAll()}`,
+//       description: "All sortiment",
+//     },
+//     ...categoryLinks,
+//   ];
+// }
+
 export const categoryLinks = [
   {
     href: paths.productShowAll(),
     description: "All sortiment",
   },
   {
-    href: paths.productShowAll(),
+    href: `${paths.productShowAll()}?category=mens-fashion`,
     description: "Men's fashion",
   },
   {
-    href: paths.productShowAll(),
+    href: `${paths.productShowAll()}?category=womens-fashion`,
     description: "Women's fashion",
   },
   {
-    href: paths.productShowAll(),
+    href: `${paths.productShowAll()}?category=jewelry`,
     description: "Jewelry",
   },
   {
-    href: paths.productShowAll(),
+    href: `${paths.productShowAll()}?category=watches`,
     description: "Watches",
   },
   {
-    href: paths.productShowAll(),
+    href: `${paths.productShowAll()}?category=sunglasses`,
     description: "Sunglasses",
   },
 ];
