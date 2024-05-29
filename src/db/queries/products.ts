@@ -67,10 +67,10 @@ export async function getNewestProductsWithVariants(): Promise<
 
   const products = await Product.aggregate([
     { $unwind: "$variants" },
-    { $limit: 3 },
     {
       $sort: { "variants.createdAt": -1 },
     },
+    { $limit: 3 },
     {
       $project: productWithVariantFormat,
     },

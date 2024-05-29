@@ -23,7 +23,7 @@ export default async function Home() {
         gridSize="large"
       >
         {newestProducts.map((product) => (
-          <Product key={product.sku} />
+          <Product key={product.sku} product={product} hasDescription={true} />
         ))}
       </ProductRow>
 
@@ -33,7 +33,7 @@ export default async function Home() {
         linkTo={paths.discountShowAll()}
       >
         {topDiscounts.map((product) => (
-          <Product key={product.sku} />
+          <Product key={product.sku} product={product} />
         ))}
       </ProductRow>
     </>
