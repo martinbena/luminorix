@@ -125,3 +125,26 @@ export async function getProductsWithDiscounts(
 
   return JSON.parse(JSON.stringify(products));
 }
+
+export async function getProductsWithFreeShipping(): Promise<
+  ProductWithVariant[]
+> {
+  await ConnectDB();
+
+  const products = await Product.aggregate([
+    { $unwind: "$variants" },
+    {
+      $match: {
+        freeShipping: { $eq: true },
+      },
+    },
+    {
+      $sort: { "variants.createdAt": -1 },
+    },
+    {
+      $project: productWithVariantFormat,
+    },
+  ]);
+
+  return JSON.parse(JSON.stringify(products));
+}
