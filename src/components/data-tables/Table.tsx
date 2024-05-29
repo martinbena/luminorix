@@ -9,7 +9,7 @@ export function Table({ children, maxWidth }: TableProps) {
   return (
     <div
       role="table"
-      className={`rounded-md border border-zinc-200 font-sans mt-16 ${maxWidth} w-full`}
+      className={`rounded-md border border-zinc-200 font-sans ${maxWidth} w-full`}
     >
       {children}
     </div>

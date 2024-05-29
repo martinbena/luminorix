@@ -41,12 +41,16 @@ export default async function AdminAllProductsPage({
   return (
     <>
       <HeadingSecondary>Manage all products</HeadingSecondary>
-      <section className="mt-12 py-8">
-        <div className="flex justify-between">
-          <Button type="secondary" href={paths.adminProductCreate()}>
-            Add new products
-          </Button>
-          <SortBy options={productSortOptions} />
+      <section className="mt-12 py-8 mob:mt-8 [&>*:nth-child(2)]:mt-12 mob:[&>*:nth-child(2)]:mt-4">
+        <div className="flex justify-between mob:flex-col mob:gap-12 items-center mob:items-start">
+          <div>
+            <Button type="secondary" href={paths.adminProductCreate()}>
+              Add new products
+            </Button>
+          </div>
+          <div>
+            <SortBy options={productSortOptions} />
+          </div>
         </div>
 
         <TableContainer>
