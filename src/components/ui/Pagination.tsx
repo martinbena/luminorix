@@ -50,7 +50,7 @@ export default function Pagination({
           <PaginationButton
             key={index + 1}
             onClick={() => handlePageChange(index + 1)}
-            activeClasses={currentPage === index + 1 ? "active" : ""}
+            activeClasses={currentPage === index + 1 ? "bg-amber-300" : ""}
             disabled={currentPage === index + 1}
           >
             {index + 1}
