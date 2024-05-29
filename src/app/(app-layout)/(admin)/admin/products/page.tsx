@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
   ItemTitle,
+  TableFooter,
 } from "@/components/data-tables/Table";
 import Button from "@/components/ui/Button";
 import HeadingSecondary from "@/components/ui/HeadingSecondary";
@@ -20,29 +21,34 @@ import Image from "next/image";
 import { Metadata } from "next";
 import SortBy from "@/components/ui/SortBy";
 import { productSortOptions } from "@/db/queries/sortOptions";
+import Pagination from "@/components/ui/Pagination";
 
 export const metadata: Metadata = {
   title: "Products",
 };
 
 interface AdminAllProductsPageProps {
-  searchParams: { sortBy: string };
+  searchParams: { sortBy: string; page: string };
 }
 
 export default async function AdminAllProductsPage({
   searchParams,
 }: AdminAllProductsPageProps) {
   const sortBy = searchParams?.sortBy;
+  const currentPage = +searchParams?.page || 1;
   const categories = await getAllCategories();
-  const products = await getAllProductsWithVariants(sortBy);
+  const { products, totalCount } = await getAllProductsWithVariants(
+    sortBy,
+    currentPage
+  );
 
   const tableColumns =
     "grid-cols-[0.6fr_2.5fr_1.2fr_1.5fr_1fr_0.4fr] mob-lg:grid-cols-[0.6fr_3fr_1.7fr_1.5fr_0.4fr] mob:grid-cols-[0.6fr_4fr_2.2fr_0.4fr] mob-sm:grid-cols-[0.6fr_6.2fr_0.4fr]";
   return (
     <>
       <HeadingSecondary>Manage all products</HeadingSecondary>
-      <section className="mt-12 py-8 mob:mt-8 [&>*:nth-child(2)]:mt-12 mob:[&>*:nth-child(2)]:mt-4">
-        <div className="flex justify-between mob:flex-col mob:gap-12 items-center mob:items-start">
+      <section className="mt-12 py-8 mob:mt-8 [&>*:nth-child(2)]:mt-12 mob:[&>*:nth-child(2)]:mt-4 max-w-5xl mx-auto">
+        <div className="flex justify-between mob:flex-col mob:gap-8 items-center mob:items-start">
           <div>
             <Button type="secondary" href={paths.adminProductCreate()}>
               Add new products
@@ -114,6 +120,9 @@ export default async function AdminAllProductsPage({
                 </TableRow>
               )}
             />
+            <TableFooter>
+              <Pagination currentPage={currentPage} totalCount={totalCount} />
+            </TableFooter>
           </Table>
         </TableContainer>
       </section>

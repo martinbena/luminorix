@@ -6,6 +6,7 @@ import Product, {
 } from "@/models/Product";
 import ConnectDB from "../connectDB";
 import { getSortOption } from "./sortOptions";
+import { PAGE_LIMIT } from "@/lib/constants";
 
 export async function getAllProducts(): Promise<ProductType[]> {
   await ConnectDB();
@@ -14,12 +15,20 @@ export async function getAllProducts(): Promise<ProductType[]> {
   return JSON.parse(JSON.stringify(products));
 }
 
+interface ProductsWithVatriantsProps {
+  products: ProductWithVariant[];
+  totalCount: number;
+}
+
 export async function getAllProductsWithVariants(
-  sortBy: string
-): Promise<ProductWithVariant[]> {
+  sortBy: string,
+  page: number = 1
+): Promise<ProductsWithVatriantsProps> {
   await ConnectDB();
 
   const sortOption = getSortOption(sortBy);
+
+  const skip = (page - 1) * PAGE_LIMIT;
 
   const products = await Product.aggregate([
     { $unwind: "$variants" },
@@ -56,7 +65,17 @@ export async function getAllProductsWithVariants(
       },
     },
     { $unset: ["lowercaseTitle", "lowercaseBrand"] },
+    { $skip: skip },
+    { $limit: PAGE_LIMIT },
   ]);
 
-  return JSON.parse(JSON.stringify(products));
+  const totalProducts = await Product.aggregate([
+    { $unwind: "$variants" },
+    { $count: "totalCount" },
+  ]);
+
+  return {
+    products: JSON.parse(JSON.stringify(products)),
+    totalCount: totalProducts[0]?.totalCount || 0,
+  };
 }

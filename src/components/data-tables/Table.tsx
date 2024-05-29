@@ -90,7 +90,7 @@ interface FooterProps {
   children: ReactNode;
 }
 
-export function Footer({ children }: FooterProps) {
+export function TableFooter({ children }: FooterProps) {
   return (
     <footer className="p-3 bg-zinc-100 flex justify-center [&:not(:has(*))]:hidden">
       {children}
