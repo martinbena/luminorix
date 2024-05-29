@@ -110,9 +110,14 @@ export async function getProductsWithDiscounts(
       },
     },
     {
+      $match: {
+        discountPercentage: { $gt: 0 },
+      },
+    },
+    {
       $sort: { discountPercentage: -1 },
     },
-    { $limit: limit ?? 0 },
+    { $limit: limit ?? 10000 },
     {
       $project: productWithVariantFormat,
     },
