@@ -12,14 +12,29 @@ export default function Product({
   product,
   hasDescription = false,
 }: ProductProps) {
-  const { title, price, previousPrice, description, image, color, size } =
-    product;
+  const {
+    title,
+    price,
+    previousPrice,
+    description,
+    image,
+    color,
+    size,
+    freeShipping,
+  } = product;
 
   return (
     <article className="h-full bg-amber-100 flex flex-col shadow-sm relative">
-      {previousPrice > price ? (
-        <div className="absolute z-[5] top-2 left-2 bg-amber-300 font-sans py-2 px-4">
-          - {Math.round(((previousPrice - price) / previousPrice) * 100)}%
+      {previousPrice > price || freeShipping ? (
+        <div className="absolute top-2 left-2 z-[5] flex gap-2 child:py-2 child:px-4 font-sans">
+          {previousPrice > price ? (
+            <div className="bg-amber-300">
+              - {Math.round(((previousPrice - price) / previousPrice) * 100)}%
+            </div>
+          ) : null}
+          {freeShipping ? (
+            <div className="bg-green-400 uppercase">Free shipping</div>
+          ) : null}
         </div>
       ) : null}
       <div className="relative aspect-square overflow-hidden">
