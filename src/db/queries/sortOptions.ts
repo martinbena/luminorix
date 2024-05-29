@@ -9,6 +9,16 @@ export const productSortOptions = [
     label: "Title (Z-A)",
     sort: { lowercaseTitle: -1 },
   },
+  {
+    value: "categoryAsc",
+    label: "Category (A-Z)",
+    sort: { category: 1 },
+  },
+  {
+    value: "categoryDesc",
+    label: "Category (Z-A)",
+    sort: { category: -1 },
+  },
   { value: "brandAsc", label: "Brand (A-Z)", sort: { lowercaseBrand: 1 } },
   { value: "brandDesc", label: "Brand (Z-A)", sort: { lowercaseBrand: -1 } },
   {
