@@ -22,7 +22,6 @@ import { Metadata } from "next";
 import SortBy from "@/components/ui/SortBy";
 import { productSortOptions } from "@/db/queries/queryOptions";
 import Pagination from "@/components/ui/Pagination";
-import { PAGE_LIMIT } from "@/lib/constants";
 import { ReadonlyURLSearchParams } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -41,7 +40,7 @@ export default async function AdminAllProductsPage({
 
   const { products, totalCount } = await getProductsWithAllVariants({
     searchParams,
-    limit: PAGE_LIMIT,
+    limit: true,
   });
 
   const tableColumns =

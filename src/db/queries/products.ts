@@ -19,12 +19,12 @@ export async function getAllProducts(): Promise<ProductType[]> {
 interface ProductsWithVatriantsProps {
   products: ProductWithVariant[];
   totalCount: number;
-  currentCategory: CategoryType
+  currentCategory: CategoryType;
 }
 
 export async function getProductsWithAllVariants({
   searchParams,
-  limit,
+  limit = false,
 }: {
   searchParams?: {
     category?: string;
@@ -37,7 +37,7 @@ export async function getProductsWithAllVariants({
     sortBy?: string;
     page?: string;
   };
-  limit?: number;
+  limit?: boolean;
 }): Promise<ProductsWithVatriantsProps> {
   await ConnectDB();
 
@@ -107,14 +107,14 @@ export async function getProductsWithAllVariants({
     { $sort: (sortOption as any) ?? { "variants.createdAt": -1 } },
     { $project: productWithVariantFormat },
     { $unset: ["lowercaseTitle", "lowercaseBrand"] },
-    { $skip: skip },
-    { $limit: limit ?? (totalProducts[0]?.totalCount || 1) },
+    { $skip: limit ? skip : totalProducts[0]?.totalCount || 1 },
+    { $limit: limit ? PAGE_LIMIT : totalProducts[0]?.totalCount || 1 },
   ]);
 
   return {
     products: JSON.parse(JSON.stringify(products)),
     totalCount: totalProducts[0]?.totalCount || 0,
-    currentCategory
+    currentCategory,
   };
 }
 
