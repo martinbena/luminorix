@@ -21,7 +21,9 @@ export default function NavigationLink({
     (pathname === href &&
       (!searchParams.length || href.split("/").length > 2)) ||
     (pathname.includes(`${href}/`) && href.split("/").length > 2) ||
-    (searchParams.length && href.includes(searchParams.toString()));
+    (searchParams.length &&
+      (href.includes(searchParams) ||
+        href.split("?").some((param) => searchParams.includes(param))));
 
   return (
     <li className="child:flex child:flex-1 child:py-2.5 child:pl-12">

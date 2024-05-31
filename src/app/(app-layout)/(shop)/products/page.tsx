@@ -1,12 +1,25 @@
 import Product from "@/components/products/Product";
 import ProductRow from "@/components/products/ProductRow";
-import { getAllProductsWithVariants } from "@/db/queries/products";
+import { getProductsWithAllVariants } from "@/db/queries/products";
+import { ReadonlyURLSearchParams } from "next/navigation";
 
-export default async function AllProductsPage() {
-  const { products } = await getAllProductsWithVariants();
+interface AllProductsPageProps {
+  searchParams: ReadonlyURLSearchParams;
+}
+
+export default async function AllProductsPage({
+  searchParams,
+}: AllProductsPageProps) {
+  const { products, currentCategory } = await getProductsWithAllVariants({
+    searchParams,
+  });
 
   return (
-    <ProductRow title="All products" sectionClasses="bg-white" gridSize="large">
+    <ProductRow
+      title={currentCategory?.title ?? "All sortiment"}
+      sectionClasses="bg-white"
+      gridSize="large"
+    >
       {products.map((product) => (
         <Product key={product.sku} product={product} />
       ))}

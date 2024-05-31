@@ -10,7 +10,7 @@ import {
 } from "@/components/data-tables/Table";
 import Button from "@/components/ui/Button";
 import HeadingSecondary from "@/components/ui/HeadingSecondary";
-import { getAllProductsWithVariants } from "@/db/queries/products";
+import { getProductsWithAllVariants } from "@/db/queries/products";
 import paths from "@/lib/paths";
 import { ProductWithVariant } from "@/models/Product";
 import * as actions from "@/actions";
@@ -23,26 +23,26 @@ import SortBy from "@/components/ui/SortBy";
 import { productSortOptions } from "@/db/queries/queryOptions";
 import Pagination from "@/components/ui/Pagination";
 import { PAGE_LIMIT } from "@/lib/constants";
+import { ReadonlyURLSearchParams } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Products",
 };
 
 interface AdminAllProductsPageProps {
-  searchParams: { sortBy: string; page: string };
+  searchParams: ReadonlyURLSearchParams & { page: string };
 }
 
 export default async function AdminAllProductsPage({
   searchParams,
 }: AdminAllProductsPageProps) {
-  const sortBy = searchParams?.sortBy;
   const currentPage = +searchParams?.page || 1;
   const categories = await getAllCategories();
-  const { products, totalCount } = await getAllProductsWithVariants(
-    sortBy,
-    currentPage,
-    PAGE_LIMIT
-  );
+
+  const { products, totalCount } = await getProductsWithAllVariants({
+    searchParams,
+    limit: PAGE_LIMIT,
+  });
 
   const tableColumns =
     "grid-cols-[0.6fr_2.5fr_1.2fr_1.5fr_1fr_0.4fr] mob-lg:grid-cols-[0.6fr_3fr_1.7fr_1.5fr_0.4fr] mob:grid-cols-[0.6fr_4fr_2.2fr_0.4fr] mob-sm:grid-cols-[0.6fr_6.2fr_0.4fr]";

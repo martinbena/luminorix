@@ -7,6 +7,7 @@ import Product, {
 import ConnectDB from "../connectDB";
 import { getSortOption, productWithVariantFormat } from "./queryOptions";
 import { PAGE_LIMIT } from "@/lib/constants";
+import Category, { Category as CategoryType } from "@/models/Category";
 
 export async function getAllProducts(): Promise<ProductType[]> {
   await ConnectDB();
@@ -18,46 +19,102 @@ export async function getAllProducts(): Promise<ProductType[]> {
 interface ProductsWithVatriantsProps {
   products: ProductWithVariant[];
   totalCount: number;
+  currentCategory: CategoryType
 }
 
-export async function getAllProductsWithVariants(
-  sortBy?: string,
-  page: number = 1,
-  limit?: number
-): Promise<ProductsWithVatriantsProps> {
+export async function getProductsWithAllVariants({
+  searchParams,
+  limit,
+}: {
+  searchParams?: {
+    category?: string;
+    maxPrice?: string;
+    minPrice?: string;
+    color?: string;
+    size?: string;
+    brand?: string;
+    rating?: string;
+    sortBy?: string;
+    page?: string;
+  };
+  limit?: number;
+}): Promise<ProductsWithVatriantsProps> {
   await ConnectDB();
 
-  const sortOption = getSortOption(sortBy ?? "");
+  const sortOption = getSortOption(searchParams?.sortBy ?? "");
 
-  const skip = (page - 1) * PAGE_LIMIT;
+  const currentPage = +(searchParams?.page ?? 1);
+  const skip = (currentPage - 1) * PAGE_LIMIT;
+
+  const matchStage: any = {};
+
+  let currentCategory;
+  if (searchParams?.category) {
+    currentCategory = await Category.findOne({ slug: searchParams.category });
+    if (currentCategory) {
+      matchStage.category = currentCategory._id;
+    } else {
+      matchStage.category = null;
+    }
+  }
+
+  if (searchParams) {
+    if (searchParams.maxPrice) {
+      matchStage["variants.price"] = {
+        ...matchStage["variants.price"],
+        $lte: +searchParams.maxPrice,
+      };
+    }
+    if (searchParams.minPrice) {
+      matchStage["variants.price"] = {
+        ...matchStage["variants.price"],
+        $gte: +searchParams.minPrice,
+      };
+    }
+    if (searchParams.color) {
+      matchStage["variants.color"] = {
+        $regex: new RegExp(searchParams.color, "i"),
+      };
+    }
+    if (searchParams.size) {
+      matchStage["variants.size"] = {
+        $regex: new RegExp(searchParams.size, "i"),
+      };
+    }
+    if (searchParams.brand) {
+      matchStage.brand = { $regex: new RegExp(searchParams.brand, "i") };
+    }
+    if (searchParams.rating) {
+      matchStage["variants.rating"] = { $gte: +searchParams.rating };
+    }
+  }
 
   const totalProducts = await Product.aggregate([
     { $unwind: "$variants" },
+    { $match: matchStage },
     { $count: "totalCount" },
   ]);
 
   const products = await Product.aggregate([
     { $unwind: "$variants" },
+    { $match: matchStage },
     {
       $addFields: {
         lowercaseTitle: { $toLower: "$title" },
         lowercaseBrand: { $toLower: "$brand" },
       },
     },
-    {
-      $sort: (sortOption as any) ?? { "variants.createdAt": -1 },
-    },
-    {
-      $project: productWithVariantFormat,
-    },
+    { $sort: (sortOption as any) ?? { "variants.createdAt": -1 } },
+    { $project: productWithVariantFormat },
     { $unset: ["lowercaseTitle", "lowercaseBrand"] },
     { $skip: skip },
-    { $limit: limit ?? (totalProducts[0]?.totalCount || 0) },
+    { $limit: limit ?? (totalProducts[0]?.totalCount || 1) },
   ]);
 
   return {
     products: JSON.parse(JSON.stringify(products)),
     totalCount: totalProducts[0]?.totalCount || 0,
+    currentCategory
   };
 }
 
