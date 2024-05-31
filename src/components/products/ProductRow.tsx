@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { Children, ReactNode } from "react";
 import HeadingSecondary from "../ui/HeadingSecondary";
 import Button from "../ui/Button";
 
@@ -30,6 +30,16 @@ export default function ProductRow({
         }`}
       >
         {children}
+        {Children.count(children) < 3 && (
+          <>
+            <span>&nbsp;</span>{" "}
+          </>
+        )}
+        {Children.count(children) < 2 && (
+          <>
+            <span>&nbsp;</span>{" "}
+          </>
+        )}
       </div>
 
       {hasLink && (
