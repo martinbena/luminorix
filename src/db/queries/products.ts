@@ -107,7 +107,7 @@ export async function getProductsWithAllVariants({
     { $sort: (sortOption as any) ?? { "variants.createdAt": -1 } },
     { $project: productWithVariantFormat },
     { $unset: ["lowercaseTitle", "lowercaseBrand"] },
-    { $skip: limit ? skip : totalProducts[0]?.totalCount || 1 },
+    { $skip: limit ? skip : 0 },
     { $limit: limit ? PAGE_LIMIT : totalProducts[0]?.totalCount || 1 },
   ]);
 
