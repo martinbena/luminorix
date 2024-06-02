@@ -98,3 +98,15 @@ export const productWithVariantFormat = {
   image: "$variants.image",
   variantCreatedAt: "$variants.createdAt",
 };
+
+export interface ProductSearchParams {
+  category?: string;
+  maxPrice?: string;
+  minPrice?: string;
+  brands?: string;
+  colors?: string;
+  sizes?: string;
+  ratings?: string;
+  sortBy?: string;
+  page?: string;
+}

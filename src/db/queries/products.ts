@@ -5,7 +5,11 @@ import Product, {
   ProductWithVariant,
 } from "@/models/Product";
 import ConnectDB from "../connectDB";
-import { getSortOption, productWithVariantFormat } from "./queryOptions";
+import {
+  ProductSearchParams,
+  getSortOption,
+  productWithVariantFormat,
+} from "./queryOptions";
 import { PAGE_LIMIT } from "@/lib/constants";
 import Category, { Category as CategoryType } from "@/models/Category";
 
@@ -26,17 +30,7 @@ export async function getProductsWithAllVariants({
   searchParams,
   limit = false,
 }: {
-  searchParams?: {
-    category?: string;
-    maxPrice?: string;
-    minPrice?: string;
-    color?: string;
-    size?: string;
-    brand?: string;
-    rating?: string;
-    sortBy?: string;
-    page?: string;
-  };
+  searchParams?: ProductSearchParams;
   limit?: boolean;
 }): Promise<ProductsWithVatriantsProps> {
   await ConnectDB();
@@ -71,21 +65,30 @@ export async function getProductsWithAllVariants({
         $gte: +searchParams.minPrice,
       };
     }
-    if (searchParams.color) {
+    if (searchParams.colors) {
+      const colorsArray = searchParams.colors.split(",");
       matchStage["variants.color"] = {
-        $regex: new RegExp(searchParams.color, "i"),
+        $in: colorsArray.map((color) => new RegExp(color, "i")),
       };
     }
-    if (searchParams.size) {
+    if (searchParams.sizes) {
+      const sizesArray = searchParams.sizes.split(",");
       matchStage["variants.size"] = {
-        $regex: new RegExp(searchParams.size, "i"),
+        $in: sizesArray.map((size) => new RegExp(size, "i")),
       };
     }
-    if (searchParams.brand) {
-      matchStage.brand = { $regex: new RegExp(searchParams.brand, "i") };
+    if (searchParams.brands) {
+      const brandsArray = searchParams.brands.split(",");
+      matchStage.brand = {
+        $in: brandsArray.map((brand) => new RegExp(brand, "i")),
+      };
     }
-    if (searchParams.rating) {
-      matchStage["variants.rating"] = { $gte: +searchParams.rating };
+    if (searchParams.ratings) {
+      const ratingsArray = searchParams.ratings.split(",").map(Number);
+      matchStage.averageRating = {
+        $gte: Math.min(...ratingsArray) - 0.3,
+        $lte: Math.max(...ratingsArray) + 0.7,
+      };
     }
   }
 
@@ -97,13 +100,14 @@ export async function getProductsWithAllVariants({
 
   const products = await Product.aggregate([
     { $unwind: "$variants" },
-    { $match: matchStage },
     {
       $addFields: {
         lowercaseTitle: { $toLower: "$title" },
         lowercaseBrand: { $toLower: "$brand" },
+        averageRating: { $avg: "$ratings.rating" },
       },
     },
+    { $match: matchStage },
     { $sort: (sortOption as any) ?? { "variants.createdAt": -1 } },
     { $project: productWithVariantFormat },
     { $unset: ["lowercaseTitle", "lowercaseBrand"] },

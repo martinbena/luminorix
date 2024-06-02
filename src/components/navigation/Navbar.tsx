@@ -1,8 +1,9 @@
+import Filters from "../ui/Filters";
 import MobileControlPanel from "./MobileControlPanel";
 import Navigation from "./Navigation";
 
 interface NavbarProps {
-  mode: "shop" | "user" | "admin";
+  mode: "shop" | "user" | "admin";  
 }
 
 export default function Navbar({ mode }: NavbarProps) {
@@ -11,6 +12,7 @@ export default function Navbar({ mode }: NavbarProps) {
       <MobileControlPanel mode={mode} />
       <aside className="tab:hidden">
         <Navigation mode={mode} />
+        {mode === "shop" && <Filters />}
       </aside>
     </div>
   );

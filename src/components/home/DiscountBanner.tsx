@@ -13,7 +13,7 @@ export default function DiscountBanner() {
           </p>
         </div>
         <Button
-          href={paths.productShowAll()}
+          href={`${paths.productShowAll()}?category=jewelry`}
           type="tertiary"
           ariaLabel="Go to the page with all jewellery"
         >

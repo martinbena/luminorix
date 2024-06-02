@@ -1,10 +1,10 @@
 import Product from "@/components/products/Product";
 import ProductRow from "@/components/products/ProductRow";
 import { getProductsWithAllVariants } from "@/db/queries/products";
-import { ReadonlyURLSearchParams } from "next/navigation";
+import { ProductSearchParams } from "@/db/queries/queryOptions";
 
 interface AllProductsPageProps {
-  searchParams: ReadonlyURLSearchParams;
+  searchParams: ProductSearchParams;
 }
 
 export default async function AllProductsPage({
