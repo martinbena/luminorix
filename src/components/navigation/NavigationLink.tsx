@@ -1,5 +1,6 @@
 "use client";
 
+import { useMergedSearchParams } from "@/lib/helpers";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
@@ -17,9 +18,14 @@ export default function NavigationLink({
   const pathname = usePathname();
   const searchParams = useSearchParams().toString();
 
+  const mergedLink = useMergedSearchParams(href);
+
   const isActive =
     (pathname === href &&
-      (!searchParams.length || href.split("/").length > 2)) ||
+      ((href === "/products" &&
+        !href.split("?").some(() => searchParams.includes("category"))) ||
+        !searchParams.length ||
+        href.split("/").length > 2)) ||
     (pathname.includes(`${href}/`) && href.split("/").length > 2) ||
     (searchParams.length &&
       (href.includes(searchParams) ||
@@ -27,7 +33,14 @@ export default function NavigationLink({
 
   return (
     <li className="child:flex child:flex-1 child:py-2.5 child:pl-12">
-      <Link className={`${isActive ? `${activeClasses}` : ""}`} href={href}>
+      <Link
+        className={`${isActive ? `${activeClasses}` : ""}`}
+        href={
+          href.split("?").some((param) => searchParams.includes(param))
+            ? mergedLink
+            : href
+        }
+      >
         {description}
       </Link>
     </li>

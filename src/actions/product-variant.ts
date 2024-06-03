@@ -11,7 +11,7 @@ import { DeleteItemState } from "./category";
 import {
   removeImageFromCloudinary,
   uploadIamgeToCloudinaryAndGetUrl,
-} from "@/lib/helpers";
+} from "@/lib/async-helpers";
 
 const productVariantSchema = z.object({
   color: z.string().optional(),

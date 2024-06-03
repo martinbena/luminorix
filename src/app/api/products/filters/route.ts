@@ -25,11 +25,28 @@ export async function GET(req: NextRequest) {
     (size) => size
   );
 
+  const priceData = await Product.aggregate([
+    { $match: matchStage },
+    { $unwind: "$variants" },
+    {
+      $group: {
+        _id: null,
+        lowestPrice: { $min: "$variants.price" },
+        highestPrice: { $max: "$variants.price" },
+      },
+    },
+  ]);
+
+  const lowestPrice = priceData[0]?.lowestPrice || 0;
+  const highestPrice = priceData[0]?.highestPrice || 100000;
+
   return NextResponse.json(
     {
       brands,
       colors,
       sizes,
+      lowestPrice,
+      highestPrice,
     },
     { status: 200 }
   );

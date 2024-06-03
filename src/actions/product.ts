@@ -12,7 +12,7 @@ import mongoose from "mongoose";
 import {
   removeImageFromCloudinary,
   uploadIamgeToCloudinaryAndGetUrl,
-} from "@/lib/helpers";
+} from "@/lib/async-helpers";
 
 const productVariantEditSchema = z.object({
   color: z.string().optional(),
