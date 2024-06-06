@@ -93,18 +93,27 @@ export async function getProductsWithAllVariants({
   }
 
   const totalProducts = await Product.aggregate([
+    {
+      $addFields: {
+        averageRating: { $avg: "$ratings.rating" },
+      },
+    },
     { $unwind: "$variants" },
     { $match: matchStage },
     { $count: "totalCount" },
   ]);
 
   const products = await Product.aggregate([
+    {
+      $addFields: {
+        averageRating: { $avg: "$ratings.rating" },
+      },
+    },
     { $unwind: "$variants" },
     {
       $addFields: {
         lowercaseTitle: { $toLower: "$title" },
         lowercaseBrand: { $toLower: "$brand" },
-        averageRating: { $avg: "$ratings.rating" },
       },
     },
     { $match: matchStage },

@@ -1,8 +1,10 @@
 "use client";
 
+import { FiltersResponse } from "@/app/api/products/filters/route";
+import { HIGHEST_POSSIBLE_PRICE, LOWEST_POSSIBLE_PRICE } from "@/lib/constants";
 import { validatePrice } from "@/lib/helpers";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Range, getTrackBackground } from "react-range";
 
 interface MultipleFilters {
@@ -25,6 +27,13 @@ const initialFilters: Filters = {
   minPrice: "",
   maxPrice: "",
 };
+
+interface FilterCounts {
+  brands: { name: string; count: number }[];
+  colors: { name: string; count: number }[];
+  sizes: { name: string; count: number }[];
+  ratings: { name: string; count: number }[];
+}
 
 export default function Filters() {
   const pathname = usePathname();
@@ -50,8 +59,39 @@ export default function Filters() {
     sizes: [],
     ratings: [],
   });
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
+  const [counts, setCounts] = useState<FilterCounts>({
+    brands: [],
+    colors: [],
+    sizes: [],
+    ratings: [],
+  });
+
+  const [priceRange, setPriceRange] = useState<[number, number]>([
+    LOWEST_POSSIBLE_PRICE,
+    HIGHEST_POSSIBLE_PRICE,
+  ]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const memoizedFilters = useMemo(
+    () => ({
+      brands: filters.brands,
+      colors: filters.colors,
+      sizes: filters.sizes,
+      ratings: filters.ratings,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
+    }),
+    [
+      filters.brands,
+      filters.colors,
+      filters.sizes,
+      filters.ratings,
+      filters.minPrice,
+      filters.maxPrice,
+    ]
+  );
+
+  const memoizedData = useMemo<Record<string, FiltersResponse>>(() => ({}), []);
 
   const buildNewSearchParams = (
     newParams: Partial<Filters>
@@ -83,7 +123,7 @@ export default function Filters() {
     });
 
     const queryString = new URLSearchParams(newSearchParams).toString();
-    router.push(`${pathname}?${queryString}`);
+    router.push(`${pathname}?${queryString}`, { scroll: false });
   };
 
   const updateFiltersAndURL = (newFilters: Filters): void => {
@@ -94,24 +134,102 @@ export default function Filters() {
 
     const newSearchParams = buildNewSearchParams(newFilters);
     const queryString = new URLSearchParams(newSearchParams).toString();
-    router.push(`${pathname}?${queryString}`);
+    router.push(`${pathname}?${queryString}`, { scroll: false });
   };
 
-  useEffect(() => {
-    const fetchFilterOptions = async () => {
+  const fetchFilterOptions = useCallback(
+    async (categorySlug: string | null): Promise<FiltersResponse> => {
+      const cacheKey = categorySlug || "all";
+      if (memoizedData[cacheKey]) {
+        return memoizedData[cacheKey];
+      }
+
       setIsLoading(true);
       const response = await fetch(
-        `/api/products/filters?categorySlug=${searchParams.category}`
+        `/api/products/filters?categorySlug=${categorySlug}`
       );
       const data = await response.json();
-      setOptions(data);
+
+      memoizedData[cacheKey] = data;
+      setIsLoading(false);
+      return data;
+    },
+    [memoizedData]
+  );
+
+  const fetchFilterCounts = useCallback(
+    async (filters: Filters, category: string | undefined) => {
+      const queryParams = new URLSearchParams();
+      if (category?.length) {
+        queryParams.append("categorySlug", category);
+      } else {
+        queryParams.delete("categorySlug");
+      }
+      if (filters.brands.length)
+        queryParams.append("brands", filters.brands.join(","));
+      if (filters.colors.length)
+        queryParams.append("colors", filters.colors.join(","));
+      if (filters.sizes.length)
+        queryParams.append("sizes", filters.sizes.join(","));
+      if (filters.minPrice) queryParams.append("minPrice", filters.minPrice);
+      if (filters.maxPrice) queryParams.append("maxPrice", filters.maxPrice);
+      if (filters.ratings)
+        queryParams.append("ratings", filters.ratings.join(","));
+
+      const response = await fetch(
+        `/api/products/filters?${queryParams.toString()}`
+      );
+      const data = await response.json();
+
+      setCounts({
+        brands: data.brands.map((b: { _id: string; count: number }) => ({
+          name: b._id,
+          count: b.count,
+        })),
+        colors: data.colors.map((c: { _id: string; count: number }) => ({
+          name: c._id,
+          count: c.count,
+        })),
+        sizes: data.sizes.map((s: { _id: string; count: number }) => ({
+          name: s._id,
+          count: s.count,
+        })),
+        ratings: data.ratings.map((r: { _id: string; count: number }) => ({
+          name: r._id,
+          count: r.count,
+        })),
+      });
+    },
+    []
+  );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchFilterOptions(searchParams.category);
+
+      setOptions({
+        brands: data.brands.map((b) => b._id),
+        colors: data.colors.map((c) => c._id),
+        sizes: data.sizes.map((s) => s._id),
+        ratings: data.ratings.map((r) => r._id),
+      });
+
+      setCounts({
+        brands: data.brands.map((b) => ({ name: b._id, count: b.count })),
+        colors: data.colors.map((c) => ({ name: c._id, count: c.count })),
+        sizes: data.sizes.map((s) => ({ name: s._id, count: s.count })),
+        ratings: data.ratings.map((r) => ({ name: r._id, count: r.count })),
+      });
+
       setPriceRange([data.lowestPrice, data.highestPrice]);
+
       const [validatedMin, validatedMax] = validatePrice(
         searchParams.minPrice,
         searchParams.maxPrice,
         data.lowestPrice,
         data.highestPrice
       );
+
       setFilters((prevFilters) => ({
         ...prevFilters,
         minPrice: validatedMin.toString(),
@@ -121,15 +239,18 @@ export default function Filters() {
       if (searchParams.minPrice || searchParams.maxPrice) {
         updatePriceURLParams(validatedMin, validatedMax);
       }
-      setIsLoading(false);
     };
 
-    fetchFilterOptions();
+    fetchData();
 
     return () => {
       setFilters(initialFilters);
     };
-  }, [searchParams.category]);
+  }, [pathname, searchParams.category, fetchFilterOptions]);
+
+  useEffect(() => {
+    fetchFilterCounts(memoizedFilters, searchParams.category?.toString());
+  }, [fetchFilterCounts, memoizedFilters, searchParams.category]);
 
   useEffect(() => {
     setFilters({
@@ -171,42 +292,82 @@ export default function Filters() {
     <div>
       <div>
         <label>Brand:</label>
-        {options.brands.map((brand) => (
+        {options.brands.sort().map((brand) => (
           <div key={brand}>
             <input
+              id={brand}
               type="checkbox"
               checked={filters.brands.includes(brand)}
               onChange={() => handleCheckboxChange("brands", brand)}
+              disabled={
+                counts.brands.find((b) => b.name === brand)?.count === undefined
+              }
             />
-            {brand}
+            {filters.brands.includes(brand) ? (
+              <strong>{brand}</strong>
+            ) : (
+              `${brand} (${
+                filters.brands.length &&
+                !filters.brands.includes(brand) &&
+                (counts.brands.find((b) => b.name === brand)?.count ?? 0) > 0
+                  ? "+"
+                  : ""
+              }${counts.brands.find((b) => b.name === brand)?.count || 0})`
+            )}
           </div>
         ))}
       </div>
       <div>
         <label>Color:</label>
-        {options.colors.map((color) => (
-          <div key={color}>
-            <input
-              type="checkbox"
-              checked={filters.colors.includes(color)}
-              onChange={() => handleCheckboxChange("colors", color)}
-            />
-            {color}
-          </div>
-        ))}
+        {options.colors
+          .filter((color) => color)
+          .sort()
+          .map((color) => (
+            <div key={color}>
+              <input
+                type="checkbox"
+                checked={filters.colors.includes(color)}
+                onChange={() => handleCheckboxChange("colors", color)}
+              />
+              {filters.colors.includes(color) ? (
+                <strong>{color}</strong>
+              ) : (
+                `${color} (${
+                  filters.colors.length &&
+                  !filters.colors.includes(color) &&
+                  (counts.colors.find((c) => c.name === color)?.count ?? 0) > 0
+                    ? "+"
+                    : ""
+                }${counts.colors.find((c) => c.name === color)?.count || 0})`
+              )}
+            </div>
+          ))}
       </div>
       <div>
         <label>Size:</label>
-        {options.sizes.map((size) => (
-          <div key={size}>
-            <input
-              type="checkbox"
-              checked={filters.sizes.includes(size)}
-              onChange={() => handleCheckboxChange("sizes", size)}
-            />
-            {size}
-          </div>
-        ))}
+        {options.sizes
+          .filter((size) => size)
+          .sort()
+          .map((size) => (
+            <div key={size}>
+              <input
+                type="checkbox"
+                checked={filters.sizes.includes(size)}
+                onChange={() => handleCheckboxChange("sizes", size)}
+              />
+              {filters.sizes.includes(size) ? (
+                <strong>{size}</strong>
+              ) : (
+                `${size} (${
+                  filters.sizes.length &&
+                  !filters.sizes.includes(size) &&
+                  (counts.sizes.find((s) => s.name === size)?.count ?? 0) > 0
+                    ? "+"
+                    : ""
+                }${counts.sizes.find((s) => s.name === size)?.count || 0})`
+              )}
+            </div>
+          ))}
       </div>
       <div>
         <h4>Price Range</h4>
@@ -290,19 +451,33 @@ export default function Filters() {
         </div>
       </div>
       <div>
-        <h4>Ratings</h4>
-        {[1, 2, 3, 4, 5].map((rating) => (
-          <label key={rating}>
-            <input
-              type="checkbox"
-              checked={filters.ratings.includes(rating.toString())}
-              onChange={() =>
-                handleCheckboxChange("ratings", rating.toString())
-              }
-            />
-            {rating}
-          </label>
-        ))}
+        <h4>Rating:</h4>
+        {options.ratings
+          .filter((rating) => rating)
+          .sort()
+          .map((rating) => (
+            <div key={rating}>
+              <input
+                type="checkbox"
+                checked={filters.ratings.includes(rating.toString())}
+                onChange={() =>
+                  handleCheckboxChange("ratings", rating.toString())
+                }
+              />
+              {filters.ratings.includes(rating.toString()) ? (
+                <strong>{rating}</strong>
+              ) : (
+                `${rating} (${
+                  filters.ratings.length &&
+                  !filters.ratings.includes(rating.toString()) &&
+                  (counts.ratings.find((r) => r.name === rating)?.count ?? 0) >
+                    0
+                    ? "+"
+                    : ""
+                }${counts.ratings.find((r) => r.name === rating)?.count || 0})`
+              )}
+            </div>
+          ))}
       </div>
     </div>
   );
