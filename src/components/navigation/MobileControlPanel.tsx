@@ -2,21 +2,27 @@
 
 import { useState } from "react";
 import ButtonIcon from "../ui/ButtonIcon";
-import { PiCrownSimpleLight, PiListThin, PiUserListThin } from "react-icons/pi";
+import {
+  PiCrownSimpleLight,
+  PiListThin,
+  PiSlidersThin,
+  PiUserListThin,
+} from "react-icons/pi";
 import MobileNavigation from "./MobileNavigation";
 import Navigation, { NavigationProps } from "./Navigation";
 import Modal from "../ui/Modal";
+import FilterPanel from "../ui/FilterPanel";
 
 interface MobileControlPanelProps {
   mode?: "shop" | "user" | "admin";
 }
 
-export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
-  const [activeNav, setActiveNav] = useState<NavigationProps["mode"] | null>(
-    null
-  );
+type ActiveNavType = NavigationProps["mode"] | "filters";
 
-  function toggleVisibility(nav: NavigationProps["mode"]): void {
+export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
+  const [activeNav, setActiveNav] = useState<ActiveNavType | null>(null);
+
+  function toggleVisibility(nav: NavigationProps["mode"] | "filters"): void {
     setActiveNav((prevNav) => (prevNav === nav ? null : nav));
   }
 
@@ -36,6 +42,17 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
           >
             <PiListThin />
           </ButtonIcon>
+
+          {mode === "shop" && (
+            <ButtonIcon
+              variant="large"
+              onClick={() => toggleVisibility("filters")}
+              additionalClasses="child:fill-zinc-800"
+              tabIndex={activeNav ? -1 : 0}
+            >
+              <PiSlidersThin />
+            </ButtonIcon>
+          )}
 
           {(mode === "user" || mode === "admin") && (
             <ButtonIcon
@@ -78,7 +95,11 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
           isVisible ? setActiveNav(activeNav) : setActiveNav(null)
         }
       >
-        {activeNav ? <Navigation mode={activeNav} /> : null}
+        {activeNav === "filters" ? (
+          <FilterPanel />
+        ) : activeNav ? (
+          <Navigation mode={activeNav} />
+        ) : null}
       </MobileNavigation>
     </>
   );
