@@ -129,7 +129,7 @@ function InputGroup({
     name,
     placeholder,
     defaultValue: value,
-    className: `${inputType === "checkbox" ? "accent-amber-400 h-4 w-4" : ""} ${
+    className: `${
       isReadOnly ? "cursor-not-allowed bg-zinc-100" : ""
     } border text-base focus:outline-none max-w-full px-4 py-3 ${
       error

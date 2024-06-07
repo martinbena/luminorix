@@ -1,4 +1,4 @@
-import Filters from "../ui/Filters";
+import FilterPanel from "../ui/FilterPanel";
 import MobileControlPanel from "./MobileControlPanel";
 import Navigation from "./Navigation";
 
@@ -12,7 +12,7 @@ export default function Navbar({ mode }: NavbarProps) {
       <MobileControlPanel mode={mode} />
       <aside className="tab:hidden">
         <Navigation mode={mode} />
-        {mode === "shop" && <Filters />}
+        {mode === "shop" && <FilterPanel />}
       </aside>
     </div>
   );

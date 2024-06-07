@@ -5,6 +5,14 @@ export const formatCurrency = (value: number) =>
     value
   );
 
+export const formatNumber = (number: string | number) => {
+  return new Intl.NumberFormat("en-US", {
+    minimumFractionDigits: 0,
+  })
+    .format(+number)
+    .replace(/,/g, " ");
+};
+
 export const useMergedSearchParams = (href: string): string => {
   const searchParams = useSearchParams();
 
