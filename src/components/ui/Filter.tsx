@@ -4,6 +4,7 @@ import { useFilterContext } from "@/app/contexts/FilterContext";
 import { formatNumber } from "@/lib/helpers";
 import { PropsWithChildren } from "react";
 import { Range, getTrackBackground } from "react-range";
+import { SkeletonAvatar, SkeletonBlock } from "skeleton-elements/react";
 
 function Filter({ children }: PropsWithChildren) {
   return (
@@ -177,7 +178,151 @@ function PriceRange() {
   );
 }
 
+function Skeleton() {
+  return (
+    <div className="flex flex-col gap-4">
+      <SkeletonRange />
+      <SkeletonBox />
+      <SkeletonBox />
+      <SkeletonBox />
+      <SkeletonBox />
+    </div>
+  );
+}
+
+function SkeletonRange() {
+  return (
+    <div className="mb-2">
+      <div className="border-b border-zinc-300 pb-1">
+        <SkeletonBlock
+          tag="p"
+          width="70px"
+          height="20px"
+          borderRadius="0"
+          effect="wave"
+        />
+      </div>
+      <div className="my-2 flex justify-center items-center child:py-0.5">
+        <SkeletonAvatar
+          tag="span"
+          size={30}
+          color="#f000000"
+          showIcon={false}
+          effect="wave"
+          borderRadius="50%"
+          iconColor=""
+        />
+        <SkeletonBlock
+          tag="span"
+          width="150px"
+          height="7px"
+          borderRadius="0"
+          effect="wave"
+        />
+        <SkeletonAvatar
+          tag="span"
+          size={30}
+          color="#f000000"
+          showIcon={false}
+          effect="wave"
+          borderRadius="50%"
+          iconColor=""
+        />
+      </div>
+      <div className="flex justify-between">
+        <SkeletonBlock
+          tag="span"
+          width="40px"
+          height="30px"
+          borderRadius="0"
+          effect="wave"
+        />
+        <SkeletonBlock
+          tag="span"
+          width="40px"
+          height="30px"
+          borderRadius="0"
+          effect="wave"
+        />
+      </div>
+    </div>
+  );
+}
+
+function SkeletonBox() {
+  return (
+    <div>
+      <div className="border-b border-zinc-300 pb-1">
+        <SkeletonBlock
+          tag="p"
+          width="70px"
+          height="20px"
+          borderRadius="0"
+          effect="wave"
+        />
+      </div>
+      <div className="my-2 flex flex-col child:py-2">
+        <div className="flex items-center gap-2">
+          <SkeletonAvatar
+            tag="span"
+            size={20}
+            color="#f000000"
+            showIcon={false}
+            effect="wave"
+            borderRadius="0"
+            iconColor=""
+          />
+          <SkeletonBlock
+            tag="span"
+            width="70px"
+            height="15px"
+            borderRadius="0"
+            effect="wave"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <SkeletonAvatar
+            tag="span"
+            size={20}
+            color="#f000000"
+            showIcon={false}
+            effect="wave"
+            borderRadius="0"
+            iconColor=""
+          />
+          <SkeletonBlock
+            tag="span"
+            width="100px"
+            height="15px"
+            borderRadius="0"
+            effect="wave"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <SkeletonAvatar
+            tag="span"
+            size={20}
+            color="#f000000"
+            showIcon={false}
+            effect="wave"
+            borderRadius="0"
+            iconColor=""
+          />
+          <SkeletonBlock
+            tag="span"
+            width="150px"
+            height="15px"
+            borderRadius="0"
+            effect="wave"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 Filter.Box = Box;
 Filter.PriceRange = PriceRange;
+Filter.Skeleton = Skeleton;
 
 export default Filter;

@@ -114,15 +114,19 @@ export default function Filters() {
     setIsLoading(false);
   }, []);
 
-  if (isLoading) return <p>Loading...</p>;
-
   return (
     <Filter>
-      <Filter.Box filterType="price" />
-      <Filter.Box filterType="brands" />
-      <Filter.Box filterType="colors" />
-      <Filter.Box filterType="sizes" />
-      <Filter.Box filterType="ratings" isReversed />
+      {isLoading ? (
+        <Filter.Skeleton />
+      ) : (
+        <>
+          <Filter.Box filterType="price" />
+          <Filter.Box filterType="brands" />
+          <Filter.Box filterType="colors" />
+          <Filter.Box filterType="sizes" />
+          <Filter.Box filterType="ratings" isReversed />{" "}
+        </>
+      )}
     </Filter>
   );
 }
