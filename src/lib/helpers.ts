@@ -16,7 +16,7 @@ export const formatNumber = (number: string | number) => {
 export const useMergedSearchParams = (href: string): string => {
   const searchParams = useSearchParams();
 
-  if (!href.includes("?")) {
+  if (!searchParams) {
     return href;
   }
   const baseUrl = process.env.BASE_URL;

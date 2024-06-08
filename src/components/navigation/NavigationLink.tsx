@@ -36,7 +36,8 @@ export default function NavigationLink({
       <Link
         className={`${isActive ? `${activeClasses}` : ""}`}
         href={
-          href.split("?").some((param) => searchParams.includes(param))
+          href.split("?").some((param) => searchParams.includes(param)) ||
+          (!href.includes("?") && !searchParams.includes("category"))
             ? mergedLink
             : href
         }
