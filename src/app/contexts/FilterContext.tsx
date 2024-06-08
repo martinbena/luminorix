@@ -161,9 +161,39 @@ function FilterProvider({ children }: FilterPropviderProps) {
 
   const memoizedData = useMemo<Record<string, FiltersResponse>>(() => ({}), []);
 
+  // function buildNewSearchParams(
+  //   newParams: Partial<Filters>
+  // ): Record<string, any> {
+  //   const updatedSearchParams: Record<string, any> = {
+  //     ...searchParams,
+  //     ...newParams,
+  //   };
+
+  //   Object.keys(updatedSearchParams).forEach(
+  //     (key: keyof typeof updatedSearchParams) => {
+  //       if (
+  //         updatedSearchParams[key] === "" ||
+  //         updatedSearchParams[key]?.length === 0 ||
+  //         updatedSearchParams[key] === null
+  //       ) {
+  //         delete updatedSearchParams[key];
+  //       }
+  //     }
+  //   );
+
+  //   return updatedSearchParams;
+  // }
+
   function buildNewSearchParams(
     newParams: Partial<Filters>
   ): Record<string, any> {
+    const currentSearchParams = new URLSearchParams(window.location.search);
+
+    const searchParams: Record<string, any> = {};
+    currentSearchParams.forEach((value, key) => {
+      searchParams[key] = value;
+    });
+
     const updatedSearchParams: Record<string, any> = {
       ...searchParams,
       ...newParams,

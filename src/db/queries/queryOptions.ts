@@ -73,8 +73,43 @@ export const productSortOptions = [
   },
 ];
 
+export const userProductSortOptions = [
+  {
+    value: "titleAsc",
+    label: "Title (A-Z)",
+    sort: { lowercaseTitle: 1 },
+  },
+  {
+    value: "titleDesc",
+    label: "Title (Z-A)",
+    sort: { lowercaseTitle: -1 },
+  },
+  {
+    value: "priceAsc",
+    label: "Price (Low to High)",
+    sort: { "variants.price": 1 },
+  },
+  {
+    value: "priceDesc",
+    label: "Price (High to Low)",
+    sort: { "variants.price": -1 },
+  },
+  {
+    value: "newest",
+    label: "Newest Arrivals",
+    sort: { "variants.createdAt": -1 },
+  },
+  {
+    value: "bestSelling",
+    label: "Best Selling",
+    sort: { "variants.sold": -1 },
+  },
+];
+
 export function getSortOption(value: string) {
-  return productSortOptions.find((option) => option.value === value)?.sort;
+  return [...productSortOptions, ...userProductSortOptions].find(
+    (option) => option.value === value
+  )?.sort;
 }
 
 export const productWithVariantFormat = {
