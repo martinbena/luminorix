@@ -1,11 +1,14 @@
 import { Children, ReactNode } from "react";
 import HeadingSecondary from "../ui/HeadingSecondary";
 import Button from "../ui/Button";
+import SortBy from "../ui/SortBy";
+import { userProductSortOptions } from "@/db/queries/queryOptions";
 
 interface ProductRowProps {
   sectionClasses?: string;
   title: string;
   children: ReactNode;
+  sort?: boolean;
   hasLink?: boolean;
   linkTo?: string;
   gridSize?: string;
@@ -15,6 +18,7 @@ export default function ProductRow({
   sectionClasses = "py-10 bg-zinc-100",
   title,
   children,
+  sort = false,
   hasLink = false,
   linkTo,
   gridSize = "small",
@@ -22,6 +26,14 @@ export default function ProductRow({
   return (
     <section className={`px-8 mob:px-5 ${sectionClasses}`}>
       <HeadingSecondary>{title}</HeadingSecondary>
+      {sort && (
+        <div className="my-6 flex justify-between items-center">
+          <div>&nbsp;</div>
+          <div className="justify-self-end">
+            <SortBy options={userProductSortOptions} />
+          </div>
+        </div>
+      )}
       <div
         className={`mt-8 grid gap-8 dt-sm:gap-4 max-w-8xl mx-auto ${
           gridSize === "small"
