@@ -12,6 +12,7 @@ import MobileNavigation from "./MobileNavigation";
 import Navigation, { NavigationProps } from "./Navigation";
 import Modal from "../ui/Modal";
 import FilterPanel from "../filters/FilterPanel";
+import { usePathname } from "next/navigation";
 
 interface MobileControlPanelProps {
   mode?: "shop" | "user" | "admin";
@@ -21,6 +22,7 @@ type ActiveNavType = NavigationProps["mode"] | "filters";
 
 export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
   const [activeNav, setActiveNav] = useState<ActiveNavType | null>(null);
+  const pathname = usePathname();
 
   function toggleVisibility(nav: NavigationProps["mode"] | "filters"): void {
     setActiveNav((prevNav) => (prevNav === nav ? null : nav));
@@ -43,7 +45,7 @@ export default function MobileControlPanel({ mode }: MobileControlPanelProps) {
             <PiListThin />
           </ButtonIcon>
 
-          {mode === "shop" && (
+          {mode === "shop" && pathname === "/products" && (
             <ButtonIcon
               variant="large"
               onClick={() => toggleVisibility("filters")}

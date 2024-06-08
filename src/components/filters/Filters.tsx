@@ -88,10 +88,6 @@ export default function Filters() {
     };
 
     fetchData();
-
-    return () => {
-      dispatch({ type: "SET_FILTERS", payload: initialState.filters });
-    };
   }, [pathname, searchParams.category, fetchFilterOptions]);
 
   useEffect(() => {
