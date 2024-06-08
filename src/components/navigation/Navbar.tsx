@@ -1,4 +1,4 @@
-import FilterPanel from "../ui/FilterPanel";
+import FilterPanel from "../filters/FilterPanel";
 import MobileControlPanel from "./MobileControlPanel";
 import Navigation from "./Navigation";
 

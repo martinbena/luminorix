@@ -11,7 +11,7 @@ import {
 import MobileNavigation from "./MobileNavigation";
 import Navigation, { NavigationProps } from "./Navigation";
 import Modal from "../ui/Modal";
-import FilterPanel from "../ui/FilterPanel";
+import FilterPanel from "../filters/FilterPanel";
 
 interface MobileControlPanelProps {
   mode?: "shop" | "user" | "admin";

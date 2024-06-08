@@ -1,9 +1,7 @@
 import Product from "@/components/products/Product";
 import ProductRow from "@/components/products/ProductRow";
 import { getProductsWithAllVariants } from "@/db/queries/products";
-import {
-  ProductSearchParams, 
-} from "@/db/queries/queryOptions";
+import { ProductSearchParams } from "@/db/queries/queryOptions";
 
 interface AllProductsPageProps {
   searchParams: ProductSearchParams;
@@ -23,6 +21,7 @@ export default async function AllProductsPage({
         sectionClasses="bg-white"
         gridSize="large"
         sort
+        filterTags
       >
         {products.map((product) => (
           <Product key={product.sku} product={product} />

@@ -40,19 +40,21 @@ interface FilterContextProps {
   updateFiltersAndURL: (newFilters: Filters) => void;
   handlePriceChange: (values: number[]) => void;
   handleCheckboxChange: (filterType: keyof Options, value: string) => void;
+  handleResetFilters: () => void;
+  handleRemoveFilter: (filterType: keyof Options, value: string) => void;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
 
 const FilterContext = createContext({} as FilterContextProps);
 
-interface Options {
+export interface Options {
   brands: string[];
   colors: string[];
   sizes: string[];
   ratings: string[];
 }
 
-interface Filters extends Options {
+export interface Filters extends Options {
   minPrice: string;
   maxPrice: string;
 }
@@ -82,7 +84,12 @@ type Action =
   | { type: "SET_FILTERS"; payload: Partial<Filters> }
   | { type: "SET_OPTIONS"; payload: Partial<Options> }
   | { type: "SET_COUNTS"; payload: Partial<Counts> }
-  | { type: "SET_PRICE_RANGE"; payload: [number, number] };
+  | { type: "SET_PRICE_RANGE"; payload: [number, number] }
+  | { type: "RESET_FILTERS" }
+  | {
+      type: "REMOVE_FILTER";
+      payload: { filterType: keyof Options; value: string };
+    };
 
 interface FilterPropviderProps {
   children: ReactNode;
@@ -101,6 +108,7 @@ function FilterProvider({ children }: FilterPropviderProps) {
       ratings: rawSearchParams.get("ratings"),
       minPrice: rawSearchParams.getAll("minPrice").sort((a, b) => +a - +b)[0],
       maxPrice: rawSearchParams.getAll("maxPrice").sort((a, b) => +b - +a)[0],
+      sortBy: rawSearchParams.get("sortBy"),
     }),
     [rawSearchParams]
   );
@@ -138,6 +146,25 @@ function FilterProvider({ children }: FilterPropviderProps) {
           ...state,
           priceRange: action.payload,
         };
+      case "RESET_FILTERS":
+        return {
+          ...state,
+          filters: {
+            ...initialState.filters,
+            minPrice: state.filters.minPrice,
+            maxPrice: state.filters.maxPrice,
+          },
+        };
+      case "REMOVE_FILTER":
+        const newFilters = { ...state.filters };
+
+        if (Array.isArray(newFilters[action.payload.filterType])) {
+          newFilters[action.payload.filterType] = newFilters[
+            action.payload.filterType
+          ].filter((item: string) => item !== action.payload.value);
+        }
+
+        return { ...state, filters: newFilters };
       default:
         return state;
     }
@@ -160,29 +187,6 @@ function FilterProvider({ children }: FilterPropviderProps) {
   );
 
   const memoizedData = useMemo<Record<string, FiltersResponse>>(() => ({}), []);
-
-  // function buildNewSearchParams(
-  //   newParams: Partial<Filters>
-  // ): Record<string, any> {
-  //   const updatedSearchParams: Record<string, any> = {
-  //     ...searchParams,
-  //     ...newParams,
-  //   };
-
-  //   Object.keys(updatedSearchParams).forEach(
-  //     (key: keyof typeof updatedSearchParams) => {
-  //       if (
-  //         updatedSearchParams[key] === "" ||
-  //         updatedSearchParams[key]?.length === 0 ||
-  //         updatedSearchParams[key] === null
-  //       ) {
-  //         delete updatedSearchParams[key];
-  //       }
-  //     }
-  //   );
-
-  //   return updatedSearchParams;
-  // }
 
   function buildNewSearchParams(
     newParams: Partial<Filters>
@@ -323,6 +327,39 @@ function FilterProvider({ children }: FilterPropviderProps) {
     updateFiltersAndURL({ ...filters, [filterType]: updatedValues });
   };
 
+  function handleResetFilters() {
+    dispatch({ type: "RESET_FILTERS" });
+    const { category, sortBy, minPrice, maxPrice } = searchParams;
+    const queryParams = new URLSearchParams();
+    if (category?.length) {
+      queryParams.append("category", category);
+    }
+    if (sortBy?.length) {
+      queryParams.append("sortBy", sortBy);
+    }
+    if (minPrice?.length) {
+      queryParams.append("minPrice", minPrice);
+    }
+    if (maxPrice?.length) {
+      queryParams.append("maxPrice", maxPrice);
+    }
+
+    const queryString = queryParams.toString();
+    router.push(`${pathname}${queryString ? `?${queryString}` : ""}`, {
+      scroll: false,
+    });
+  }
+
+  function handleRemoveFilter(filterType: keyof Options, value: string): void {
+    dispatch({ type: "REMOVE_FILTER", payload: { filterType, value } });
+
+    const updatedValues = filters[filterType].filter(
+      (item: string) => item !== value
+    );
+
+    updateFiltersAndURL({ ...filters, [filterType]: updatedValues });
+  }
+
   return (
     <FilterContext.Provider
       value={{
@@ -339,6 +376,8 @@ function FilterProvider({ children }: FilterPropviderProps) {
         isLoading,
         handlePriceChange,
         handleCheckboxChange,
+        handleResetFilters,
+        handleRemoveFilter,
         setIsLoading,
       }}
     >

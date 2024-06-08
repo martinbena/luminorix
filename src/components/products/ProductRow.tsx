@@ -3,12 +3,14 @@ import HeadingSecondary from "../ui/HeadingSecondary";
 import Button from "../ui/Button";
 import SortBy from "../ui/SortBy";
 import { userProductSortOptions } from "@/db/queries/queryOptions";
+import FilterTags from "../filters/FilterTags";
 
 interface ProductRowProps {
   sectionClasses?: string;
   title: string;
   children: ReactNode;
   sort?: boolean;
+  filterTags?: boolean;
   hasLink?: boolean;
   linkTo?: string;
   gridSize?: string;
@@ -19,6 +21,7 @@ export default function ProductRow({
   title,
   children,
   sort = false,
+  filterTags = false,
   hasLink = false,
   linkTo,
   gridSize = "small",
@@ -26,9 +29,9 @@ export default function ProductRow({
   return (
     <section className={`px-8 mob:px-5 ${sectionClasses}`}>
       <HeadingSecondary>{title}</HeadingSecondary>
-      {sort && (
-        <div className="my-6 flex justify-between items-center">
-          <div>&nbsp;</div>
+      {(sort || filterTags) && (
+        <div className="my-6 flex justify-between gap-4 mob-lg:flex-col">
+          <div>{filterTags ? <FilterTags /> : null}</div>
           <div className="justify-self-end">
             <SortBy options={userProductSortOptions} />
           </div>
