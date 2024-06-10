@@ -7,9 +7,43 @@ import {
 } from "@/app/contexts/FilterContext";
 import { IoClose } from "react-icons/io5";
 import Button from "../ui/Button";
+import { useSearchParams } from "next/navigation";
+import { useMemo } from "react";
 
 export default function FilterTags() {
-  const { state, handleRemoveFilter, handleResetFilters } = useFilterContext();
+  const rawSearchParams = useSearchParams();
+  const searchParams = useMemo(
+    () => ({
+      category: rawSearchParams.get("category"),
+      brands: rawSearchParams.get("brands"),
+      colors: rawSearchParams.get("colors"),
+      sizes: rawSearchParams.get("sizes"),
+      ratings: rawSearchParams.get("ratings"),
+      minPrice: rawSearchParams.getAll("minPrice").sort((a, b) => +a - +b)[0],
+      maxPrice: rawSearchParams.getAll("maxPrice").sort((a, b) => +b - +a)[0],
+      sortBy: rawSearchParams.get("sortBy"),
+    }),
+    [rawSearchParams]
+  );
+  const { state, handleRemoveFilter, dispatch, pathname, router } =
+    useFilterContext();
+
+  function handleResetFilters() {
+    dispatch({ type: "RESET_FILTERS" });
+    const { category, sortBy } = searchParams;
+    const queryParams = new URLSearchParams();
+    if (category?.length) {
+      queryParams.append("category", category);
+    }
+    if (sortBy?.length) {
+      queryParams.append("sortBy", sortBy);
+    }
+
+    const queryString = queryParams.toString();
+    router.push(`${pathname}${queryString ? `?${queryString}` : ""}`, {
+      scroll: false,
+    });
+  }
 
   const hasFilters = Object.keys(state.filters).some(
     (filterType) =>

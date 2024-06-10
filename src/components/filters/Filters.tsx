@@ -2,14 +2,14 @@
 
 import { useFilterContext } from "@/app/contexts/FilterContext";
 import { validatePrice } from "@/lib/helpers";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import Filter from "./Filter";
+import { useSearchParams } from "next/navigation";
 
 export default function Filters() {
   const {
     fetchFilterOptions,
-    fetchFilterCounts,
-    searchParams,
+    fetchFilterCounts,  
     memoizedFilters,
     pathname,
     dispatch,
@@ -18,6 +18,21 @@ export default function Filters() {
     setIsLoading,
     error,
   } = useFilterContext();
+
+  const rawSearchParams = useSearchParams();
+  const searchParams = useMemo(
+    () => ({
+      category: rawSearchParams.get("category"),
+      brands: rawSearchParams.get("brands"),
+      colors: rawSearchParams.get("colors"),
+      sizes: rawSearchParams.get("sizes"),
+      ratings: rawSearchParams.get("ratings"),
+      minPrice: rawSearchParams.getAll("minPrice").sort((a, b) => +a - +b)[0],
+      maxPrice: rawSearchParams.getAll("maxPrice").sort((a, b) => +b - +a)[0],
+      sortBy: rawSearchParams.get("sortBy"),
+    }),
+    [rawSearchParams]
+  );
 
   useEffect(() => {
     const fetchData = async () => {

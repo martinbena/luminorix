@@ -2,6 +2,7 @@
 
 import { FiltersResponse } from "@/app/api/products/filters/route";
 import { HIGHEST_POSSIBLE_PRICE, LOWEST_POSSIBLE_PRICE } from "@/lib/constants";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Dispatch,
@@ -17,19 +18,11 @@ import {
 
 interface FilterContextProps {
   state: FilterState;
-  searchParams: {
-    category: string | null;
-    brands: string | null;
-    colors: string | null;
-    sizes: string | null;
-    ratings: string | null;
-    minPrice: string;
-    maxPrice: string;
-  };
   dispatch: Dispatch<Action>;
   initialState: FilterState;
   memoizedFilters: Filters;
   pathname: string;
+  router: AppRouterInstance;
   isLoading: boolean;
   error: string | null;
   setError: Dispatch<SetStateAction<string | null>>;
@@ -44,7 +37,6 @@ interface FilterContextProps {
   updateFiltersAndURL: (newFilters: Filters) => void;
   handlePriceChange: (values: number[]) => void;
   handleCheckboxChange: (filterType: keyof Options, value: string) => void;
-  handleResetFilters: () => void;
   handleRemoveFilter: (filterType: keyof Options, value: string) => void;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
@@ -102,20 +94,6 @@ interface FilterPropviderProps {
 function FilterProvider({ children }: FilterPropviderProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const rawSearchParams = useSearchParams();
-  const searchParams = useMemo(
-    () => ({
-      category: rawSearchParams.get("category"),
-      brands: rawSearchParams.get("brands"),
-      colors: rawSearchParams.get("colors"),
-      sizes: rawSearchParams.get("sizes"),
-      ratings: rawSearchParams.get("ratings"),
-      minPrice: rawSearchParams.getAll("minPrice").sort((a, b) => +a - +b)[0],
-      maxPrice: rawSearchParams.getAll("maxPrice").sort((a, b) => +b - +a)[0],
-      sortBy: rawSearchParams.get("sortBy"),
-    }),
-    [rawSearchParams]
-  );
 
   const initialState: FilterState = {
     filters: {
@@ -355,23 +333,6 @@ function FilterProvider({ children }: FilterPropviderProps) {
     updateFiltersAndURL({ ...filters, [filterType]: updatedValues });
   };
 
-  function handleResetFilters() {
-    dispatch({ type: "RESET_FILTERS" });
-    const { category, sortBy } = searchParams;
-    const queryParams = new URLSearchParams();
-    if (category?.length) {
-      queryParams.append("category", category);
-    }
-    if (sortBy?.length) {
-      queryParams.append("sortBy", sortBy);
-    }
-
-    const queryString = queryParams.toString();
-    router.push(`${pathname}${queryString ? `?${queryString}` : ""}`, {
-      scroll: false,
-    });
-  }
-
   function handleRemoveFilter(filterType: keyof Options, value: string): void {
     dispatch({ type: "REMOVE_FILTER", payload: { filterType, value } });
 
@@ -389,16 +350,15 @@ function FilterProvider({ children }: FilterPropviderProps) {
         fetchFilterCounts,
         fetchFilterOptions,
         updateFiltersAndURL,
-        searchParams,
         dispatch,
         initialState,
         memoizedFilters,
         pathname,
+        router,
         updatePriceURLParams,
         isLoading,
         handlePriceChange,
         handleCheckboxChange,
-        handleResetFilters,
         handleRemoveFilter,
         setIsLoading,
         error,

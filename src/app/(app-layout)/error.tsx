@@ -9,5 +9,10 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  return <ErrorUI error={error} reset={reset} />;
+  return (
+    <>
+      <span>&nbsp;</span>
+      <ErrorUI error={error} reset={reset} />;
+    </>
+  );
 }

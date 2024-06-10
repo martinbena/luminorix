@@ -1,32 +1,30 @@
-import Product from "@/components/products/Product";
-import ProductRow from "@/components/products/ProductRow";
-import { getProductsWithAllVariants } from "@/db/queries/products";
+import AllProducts from "@/components/products/AllProducts";
+import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
+import { getCategoryBySlug } from "@/db/queries/categories";
 import { ProductSearchParams } from "@/db/queries/queryOptions";
+import { Suspense } from "react";
 
-interface AllProductsPageProps {
+export interface AllProductsPageProps {
   searchParams: ProductSearchParams;
+}
+
+export async function generateMetadata({ searchParams }: AllProductsPageProps) {
+  const { category: categorySlug } = searchParams;
+  const category = await getCategoryBySlug(categorySlug);
+
+  return {
+    title: `${category?.title ?? "All Sortiment"}`,
+  };
 }
 
 export default async function AllProductsPage({
   searchParams,
 }: AllProductsPageProps) {
-  const { products, currentCategory } = await getProductsWithAllVariants({
-    searchParams,
-  });
-
   return (
-    <>
-      <ProductRow
-        title={currentCategory?.title ?? "All sortiment"}
-        sectionClasses="bg-white"
-        gridSize="large"
-        sort
-        filterTags
-      >
-        {products.map((product) => (
-          <Product key={product.sku} product={product} />
-        ))}
-      </ProductRow>
-    </>
+    <Suspense
+      fallback={<ProductRowSkeleton gridSize="large" hasTitle numItems={12} />}
+    >
+      <AllProducts searchParams={searchParams} />
+    </Suspense>
   );
 }
