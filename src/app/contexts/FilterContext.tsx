@@ -31,11 +31,15 @@ interface FilterContextProps {
   memoizedFilters: Filters;
   pathname: string;
   isLoading: boolean;
+  error: string | null;
+  setError: Dispatch<SetStateAction<string | null>>;
   fetchFilterCounts: (
     filters: Filters,
     category: string | undefined
   ) => Promise<void>;
-  fetchFilterOptions: (categorySlug: string | null) => Promise<FiltersResponse>;
+  fetchFilterOptions: (
+    categorySlug: string | null
+  ) => Promise<FiltersResponse | null>;
   updatePriceURLParams: (minPrice: number, maxPrice: number) => void;
   updateFiltersAndURL: (newFilters: Filters) => void;
   handlePriceChange: (values: number[]) => void;
@@ -171,8 +175,9 @@ function FilterProvider({ children }: FilterPropviderProps) {
   }
 
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { filters, priceRange } = state;
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const { filters, priceRange } = state;
 
   const memoizedFilters = useMemo(
     () => ({
@@ -237,21 +242,35 @@ function FilterProvider({ children }: FilterPropviderProps) {
   }
 
   const fetchFilterOptions = useCallback(
-    async (categorySlug: string | null): Promise<FiltersResponse> => {
+    async (categorySlug: string | null): Promise<FiltersResponse | null> => {
       const cacheKey = categorySlug || "all";
       if (memoizedData[cacheKey]) {
         return memoizedData[cacheKey];
       }
 
       setIsLoading(true);
-      const response = await fetch(
-        `/api/products/filters?categorySlug=${categorySlug}`
-      );
-      const data = await response.json();
+      setError(null);
 
-      memoizedData[cacheKey] = data;
-      setIsLoading(false);
-      return data;
+      try {
+        const response = await fetch(
+          `/api/products/filters?categorySlug=${categorySlug}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Could not get product filters");
+        }
+
+        const data = await response.json();
+
+        memoizedData[cacheKey] = data;
+
+        return data;
+      } catch (error: any) {
+        setError(error.message);
+        return null;
+      } finally {
+        setIsLoading(false);
+      }
     },
     [memoizedData]
   );
@@ -275,32 +294,41 @@ function FilterProvider({ children }: FilterPropviderProps) {
       if (filters.ratings)
         queryParams.append("ratings", filters.ratings.join(","));
 
-      const response = await fetch(
-        `/api/products/filters?${queryParams.toString()}`
-      );
-      const data = await response.json();
+      try {
+        const response = await fetch(
+          `/api/products/filters?${queryParams.toString()}`
+        );
 
-      dispatch({
-        type: "SET_COUNTS",
-        payload: {
-          brands: data.brands.map((b: { _id: string; count: number }) => ({
-            name: b._id,
-            count: b.count,
-          })),
-          colors: data.colors.map((c: { _id: string; count: number }) => ({
-            name: c._id,
-            count: c.count,
-          })),
-          sizes: data.sizes.map((s: { _id: string; count: number }) => ({
-            name: s._id,
-            count: s.count,
-          })),
-          ratings: data.ratings.map((r: { _id: string; count: number }) => ({
-            name: r._id,
-            count: r.count,
-          })),
-        },
-      });
+        if (!response.ok) {
+          throw new Error("Could not get product filters");
+        }
+
+        const data = await response.json();
+
+        dispatch({
+          type: "SET_COUNTS",
+          payload: {
+            brands: data.brands.map((b: { _id: string; count: number }) => ({
+              name: b._id,
+              count: b.count,
+            })),
+            colors: data.colors.map((c: { _id: string; count: number }) => ({
+              name: c._id,
+              count: c.count,
+            })),
+            sizes: data.sizes.map((s: { _id: string; count: number }) => ({
+              name: s._id,
+              count: s.count,
+            })),
+            ratings: data.ratings.map((r: { _id: string; count: number }) => ({
+              name: r._id,
+              count: r.count,
+            })),
+          },
+        });
+      } catch (error: any) {
+        setError(error.message);
+      }
     },
     []
   );
@@ -373,6 +401,8 @@ function FilterProvider({ children }: FilterPropviderProps) {
         handleResetFilters,
         handleRemoveFilter,
         setIsLoading,
+        error,
+        setError,
       }}
     >
       {children}

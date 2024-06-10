@@ -10,13 +10,13 @@ export default function Filters() {
     fetchFilterOptions,
     fetchFilterCounts,
     searchParams,
-    initialState,
     memoizedFilters,
     pathname,
     dispatch,
     updatePriceURLParams,
     isLoading,
     setIsLoading,
+    error,
   } = useFilterContext();
 
   useEffect(() => {
@@ -24,64 +24,66 @@ export default function Filters() {
       setIsLoading(true);
       const data = await fetchFilterOptions(searchParams.category);
 
-      dispatch({
-        type: "SET_OPTIONS",
-        payload: {
-          brands: data.brands.map((b: { _id: string }) => b._id),
-          colors: data.colors.map((c: { _id: string }) => c._id),
-          sizes: data.sizes.map((s: { _id: string }) => s._id),
-          ratings: data.ratings.map((r: { _id: string }) => r._id),
-        },
-      });
+      if (data && !error) {
+        dispatch({
+          type: "SET_OPTIONS",
+          payload: {
+            brands: data.brands.map((b: { _id: string }) => b._id),
+            colors: data.colors.map((c: { _id: string }) => c._id),
+            sizes: data.sizes.map((s: { _id: string }) => s._id),
+            ratings: data.ratings.map((r: { _id: string }) => r._id),
+          },
+        });
 
-      dispatch({
-        type: "SET_COUNTS",
-        payload: {
-          brands: data.brands.map((b: { _id: string; count: number }) => ({
-            name: b._id,
-            count: b.count,
-          })),
-          colors: data.colors.map((c: { _id: string; count: number }) => ({
-            name: c._id,
-            count: c.count,
-          })),
-          sizes: data.sizes.map((s: { _id: string; count: number }) => ({
-            name: s._id,
-            count: s.count,
-          })),
-          ratings: data.ratings.map((r: { _id: string; count: number }) => ({
-            name: r._id,
-            count: r.count,
-          })),
-        },
-      });
+        dispatch({
+          type: "SET_COUNTS",
+          payload: {
+            brands: data.brands.map((b: { _id: string; count: number }) => ({
+              name: b._id,
+              count: b.count,
+            })),
+            colors: data.colors.map((c: { _id: string; count: number }) => ({
+              name: c._id,
+              count: c.count,
+            })),
+            sizes: data.sizes.map((s: { _id: string; count: number }) => ({
+              name: s._id,
+              count: s.count,
+            })),
+            ratings: data.ratings.map((r: { _id: string; count: number }) => ({
+              name: r._id,
+              count: r.count,
+            })),
+          },
+        });
 
-      dispatch({
-        type: "SET_PRICE_RANGE",
-        payload: [data.lowestPrice, data.highestPrice],
-      });
+        dispatch({
+          type: "SET_PRICE_RANGE",
+          payload: [data.lowestPrice, data.highestPrice],
+        });
 
-      const [validatedMin, validatedMax] = validatePrice(
-        searchParams.minPrice,
-        searchParams.maxPrice,
-        data.lowestPrice,
-        data.highestPrice
-      );
+        const [validatedMin, validatedMax] = validatePrice(
+          searchParams.minPrice,
+          searchParams.maxPrice,
+          data.lowestPrice,
+          data.highestPrice
+        );
 
-      dispatch({
-        type: "SET_FILTERS",
-        payload: {
-          brands: searchParams.brands?.split(",") || [],
-          colors: searchParams.colors?.split(",") || [],
-          sizes: searchParams.sizes?.split(",") || [],
-          minPrice: validatedMin.toString(),
-          maxPrice: validatedMax.toString(),
-          ratings: searchParams.ratings?.split(",") || [],
-        },
-      });
+        dispatch({
+          type: "SET_FILTERS",
+          payload: {
+            brands: searchParams.brands?.split(",") || [],
+            colors: searchParams.colors?.split(",") || [],
+            sizes: searchParams.sizes?.split(",") || [],
+            minPrice: validatedMin.toString(),
+            maxPrice: validatedMax.toString(),
+            ratings: searchParams.ratings?.split(",") || [],
+          },
+        });
 
-      if (searchParams.minPrice || searchParams.maxPrice) {
-        updatePriceURLParams(validatedMin, validatedMax);
+        if (searchParams.minPrice || searchParams.maxPrice) {
+          updatePriceURLParams(validatedMin, validatedMax);
+        }
       }
 
       setIsLoading(false);
@@ -109,6 +111,9 @@ export default function Filters() {
     });
     setIsLoading(false);
   }, []);
+
+  if (error)
+    return <div className="mx-4 text-center text-red-600">{error}</div>;
 
   return (
     <Filter>
