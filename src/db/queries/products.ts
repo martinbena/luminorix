@@ -12,6 +12,7 @@ import {
 } from "./queryOptions";
 import { PAGE_LIMIT } from "@/lib/constants";
 import Category, { Category as CategoryType } from "@/models/Category";
+import { isDynamicServerError } from "next/dist/client/components/hooks-server-context";
 
 export async function getAllProducts(): Promise<ProductType[]> {
   try {
@@ -135,7 +136,11 @@ export async function getProductsWithAllVariants({
       currentCategory,
     };
   } catch (error) {
-    throw new Error("Could not get products");
+    if (isDynamicServerError(error)) {
+      throw error;
+    }
+    console.error("Error in getProductsWithAllVariants:", error);
+    throw new Error("Could not get products from query");
   }
 }
 
