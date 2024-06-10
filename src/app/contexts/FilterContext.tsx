@@ -151,8 +151,8 @@ function FilterProvider({ children }: FilterPropviderProps) {
           ...state,
           filters: {
             ...initialState.filters,
-            minPrice: state.filters.minPrice,
-            maxPrice: state.filters.maxPrice,
+            minPrice: state.priceRange[0].toString(),
+            maxPrice: state.priceRange[1].toString(),
           },
         };
       case "REMOVE_FILTER":
@@ -329,19 +329,13 @@ function FilterProvider({ children }: FilterPropviderProps) {
 
   function handleResetFilters() {
     dispatch({ type: "RESET_FILTERS" });
-    const { category, sortBy, minPrice, maxPrice } = searchParams;
+    const { category, sortBy } = searchParams;
     const queryParams = new URLSearchParams();
     if (category?.length) {
       queryParams.append("category", category);
     }
     if (sortBy?.length) {
       queryParams.append("sortBy", sortBy);
-    }
-    if (minPrice?.length) {
-      queryParams.append("minPrice", minPrice);
-    }
-    if (maxPrice?.length) {
-      queryParams.append("maxPrice", maxPrice);
     }
 
     const queryString = queryParams.toString();
