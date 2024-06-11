@@ -2,6 +2,8 @@ import Image from "next/image";
 import Button from "../ui/Button";
 import { ProductWithVariant } from "@/models/Product";
 import { formatCurrency } from "@/lib/helpers";
+import Link from "next/link";
+import paths from "@/lib/paths";
 
 interface ProductProps {
   product: ProductWithVariant;
@@ -21,6 +23,8 @@ export default function Product({
     color,
     size,
     freeShipping,
+    slug,
+    sku,
   } = product;
 
   return (
@@ -38,23 +42,30 @@ export default function Product({
         </div>
       ) : null}
       <div className="relative aspect-square overflow-hidden">
-        <Image
-          src={image}
-          alt={`${title}${color || size ? "," : ""}${color ? ` ${color}` : ""}${
-            size ? ` ${size}` : ""
-          }`}
-          className="object-cover"
-          fill
-          sizes="50vw"
-        />
+        <Link className="hover:underline" href={paths.productShow(slug, sku)}>
+          <Image
+            src={image}
+            alt={`${title}${color || size ? "," : ""}${
+              color ? ` ${color}` : ""
+            }${size ? ` ${size}` : ""}`}
+            className="object-cover"
+            fill
+            sizes="50vw"
+          />
+        </Link>
       </div>
 
       <div className="pt-8 pb-6 dt-sm:p-4 px-5 flex flex-col justify-between flex-1">
         <div>
           <h3 className="text-xl capitalize mb-1.5 font-medium mob-sm:text-lg">
-            {`${title}${color || size ? "," : ""}${color ? ` ${color}` : ""}${
-              size ? ` ${size}` : ""
-            }`}
+            <Link
+              className="hover:underline"
+              href={paths.productShow(slug, sku)}
+            >
+              {`${title}${color || size ? "," : ""}${color ? ` ${color}` : ""}${
+                size ? ` ${size}` : ""
+              }`}
+            </Link>
           </h3>
           <div className="flex gap-2 child:font-sans mb-6 child:text-lg items-center">
             <p

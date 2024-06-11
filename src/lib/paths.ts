@@ -5,8 +5,8 @@ const paths = {
   productShowAll() {
     return "/products";
   },
-  productShow(productSlug: string) {
-    return `/products/${productSlug}`;
+  productShow(productSlug: string, sku: string) {
+    return `/${productSlug}/${sku}`;
   },
   marketItemShowAll() {
     return "/market";
