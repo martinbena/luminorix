@@ -1,41 +1,25 @@
 import DiscountSection from "@/components/home/DiscountSection";
-import Product from "@/components/products/Product";
-import ProductRow from "@/components/products/ProductRow";
-import {
-  getNewestProductsWithVariants,
-  getProductsWithDiscounts,
-} from "@/db/queries/products";
-import paths from "@/lib/paths";
+import NewestProducts from "@/components/products/NewestProducts";
+import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
+import TopDiscounts from "@/components/products/TopDiscounts";
+import { Suspense } from "react";
 
 export default async function Home() {
-  const newestProducts = await getNewestProductsWithVariants();
-  const topDiscounts = await getProductsWithDiscounts(4);
-
   return (
     <>
       <DiscountSection />
 
-      <ProductRow
-        title="Newest products"
-        hasLink={true}
-        linkTo={paths.productShowAll()}
-        sectionClasses="py-16 bg-white"
-        gridSize="large"
+      <Suspense
+        fallback={<ProductRowSkeleton gridSize="large" numItems={3} hasTitle />}
       >
-        {newestProducts.map((product) => (
-          <Product key={product.sku} product={product} hasDescription={true} />
-        ))}
-      </ProductRow>
+        <NewestProducts />
+      </Suspense>
 
-      <ProductRow
-        title="Top discounts"
-        hasLink={true}
-        linkTo={paths.discountShowAll()}
+      <Suspense
+        fallback={<ProductRowSkeleton gridSize="small" numItems={4} hasTitle />}
       >
-        {topDiscounts.map((product) => (
-          <Product key={product.sku} product={product} />
-        ))}
-      </ProductRow>
+        <TopDiscounts />
+      </Suspense>
     </>
   );
 }
