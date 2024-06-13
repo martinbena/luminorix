@@ -1,3 +1,4 @@
+import { addDays, format } from "date-fns";
 import { useSearchParams } from "next/navigation";
 
 export const formatCurrency = (value: number) =>
@@ -41,3 +42,49 @@ export const validatePrice = (
   const validatedMax = Math.min(+maxPrice || highest, highest);
   return [validatedMin, validatedMax];
 };
+
+export function alphanumericSort(a: string, b: string): number {
+  const regex = /(\d+)|(\D+)/g;
+  const aParts = a.match(regex);
+  const bParts = b.match(regex);
+
+  if (aParts && bParts) {
+    for (let i = 0; i < Math.min(aParts.length, bParts.length); i++) {
+      const aPart = aParts[i];
+      const bPart = bParts[i];
+
+      if (aPart !== bPart) {
+        const aIsNumber = !isNaN(Number(aPart));
+        const bIsNumber = !isNaN(Number(bPart));
+
+        if (aIsNumber && bIsNumber) {
+          return Number(aPart) - Number(bPart);
+        }
+
+        if (aIsNumber && !bIsNumber) {
+          return -1;
+        }
+
+        if (!aIsNumber && bIsNumber) {
+          return 1;
+        }
+
+        return aPart.localeCompare(bPart);
+      }
+    }
+  }
+
+  return a.localeCompare(b);
+}
+
+export function getDeliveryDateRange() {
+  const today = new Date();
+  const startDate = addDays(today, 2);
+  const endDate = addDays(today, 4);
+
+  const startDay = format(startDate, "d");
+  const endDay = format(endDate, "d");
+  const monthYear = format(startDate, "MMM, yyyy");
+
+  return `${startDay} - ${endDay} ${monthYear}`;
+}

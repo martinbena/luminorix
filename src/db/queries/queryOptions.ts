@@ -122,6 +122,7 @@ export const productWithVariantFormat = {
   category: 1,
   soldTotal: 1,
   ratings: 1,
+  averageRating: 1,
   _variantId: "$variants._id",
   sku: "$variants.sku",
   price: "$variants.price",
