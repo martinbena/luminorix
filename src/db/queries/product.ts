@@ -164,3 +164,99 @@ export async function getColorAndSizeVariantsBySku(
     throw new Error("Could not get color and size variants by SKU");
   }
 }
+
+export async function getRelatedVariantsBySku(
+  sku: string
+): Promise<ProductWithVariant[]> {
+  try {
+    await ConnectDB();
+
+    const result = await Product.aggregate([
+      { $unwind: "$variants" },
+      { $match: { "variants.sku": sku } },
+      { $group: { _id: "$_id", category: { $first: "$category" } } },
+      {
+        $lookup: {
+          from: "products",
+          let: { categoryId: "$category", excludedSku: sku },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$category", "$$categoryId"] } } },
+            { $unwind: "$variants" },
+            { $match: { $expr: { $ne: ["$variants.sku", "$$excludedSku"] } } },
+            {
+              $project: productWithVariantFormat,
+            },
+            { $sample: { size: 4 } },
+          ],
+          as: "relatedVariants",
+        },
+      },
+      { $unwind: "$relatedVariants" },
+      { $replaceRoot: { newRoot: "$relatedVariants" } },
+    ]);
+
+    return result;
+  } catch (error) {
+    console.error("Error in getRelatedVariantsBySku:", error);
+    throw new Error("Could not get related variants by SKU");
+  }
+}
+
+export async function getRelatedProductsBySku(
+  sku: string
+): Promise<ProductWithVariant[]> {
+  try {
+    await ConnectDB();
+
+    const result = await Product.aggregate([
+      { $unwind: "$variants" },
+      { $match: { "variants.sku": sku } },
+      { $group: { _id: "$_id", category: { $first: "$category" } } },
+      {
+        $lookup: {
+          from: "products",
+          let: { categoryId: "$category", excludedSku: sku },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$category", "$$categoryId"] } } },
+            { $unwind: "$variants" },
+            { $match: { $expr: { $ne: ["$variants.sku", "$$excludedSku"] } } },
+            {
+              $group: {
+                _id: "$_id",
+                product: {
+                  $first: {
+                    title: "$title",
+                    slug: "$slug",
+                    description: "$description",
+                    brand: "$brand",
+                    freeShipping: "$freeShipping",
+                    soldTotal: "$soldTotal",
+                    sku: "$variants.sku",
+                    price: "$variants.price",
+                    previousPrice: "$variants.previousPrice",
+                    color: "$variants.color",
+                    size: "$variants.size",
+                    stock: "$variants.stock",
+                    sold: "$variants.sold",
+                    image: "$variants.image",
+                    ratings: "$ratings",
+                  },
+                },
+              },
+            },
+            { $sample: { size: 4 } },
+          ],
+          as: "relatedProducts",
+        },
+      },
+      { $project: { _id: 0, relatedProducts: 1 } },
+      { $unwind: "$relatedProducts" },
+      { $replaceRoot: { newRoot: "$relatedProducts.product" } },
+    ]);
+
+    return result;
+  } catch (error) {
+    console.error("Error in getRelatedProductsBySku:", error);
+    throw new Error("Could not get related products by SKU");
+  }
+}
