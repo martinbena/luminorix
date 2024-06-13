@@ -25,6 +25,7 @@
     "react-icons": "^5.0.1",
     "react-photoswipe-gallery": "^3.0.1",
     "react-range": "^1.8.14",
+    "react-share": "^5.1.0",
     "sharp": "^0.33.3",
     "skeleton-elements": "^4.0.1",
     "slugify": "^1.6.6",

@@ -12,6 +12,7 @@ import { PiCalendarBlank, PiHeart, PiTruck } from "react-icons/pi";
 import Button from "@/components/ui/Button";
 import ProductImage from "@/components/products/ProductImage";
 import probe from "probe-image-size";
+import SocialNetworks from "@/components/ui/SocialNetworks";
 
 export async function generateMetadata({
   params,
@@ -160,7 +161,7 @@ export default async function SingleProductPage({
           <Button type="primary">Buy now</Button>
         </div>
         <hr className="text-zinc-400 my-8" />
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 mb-8">
           <p className="flex items-center gap-1">
             <PiCalendarBlank className="w-5 h-5" />{" "}
             <span className="font-semibold">Delivery:</span>{" "}
@@ -171,6 +172,14 @@ export default async function SingleProductPage({
             <span className="font-semibold">Shipping:</span>{" "}
             {`${freeShipping ? "Free" : "$5"}`}{" "}
           </p>
+        </div>
+        <div className="flex flex-col gap-6">
+          <p className="font-semibold">Share</p>
+          <SocialNetworks
+            product={JSON.parse(JSON.stringify(product))}
+            slug={slug}
+            sku={sku}
+          />
         </div>
       </div>
     </div>
