@@ -1,8 +1,7 @@
 import "./globals.css";
 import "skeleton-elements/css";
+import "photoswipe/dist/photoswipe.css";
 import type { Metadata } from "next";
-import Header from "@/components/header/Header";
-import Footer from "@/components/footer/Footer";
 import { Toaster } from "react-hot-toast";
 import Providers from "./providers";
 import { Playfair_Display, Raleway } from "next/font/google";

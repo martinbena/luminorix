@@ -5,12 +5,13 @@ import {
 } from "@/db/queries/product";
 import { formatCurrency, getDeliveryDateRange } from "@/lib/helpers";
 import paths from "@/lib/paths";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import colorNameList from "color-name-list";
 import { PiCalendarBlank, PiHeart, PiTruck } from "react-icons/pi";
 import Button from "@/components/ui/Button";
+import ProductImage from "@/components/products/ProductImage";
+import probe from "probe-image-size";
 
 export async function generateMetadata({
   params,
@@ -66,16 +67,16 @@ export default async function SingleProductPage({
     sku
   );
 
+  const { width, height } = await probe(image);
+
   return (
     <div className="grid grid-cols-2 gap-16">
-      <div className="relative w-full aspect-square overflow-hidden">
-        <Image
-          src={image}
-          alt={`Image of ${title}`}
-          fill
-          sizes="50vw"
-          className="object-cover"
-        />
+      <div
+        className={`relative w-full min-h-[550px] overflow-hidden ${
+          Math.round(width / height) === 1 ? "aspect-square" : "aspect-video"
+        }`}
+      >
+        <ProductImage title={title} image={image} size={{ width, height }} />
       </div>
       <div className="font-sans mb-8">
         <h2 className="font-semibold text-3xl">{`${title}${
