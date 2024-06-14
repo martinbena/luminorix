@@ -15,7 +15,14 @@ interface RatingsProps {
 export default function Ratings({ ratings }: RatingsProps) {
   const [showAll, setShowAll] = useState(false);
 
-  const displayedRatings = showAll ? ratings : ratings.slice(0, 2);
+  const ratingsWithComments = ratings.filter((rating) => rating.comment);
+
+  const displayedRatings = showAll
+    ? ratingsWithComments
+    : ratingsWithComments.slice(0, 2);
+
+  if (!ratingsWithComments.length)
+    return <p>There are no reviews for this product yet.</p>;
 
   return (
     <div className="max-w-2xl mx-auto flex flex-col gap-8 w-full">

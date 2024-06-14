@@ -11,6 +11,14 @@ export default function RatingDistribution({
   ratings,
   averageRating,
 }: RatingDistributionProps) {
+  const defaultDistribution = {
+    5: 1,
+    4: 1,
+    3: 0,
+    2: 0,
+    1: 0,
+  };
+
   const distribution = {
     5: 0,
     4: 0,
@@ -19,11 +27,16 @@ export default function RatingDistribution({
     1: 0,
   };
 
-  ratings.forEach((rating) => {
-    distribution[rating.rating]++;
-  });
+  if (ratings.length === 0) {
+    Object.assign(distribution, defaultDistribution);
+    averageRating = 4.5;
+  } else {
+    ratings.forEach((rating) => {
+      distribution[rating.rating]++;
+    });
+  }
 
-  const totalRatings = ratings.length;
+  const totalRatings = ratings.length === 0 ? 2 : ratings.length;
 
   const ratingIcons = Object.keys(distribution)
     .map((rating) => {
