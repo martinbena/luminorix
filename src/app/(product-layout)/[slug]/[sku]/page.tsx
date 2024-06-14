@@ -18,6 +18,7 @@ import SocialNetworks from "@/components/ui/SocialNetworks";
 import ProductRow from "@/components/products/ProductRow";
 import Product from "@/components/products/Product";
 import { ProductWithVariant } from "@/models/Product";
+import RatingDistribution from "@/components/products/RatingDistribution";
 
 export async function generateMetadata({
   params,
@@ -67,6 +68,8 @@ export default async function SingleProductPage({
     previousPrice,
     stock,
     freeShipping,
+    ratings,
+    averageRating,
   } = product;
 
   const { uniqueColors, sizesByColor } = await getColorAndSizeVariantsBySku(
@@ -79,7 +82,7 @@ export default async function SingleProductPage({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-16">
+      <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto">
         <div
           className={`relative w-full min-h-[550px] overflow-hidden ${
             Math.round(width / height) === 1 ? "aspect-square" : "aspect-video"
@@ -93,7 +96,7 @@ export default async function SingleProductPage({
           }${color ? ` ${color}` : ""}${size ? ` ${size}` : ""}`}</h2>
           <article className="mt-6 mb-8">{description}</article>
           <p className="text-2xl">
-            {previousPrice && (
+            {previousPrice > price && (
               <span className="mr-5 line-through text-zinc-600">
                 {formatCurrency(previousPrice)}
               </span>
@@ -164,7 +167,7 @@ export default async function SingleProductPage({
             </div>
             <p>{stock} in stock</p>
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 max-w-sixty">
             <Button type="secondary">Add to cart</Button>
             <Button type="primary" beforeBackground="before:bg-white">
               Buy now
@@ -199,6 +202,9 @@ export default async function SingleProductPage({
             <Product key={product.sku} product={product} />
           ))}
         </ProductRow>
+      </div>
+      <div>
+        <RatingDistribution ratings={ratings} averageRating={averageRating} />
       </div>
     </>
   );

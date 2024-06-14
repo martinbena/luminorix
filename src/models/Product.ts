@@ -1,8 +1,8 @@
 import mongoose, { Types } from "mongoose";
 import { Document } from "mongoose";
 
-interface Rating extends Document {
-  rating: number;
+export interface Rating extends Document {
+  rating: 5 | 4 | 3 | 2 | 1;
   comment: string;
   postedBy: Types.ObjectId;
 }
@@ -82,7 +82,9 @@ export interface Product extends Document {
   ratings: Rating[];
 }
 
-export interface ProductWithVariant extends Product, Variant {}
+export interface ProductWithVariant extends Product, Variant {
+  averageRating: number;
+}
 
 const productSchema = new mongoose.Schema<Product>(
   {
