@@ -36,6 +36,43 @@ export async function getProductVariantBySku(
         },
       },
       {
+        $lookup: {
+          from: "users",
+          localField: "ratings.postedBy",
+          foreignField: "_id",
+          as: "ratingUsers",
+        },
+      },
+      {
+        $addFields: {
+          ratings: {
+            $map: {
+              input: "$ratings",
+              as: "rating",
+              in: {
+                _id: "$$rating._id",
+                rating: "$$rating.rating",
+                comment: "$$rating.comment",
+                postedBy: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$ratingUsers",
+                        as: "user",
+                        cond: { $eq: ["$$user._id", "$$rating.postedBy"] },
+                      },
+                    },
+                    0,
+                  ],
+                },
+                createdAt: "$$rating.createdAt",
+                updatedAt: "$$rating.updatedAt",
+              },
+            },
+          },
+        },
+      },
+      {
         $project: productWithVariantFormat,
       },
       { $limit: 1 },

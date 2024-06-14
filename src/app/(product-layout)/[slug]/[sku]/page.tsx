@@ -19,6 +19,7 @@ import ProductRow from "@/components/products/ProductRow";
 import Product from "@/components/products/Product";
 import { ProductWithVariant } from "@/models/Product";
 import RatingDistribution from "@/components/products/RatingDistribution";
+import Ratings from "@/components/products/Ratings";
 
 export async function generateMetadata({
   params,
@@ -203,8 +204,11 @@ export default async function SingleProductPage({
           ))}
         </ProductRow>
       </div>
-      <div>
-        <RatingDistribution ratings={ratings} averageRating={averageRating} />
+      <div className="grid grid-cols-2 mt-16 mb-4 gap-16">
+        <div>
+          <RatingDistribution ratings={ratings} averageRating={averageRating} />
+        </div>
+        <Ratings ratings={JSON.parse(JSON.stringify(ratings))} />
       </div>
     </>
   );

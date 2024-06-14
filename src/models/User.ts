@@ -22,7 +22,7 @@ const wishlistItemSchema = new mongoose.Schema<WishlistItem>(
   { timestamps: true }
 );
 
-interface User extends Document {
+export interface User extends Document {
   name: string;
   email: string;
   password: string;

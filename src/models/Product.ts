@@ -1,10 +1,13 @@
 import mongoose, { Types } from "mongoose";
 import { Document } from "mongoose";
+import { User } from "./User";
 
 export interface Rating extends Document {
   rating: 5 | 4 | 3 | 2 | 1;
   comment: string;
-  postedBy: Types.ObjectId;
+  postedBy: Partial<User>;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const ratingSchema = new mongoose.Schema<Rating>(
