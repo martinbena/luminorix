@@ -20,6 +20,7 @@ import Product from "@/components/products/Product";
 import { ProductWithVariant } from "@/models/Product";
 import RatingDistribution from "@/components/products/RatingDistribution";
 import Ratings from "@/components/products/Ratings";
+import AddEditRating from "@/components/products/AddEditRating";
 
 export async function generateMetadata({
   params,
@@ -205,8 +206,9 @@ export default async function SingleProductPage({
         </ProductRow>
       </div>
       <div className="grid grid-cols-2 mt-16 mb-4 gap-16">
-        <div>
+        <div className="flex flex-col gap-8">
           <RatingDistribution ratings={ratings} averageRating={averageRating} />
+          <AddEditRating />
         </div>
         <Ratings ratings={JSON.parse(JSON.stringify(ratings))} />
       </div>

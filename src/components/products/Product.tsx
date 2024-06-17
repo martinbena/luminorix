@@ -41,19 +41,21 @@ export default function Product({
           ) : null}
         </div>
       ) : null}
-      <div className="relative aspect-square overflow-hidden">
-        <Link className="hover:underline" href={paths.productShow(slug, sku)}>
-          <Image
-            src={image}
-            alt={`${title}${color || size ? "," : ""}${
-              color ? ` ${color}` : ""
-            }${size ? ` ${size}` : ""}`}
-            className="object-cover"
-            fill
-            sizes="50vw"
-          />
-        </Link>
-      </div>
+
+      <Link
+        className="hover:underline relative aspect-square overflow-hidden"
+        href={paths.productShow(slug, sku)}
+      >
+        <Image
+          src={image}
+          alt={`${title}${color || size ? "," : ""}${color ? ` ${color}` : ""}${
+            size ? ` ${size}` : ""
+          }`}
+          className="object-cover"
+          fill
+          sizes="50vw"
+        />
+      </Link>
 
       <div className="pt-8 pb-6 dt-sm:p-4 px-5 flex flex-col justify-between flex-1">
         <div>

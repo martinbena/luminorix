@@ -76,7 +76,7 @@ export default function RatingDistribution({
     .reverse();
 
   return (
-    <div className="flex flex-wrap font-sans max-w-3xl mx-auto">
+    <div className="flex flex-wrap font-sans max-w-3xl mx-auto w-full">
       <div className="w-1/4 flex items-center justify-center">
         <div className="flex flex-col justify-center items-center">
           <p className="text-5xl font-bold mb-5">{averageRating?.toFixed(1)}</p>
