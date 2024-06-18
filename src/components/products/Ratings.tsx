@@ -28,23 +28,23 @@ export default function Ratings({ ratings }: RatingsProps) {
     <div className="max-w-2xl mx-auto flex flex-col gap-8 w-full">
       {displayedRatings.map((rating, index) => (
         <div key={index}>
-          <div className="grid grid-cols-[1fr_4fr_1fr] gap-y-2">
+          <div className="grid grid-cols-[1fr_3.5fr_1.5fr] mob:grid-cols-[1.2fr_2.2fr_1.8fr] gap-y-2 mob:gap-x-2 mob:gap-y-3">
             <Image
               src={rating.postedBy.image ?? UserImagePlaceholder}
               alt={`Image of the user ${rating.postedBy.name}`}
               width={48}
               height={48}
-              className="rounded-full justify-self-center"
+              className="rounded-full justify-self-center mob:justify-self-start"
             />
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col justify-between">
               <p className="text-base">{rating.postedBy.name}</p>
               <Stars rating={rating.rating} />
             </div>
-            <p className="self-end">
+            <p className="self-end mob:text-xs">
               {formatDistanceToNow(new Date(rating.createdAt))} ago
             </p>
-            <span>&nbsp;</span>
-            <div className="text-base">{rating.comment}</div>
+            <span className="mob:hidden">&nbsp;</span>
+            <div className="text-base mob:col-span-3">{rating.comment}</div>
           </div>
         </div>
       ))}

@@ -92,10 +92,10 @@ export default async function SingleProductPage({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto">
+      <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto tab:grid-cols-1 tab:gap-8 text-zinc-800">
         <div>
           <div
-            className={`relative w-full min-h-[550px] overflow-hidden ${
+            className={`relative w-full min-h-[550px] mob-lg:min-h-96 mob-sm:min-h-60 overflow-hidden ${
               Math.round(width / height) === 1
                 ? "aspect-square"
                 : "aspect-video"
@@ -115,11 +115,11 @@ export default async function SingleProductPage({
         </div>
 
         <div className="font-sans mb-8">
-          <h2 className="font-semibold text-3xl">{`${title}${
+          <h2 className="font-semibold text-3xl mob-sm:text-2xl">{`${title}${
             color || size ? "," : ""
           }${color ? ` ${color}` : ""}${size ? ` ${size}` : ""}`}</h2>
           <article className="mt-6 mb-8">{description}</article>
-          <p className="text-2xl">
+          <p className="text-2xl mob-sm:text-xl">
             {previousPrice > price && (
               <span className="mr-5 line-through text-zinc-600">
                 {formatCurrency(previousPrice)}
@@ -187,25 +187,33 @@ export default async function SingleProductPage({
           <div className="flex gap-10 font-semibold mb-8">
             <p>{stock} in stock</p>
 
-            <form action={actions.toggleWishlistProduct.bind(null, slug, sku)}>
-              <button type="submit" className="flex items-center gap-1 group">
-                {isInWishlist ? (
-                  <PiHeartFill className="w-4 h-4 text-amber-500" />
-                ) : (
-                  <PiHeart className="w-4 h-4" />
-                )}
-                <span className="group-hover:underline">
-                  Wishlist{isInWishlist ? "ed" : ""}
-                </span>
-              </button>
-            </form>
+            {session?.user ? (
+              <form
+                action={actions.toggleWishlistProduct.bind(null, slug, sku)}
+              >
+                <button type="submit" className="flex items-center gap-1 group">
+                  {isInWishlist ? (
+                    <PiHeartFill className="w-4 h-4 text-amber-500" />
+                  ) : (
+                    <PiHeart className="w-4 h-4" />
+                  )}
+                  <span className="group-hover:underline">
+                    Wishlist{isInWishlist ? "ed" : ""}
+                  </span>
+                </button>
+              </form>
+            ) : null}
           </div>
-          <div className="flex flex-col gap-2 max-w-sixty">
-            <Button type="secondary">Add to cart</Button>
-            <Button type="primary" beforeBackground="before:bg-white">
-              Buy now
-            </Button>
-          </div>
+          {stock > 0 ? (
+            <div className="flex flex-col gap-2 max-w-sixty mob-lg:max-w-full">
+              <Button type="secondary">Add to cart</Button>
+              <Button type="primary" beforeBackground="before:bg-white">
+                Buy now
+              </Button>
+            </div>
+          ) : (
+            <p>This product is not available at the moment.</p>
+          )}
           <hr className="text-zinc-400 my-8" />
           <div className="flex flex-col gap-6 mb-8">
             <p className="flex items-center gap-1">
@@ -236,7 +244,7 @@ export default async function SingleProductPage({
           ))}
         </ProductRow>
       </div>
-      <div className="grid grid-cols-2 mt-16 mb-4 gap-16">
+      <div className="grid grid-cols-2 mt-16 mb-4 gap-16 tab-xl:gap-4 tab:grid-cols-1 tab:gap-16">
         <div className="flex flex-col gap-8">
           <RatingDistribution ratings={ratings} averageRating={averageRating} />
           {session?.user ? <AddEditRating /> : null}

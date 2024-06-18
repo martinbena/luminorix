@@ -76,15 +76,17 @@ export default function RatingDistribution({
     .reverse();
 
   return (
-    <div className="flex flex-wrap font-sans max-w-3xl mx-auto w-full">
-      <div className="w-1/4 flex items-center justify-center">
+    <div className="flex flex-wrap font-sans max-w-3xl mx-auto w-full mob:flex-col mob:items-center mob:gap-4">
+      <div className="w-1/4 mob:w-full flex items-center justify-center pr-2">
         <div className="flex flex-col justify-center items-center">
           <p className="text-5xl font-bold mb-5">{averageRating?.toFixed(1)}</p>
           <Stars rating={averageRating} />
-          <p className="mt-1.5 text-base">Product Rating</p>
+          <p className="mt-1.5 text-base tab-lg:text-sm tab:text-base">
+            Product Rating
+          </p>
         </div>
       </div>
-      <div className="w-3/4">{ratingIcons}</div>
+      <div className="w-3/4 mob:w-full">{ratingIcons}</div>
     </div>
   );
 }
