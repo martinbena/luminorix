@@ -11,6 +11,7 @@ import {
   EmailIcon,
 } from "react-share";
 import { ProductWithVariant } from "@/models/Product";
+import { getProductVariantTitle } from "@/lib/helpers";
 
 interface SocialNetworksProps {
   product: ProductWithVariant;
@@ -25,46 +26,42 @@ export default function SocialNetworks({
 }: SocialNetworksProps) {
   const { brand, title, color, size } = product;
   const shareUrl = `${process.env.BASE_URL}/${slug}/${sku}`;
+  const composedTitle = getProductVariantTitle(title, color, size);
   return (
-    <div className="flex gap-3">
-      <FacebookShareButton
-        url={shareUrl}
-        title={`${title}${color || size ? "," : ""}${color ? ` ${color}` : ""}${
-          size ? ` ${size}` : ""
-        }`}
-        hashtag={`#Fancy${brand}ForSell`}
-      >
-        <FacebookIcon size={40} round={true} />
-      </FacebookShareButton>
-      <TwitterShareButton
-        url={shareUrl}
-        title={`${title}${color || size ? "," : ""}${color ? ` ${color}` : ""}${
-          size ? ` ${size}` : ""
-        }`}
-        hashtags={[`#Fancy${brand}ForSell`]}
-      >
-        <TwitterIcon size={40} round={true} />
-      </TwitterShareButton>
+    <div className="flex flex-col gap-6">
+      <p className="font-semibold">Share</p>
+      <div className="flex gap-3">
+        <FacebookShareButton
+          url={shareUrl}
+          title={composedTitle}
+          hashtag={`#Fancy${brand}ForSell`}
+        >
+          <FacebookIcon size={40} round={true} />
+        </FacebookShareButton>
+        <TwitterShareButton
+          url={shareUrl}
+          title={composedTitle}
+          hashtags={[`#Fancy${brand}ForSell`]}
+        >
+          <TwitterIcon size={40} round={true} />
+        </TwitterShareButton>
 
-      <WhatsappShareButton
-        url={shareUrl}
-        title={`${title}${color || size ? "," : ""}${color ? ` ${color}` : ""}${
-          size ? ` ${size}` : ""
-        }`}
-        separator=":: "
-      >
-        <WhatsappIcon size={40} round={true} />
-      </WhatsappShareButton>
+        <WhatsappShareButton
+          url={shareUrl}
+          title={composedTitle}
+          separator=":: "
+        >
+          <WhatsappIcon size={40} round={true} />
+        </WhatsappShareButton>
 
-      <EmailShareButton
-        url={shareUrl}
-        subject={`${title}${color || size ? "," : ""}${
-          color ? ` ${color}` : ""
-        }${size ? ` ${size}` : ""}`}
-        body={`Check out this ${brand}: ${shareUrl}`}
-      >
-        <EmailIcon size={40} round={true} />
-      </EmailShareButton>
+        <EmailShareButton
+          url={shareUrl}
+          subject={composedTitle}
+          body={`Check out this ${brand}: ${shareUrl}`}
+        >
+          <EmailIcon size={40} round={true} />
+        </EmailShareButton>
+      </div>
     </div>
   );
 }

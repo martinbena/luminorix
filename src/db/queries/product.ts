@@ -114,12 +114,12 @@ export async function getAllSlugSkuCombinations(): Promise<
   }
 }
 
-interface RelatedColor {
+export interface RelatedColor {
   sku: string;
   color: string;
 }
 
-interface RelatedSize {
+export interface RelatedSize {
   sku: string;
   size: string;
 }
@@ -283,7 +283,8 @@ export async function getRelatedProductsBySku(
                 },
               },
             },
-            { $sample: { size: 4 } },
+            // { $sample: { size: 4 } },
+            { $limit: 4 },
           ],
           as: "relatedProducts",
         },

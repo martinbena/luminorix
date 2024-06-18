@@ -47,10 +47,13 @@ export async function toggleWishlistProduct(slug: string, sku: string) {
     }
 
     await user.save();
-
+  } catch (error) {
+    console.log(error);
+    return {
+      error: "Something went wrong",
+    };
+  } finally {
     revalidatePath(paths.userWishlist());
     revalidatePath(paths.productShow(slug, sku));
-  } catch (error) {
-    throw error;
   }
 }

@@ -88,3 +88,13 @@ export function getDeliveryDateRange() {
 
   return `${startDay} - ${endDay} ${monthYear}`;
 }
+
+export function getProductVariantTitle(
+  productTitle: string,
+  color: string | undefined,
+  size: string | undefined
+) {
+  return `${productTitle}${color || size ? "," : ""}${
+    color ? ` ${color}` : ""
+  }${size ? ` ${size}` : ""}`;
+}

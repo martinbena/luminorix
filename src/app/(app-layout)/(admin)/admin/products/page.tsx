@@ -16,7 +16,7 @@ import { ProductWithVariant } from "@/models/Product";
 import * as actions from "@/actions";
 import AddEditProductForm from "@/components/admin/AddEditProductForm";
 import { getAllCategories } from "@/db/queries/categories";
-import { formatCurrency } from "@/lib/helpers";
+import { formatCurrency, getProductVariantTitle } from "@/lib/helpers";
 import Image from "next/image";
 import { Metadata } from "next";
 import SortBy from "@/components/ui/SortBy";
@@ -84,11 +84,11 @@ export default async function AdminAllProductsPage({
                     />
                   </div>
                   <ItemTitle>
-                    {`${product?.title}${
-                      product?.color || product?.size ? "," : ""
-                    }${product?.color ? ` ${product.color}` : ""}${
-                      product?.size ? ` ${product.size}` : ""
-                    }`}
+                    {getProductVariantTitle(
+                      product.title,
+                      product.color,
+                      product.size
+                    )}
                   </ItemTitle>
                   <div className="mob:hidden">{product.brand}</div>
                   <div className="font-semibold mob-sm:hidden">
