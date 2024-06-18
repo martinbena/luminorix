@@ -10,7 +10,7 @@ import paths from "@/lib/paths";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import colorNameList from "color-name-list";
-import { PiCalendarBlank, PiHeart, PiTruck } from "react-icons/pi";
+import { PiCalendarBlank, PiHeart, PiHeartFill, PiTruck } from "react-icons/pi";
 import Button from "@/components/ui/Button";
 import ProductImage from "@/components/products/ProductImage";
 import probe from "probe-image-size";
@@ -21,6 +21,9 @@ import { ProductWithVariant } from "@/models/Product";
 import RatingDistribution from "@/components/products/RatingDistribution";
 import Ratings from "@/components/products/Ratings";
 import AddEditRating from "@/components/products/AddEditRating";
+import * as actions from "@/actions";
+import { auth } from "@/auth";
+import { isProductInWishlist } from "@/db/queries/user";
 
 export async function generateMetadata({
   params,
@@ -82,16 +85,35 @@ export default async function SingleProductPage({
 
   const relatedProducts = await getRelatedVariantsBySku(sku);
 
+  const session = await auth();
+  const isInWishlist = session?.user
+    ? await isProductInWishlist(session?.user._id, sku)
+    : false;
+
   return (
     <>
       <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto">
-        <div
-          className={`relative w-full min-h-[550px] overflow-hidden ${
-            Math.round(width / height) === 1 ? "aspect-square" : "aspect-video"
-          }`}
-        >
-          <ProductImage title={title} image={image} size={{ width, height }} />
+        <div>
+          <div
+            className={`relative w-full min-h-[550px] overflow-hidden ${
+              Math.round(width / height) === 1
+                ? "aspect-square"
+                : "aspect-video"
+            }`}
+          >
+            <ProductImage
+              title={title}
+              image={image}
+              size={{ width, height }}
+            />
+          </div>
+          <div className="text-base mt-1.5">
+            <p>
+              <span className="font-semibold">SKU:</span> {sku}
+            </p>
+          </div>
         </div>
+
         <div className="font-sans mb-8">
           <h2 className="font-semibold text-3xl">{`${title}${
             color || size ? "," : ""
@@ -163,11 +185,20 @@ export default async function SingleProductPage({
           </div>
 
           <div className="flex gap-10 font-semibold mb-8">
-            <div className="flex items-center gap-1">
-              {" "}
-              <PiHeart className="w-4 h-4" /> Wishlist{" "}
-            </div>
             <p>{stock} in stock</p>
+
+            <form action={actions.toggleWishlistProduct.bind(null, slug, sku)}>
+              <button type="submit" className="flex items-center gap-1 group">
+                {isInWishlist ? (
+                  <PiHeartFill className="w-4 h-4 text-amber-500" />
+                ) : (
+                  <PiHeart className="w-4 h-4" />
+                )}
+                <span className="group-hover:underline">
+                  Wishlist{isInWishlist ? "ed" : ""}
+                </span>
+              </button>
+            </form>
           </div>
           <div className="flex flex-col gap-2 max-w-sixty">
             <Button type="secondary">Add to cart</Button>
@@ -208,7 +239,7 @@ export default async function SingleProductPage({
       <div className="grid grid-cols-2 mt-16 mb-4 gap-16">
         <div className="flex flex-col gap-8">
           <RatingDistribution ratings={ratings} averageRating={averageRating} />
-          <AddEditRating />
+          {session?.user ? <AddEditRating /> : null}
         </div>
         <Ratings ratings={JSON.parse(JSON.stringify(ratings))} />
       </div>

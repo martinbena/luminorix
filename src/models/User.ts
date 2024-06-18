@@ -1,8 +1,12 @@
 import mongoose, { Document, Types } from "mongoose";
 
-interface WishlistItem extends Document {
+export interface WishlistItem extends Document {
+  sku: string;
   product: Types.ObjectId;
   title: string;
+  color: string;
+  size: string;
+  stock: number;
   slug: string;
   price: number;
   image: string;
@@ -10,11 +14,15 @@ interface WishlistItem extends Document {
 
 const wishlistItemSchema = new mongoose.Schema<WishlistItem>(
   {
+    sku: String,
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
     },
     title: String,
+    color: String,
+    size: String,
+    stock: Number,
     slug: String,
     price: Number,
     image: String,

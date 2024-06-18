@@ -59,6 +59,7 @@ export const authConfig: NextAuthConfig = {
         const userByEmail = await User.findOne({ email: user.email });
         userByEmail.password = undefined;
         userByEmail.resetCode = undefined;
+        userByEmail.wishlist = undefined;
         token.user = userByEmail;
       }
       return token;

@@ -11,3 +11,4 @@ export { addVariantToProduct } from "./product-variant";
 export { editProductWithVariant } from "./product";
 export { removeVariantFromProduct } from "./product-variant";
 export { addRating } from "./rating";
+export { toggleWishlistProduct } from "./wishlist";

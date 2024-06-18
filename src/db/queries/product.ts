@@ -223,11 +223,13 @@ export async function getRelatedVariantsBySku(
             {
               $project: productWithVariantFormat,
             },
-            { $sample: { size: 4 } },
+            // { $sample: { size: 4 } },
+            { $limit: 4 },
           ],
           as: "relatedVariants",
         },
       },
+      { $limit: 4 },
       { $unwind: "$relatedVariants" },
       { $replaceRoot: { newRoot: "$relatedVariants" } },
     ]);
