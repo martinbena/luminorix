@@ -3,7 +3,7 @@
 import { FiltersResponse } from "@/app/api/products/filters/route";
 import { HIGHEST_POSSIBLE_PRICE, LOWEST_POSSIBLE_PRICE } from "@/lib/constants";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Dispatch,
   ReactNode,

@@ -7,7 +7,7 @@ import {
 } from "@/lib/helpers";
 import { ProductWithVariant } from "@/models/Product";
 import { auth } from "@/auth";
-import { isProductInWishlist } from "@/db/queries/user";
+import { isProductInWishlist } from "@/db/queries/wishlist";
 import { PiCalendarBlank, PiTruck } from "react-icons/pi";
 import Button from "../ui/Button";
 import SocialNetworks from "../ui/SocialNetworks";

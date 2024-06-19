@@ -284,6 +284,7 @@ export async function getRelatedProductsBySku(
               },
             },
             // { $sample: { size: 4 } },
+            { $sort: { "product.sku": 1 } },
             { $limit: 4 },
           ],
           as: "relatedProducts",

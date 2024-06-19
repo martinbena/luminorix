@@ -1,6 +1,7 @@
 "use client";
 
 import * as actions from "@/actions";
+import { useWishlistContext } from "@/app/contexts/WishlistContext";
 import { useOptimistic } from "react";
 import { PiHeart, PiHeartFill } from "react-icons/pi";
 
@@ -15,6 +16,7 @@ export default function WishlistButton({
   sku,
   isInWishlist,
 }: WishlistButtonProps) {
+  const { setWishlistCount } = useWishlistContext();
   const [optimisticWishlistItem, updateOptimisticWishlistItem] = useOptimistic(
     isInWishlist,
     (prevState: boolean, newState: boolean) => {
@@ -27,6 +29,8 @@ export default function WishlistButton({
     <form
       action={async () => {
         updateOptimisticWishlistItem(isInWishlist);
+        !isInWishlist && setWishlistCount((prevCount) => prevCount + 1);
+        isInWishlist && setWishlistCount((prevCount) => prevCount - 1);
         await actions.toggleWishlistProduct(slug, sku);
       }}
     >
