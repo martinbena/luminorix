@@ -1,5 +1,6 @@
 import HeadingSecondary from "@/components/ui/HeadingSecondary";
 import Reviews from "@/components/user/Reviews";
+import ReviewsSkeleton from "@/components/user/ReviewsSkeleton";
 import { Metadata } from "next";
 import { Suspense } from "react";
 
@@ -12,7 +13,7 @@ export default function UserReviewsPage() {
     <>
       <HeadingSecondary>Your reviews</HeadingSecondary>
       <div className="mt-12">
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={<ReviewsSkeleton />}>
           <Reviews />
         </Suspense>
       </div>

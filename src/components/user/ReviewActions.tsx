@@ -15,7 +15,7 @@ interface ReviewActions {
 export default function ReviewActions({ rating }: ReviewActions) {
   return (
     <Modal>
-      <div className="flex flex-col border-l border-zinc-300 w-[100px]">
+      <div className="flex flex-col border-l border-amber-500 w-24 mob:w-12">
         <Modal.Open opens="edit">
           <ReviewActionButton icon={<PiNotePencilLight />}>
             Edit

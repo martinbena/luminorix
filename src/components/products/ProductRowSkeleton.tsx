@@ -1,3 +1,4 @@
+import { SKELETON_EFFECT } from "@/lib/constants";
 import { SkeletonBlock } from "skeleton-elements/react";
 
 interface ProductRowSkeletonProps {
@@ -11,8 +12,6 @@ export default function ProductRowSkeleton({
   gridSize = "small",
   numItems = 4,
 }: ProductRowSkeletonProps) {
-  const effect = "wave";
-
   return (
     <section className={`px-8 mob:px-5`}>
       {hasTitle && (
@@ -21,7 +20,7 @@ export default function ProductRowSkeleton({
           height="28px"
           width="300px"
           borderRadius="0"
-          effect={effect}
+          effect={SKELETON_EFFECT}
         />
       )}
       <div
@@ -42,7 +41,7 @@ export default function ProductRowSkeleton({
                 height="100%"
                 width="100%"
                 borderRadius="0"
-                effect={effect}
+                effect={SKELETON_EFFECT}
               />
             </div>
 
@@ -53,7 +52,7 @@ export default function ProductRowSkeleton({
                   height="28px"
                   width="70%"
                   borderRadius="0"
-                  effect={effect}
+                  effect={SKELETON_EFFECT}
                 />
                 <div className="mb-6 mt-1.5">
                   <SkeletonBlock
@@ -61,7 +60,7 @@ export default function ProductRowSkeleton({
                     height="28px"
                     width="25%"
                     borderRadius="0"
-                    effect={effect}
+                    effect={SKELETON_EFFECT}
                   />
                 </div>
               </div>
@@ -71,14 +70,14 @@ export default function ProductRowSkeleton({
                   height="44px"
                   width="100%"
                   borderRadius="0"
-                  effect={effect}
+                  effect={SKELETON_EFFECT}
                 />
                 <SkeletonBlock
                   tag="div"
                   height="44px"
                   width="100%"
                   borderRadius="0"
-                  effect={effect}
+                  effect={SKELETON_EFFECT}
                 />
               </div>
             </div>

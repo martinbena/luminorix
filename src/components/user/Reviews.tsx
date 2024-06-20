@@ -29,7 +29,7 @@ export default async function Reviews() {
         <ul className="max-w-5xl mx-auto flex flex-col gap-6">
           {reviews.map((item) => {
             return (
-              <li key={item.title} className="flex border border-zinc-300">
+              <li key={item.title} className="flex border border-amber-500">
                 <div className="px-6 py-3 flex-grow">
                   <h3 className="font-semibold font-sans text-2xl mb-2">
                     <Link
@@ -39,11 +39,11 @@ export default async function Reviews() {
                       {item.title}
                     </Link>
                   </h3>
-                  <div className="mb-8">
+                  <div className="mb-3">
                     <Stars rating={item.review.rating} />
                   </div>
                   <p className="text-base">{item.review.comment}</p>
-                  <p className="text-right font-sans text-zinc-600">
+                  <p className="text-right font-sans text-zinc-600 mt-4">
                     Rated{" "}
                     {format(
                       new Date(item.review.createdAt),

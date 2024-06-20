@@ -1,6 +1,5 @@
+import { SKELETON_EFFECT } from "@/lib/constants";
 import { SkeletonBlock } from "skeleton-elements/react";
-
-const effect = "wave";
 
 export default function WishlistSkeleton() {
   return (
@@ -21,7 +20,7 @@ function WishlistItemSkeleton() {
           width="100%"
           height="100%"
           borderRadius="0"
-          effect={effect}
+          effect={SKELETON_EFFECT}
         />
       </div>
 
@@ -33,7 +32,7 @@ function WishlistItemSkeleton() {
               width="100%"
               height="29px"
               borderRadius="0"
-              effect={effect}
+              effect={SKELETON_EFFECT}
             />
           </div>
 
@@ -42,7 +41,7 @@ function WishlistItemSkeleton() {
             width="100px"
             height="20px"
             borderRadius="0"
-            effect={effect}
+            effect={SKELETON_EFFECT}
           />
         </div>
 
@@ -52,7 +51,7 @@ function WishlistItemSkeleton() {
             width="150px"
             height="32px"
             borderRadius="0"
-            effect={effect}
+            effect={SKELETON_EFFECT}
           />
         </div>
       </div>
@@ -64,14 +63,14 @@ function WishlistItemSkeleton() {
             width="100%"
             height="44px"
             borderRadius="0"
-            effect={effect}
+            effect={SKELETON_EFFECT}
           />
           <SkeletonBlock
             tag="button"
             width="100%"
             height="44px"
             borderRadius="0"
-            effect={effect}
+            effect={SKELETON_EFFECT}
           />
         </div>
 
@@ -81,7 +80,7 @@ function WishlistItemSkeleton() {
             width="24px"
             height="24px"
             borderRadius="0"
-            effect={effect}
+            effect={SKELETON_EFFECT}
           />
         </div>
       </div>

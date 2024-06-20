@@ -209,7 +209,7 @@ export async function deleteRating(
   userId: string
 ): Promise<DeleteItemState> {
   try {
-    await ConnectDB();
+    await ConnectDB();    
     const result = await Product.updateOne(
       { slug: productSlug },
       { $pull: { ratings: { postedBy: new mongoose.Types.ObjectId(userId) } } }
