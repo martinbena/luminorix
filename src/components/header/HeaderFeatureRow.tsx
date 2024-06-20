@@ -42,7 +42,8 @@ export default function HeaderFeatureRow() {
     if (session.data?.user?._id) {
       fetchWishlistCount(session.data.user._id);
     }
-  }, [session.data?.user?._id, setWishlistCount, wishlistCount]);
+  }, [session.data?.user?._id, setWishlistCount]);
+
   return (
     <>
       <div className="flex gap-16 tab:gap-8 mob-sm:gap-3 col-span-2 tab:col-span-1 justify-self-end">

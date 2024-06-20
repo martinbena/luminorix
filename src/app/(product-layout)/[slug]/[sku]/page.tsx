@@ -10,6 +10,7 @@ import {
   getAllSlugSkuCombinations,
   getProductVariantBySku,
 } from "@/db/queries/product";
+import { getProductVariantTitle } from "@/lib/helpers";
 import { notFound } from "next/navigation";
 import probe from "probe-image-size";
 import { Suspense } from "react";
@@ -26,9 +27,7 @@ export async function generateMetadata({
   const { title, color, size, description } = product;
 
   return {
-    title: `${title}${color || size ? "," : ""}${color ? ` ${color}` : ""}${
-      size ? ` ${size}` : ""
-    }`,
+    title: getProductVariantTitle(title, color, size),
     description:
       description.length >= 155
         ? `${description.slice(0, 155)}...`

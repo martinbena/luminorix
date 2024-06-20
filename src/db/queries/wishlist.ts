@@ -27,10 +27,10 @@ interface WishlistResponse {
 }
 
 export async function getAllWishlistedItems(
-  userId: ObjectId
+  userId: ObjectId | undefined
 ): Promise<WishlistResponse> {
   try {
-    ConnectDB();
+    await ConnectDB();
 
     const user = await User.findById(userId).select("wishlist");
     if (!user) {

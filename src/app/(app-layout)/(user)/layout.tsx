@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import Navbar from "@/components/navigation/Navbar";
 
 export const metadata: Metadata = {
-  title: "Luminorix | Administration",
+  title: {
+    template: "%s | Profile",
+    default: "Dashboard | Profile",
+  },
   description:
-    "Access the secure admin section to manage critical aspects of the platform. Gain control over settings, product editing, and data management tools. This section is reserved for authorized administrators to oversee platform operations efficiently.",
+    "Manage your account settings, view your dashboard, and handle your wishlist, orders, reviews, and messages. Sell items and enjoy a seamless user experience on our e-commerce platform.",
 };
 
 export default function UserLayout({
@@ -15,7 +18,7 @@ export default function UserLayout({
   return (
     <>
       <Navbar mode="user" />
-      <main className="bg-white text-zinc-800 p-8 min-h-[65vh]">
+      <main className="bg-white text-zinc-800 mob-lg:px-4 p-8 min-h-[65vh]">
         {children}
       </main>
     </>

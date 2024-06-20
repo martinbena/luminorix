@@ -7,7 +7,10 @@ import {
 } from "@/lib/helpers";
 import { ProductWithVariant } from "@/models/Product";
 import { auth } from "@/auth";
-import { isProductInWishlist } from "@/db/queries/wishlist";
+import {
+  getAllWishlistedItems,
+  isProductInWishlist,
+} from "@/db/queries/wishlist";
 import { PiCalendarBlank, PiTruck } from "react-icons/pi";
 import Button from "../ui/Button";
 import SocialNetworks from "../ui/SocialNetworks";
@@ -46,6 +49,10 @@ export default async function ProductDetails({
   const isInWishlist = session?.user
     ? await isProductInWishlist(session?.user._id, sku)
     : false;
+
+  const count = session?.user
+    ? (await getAllWishlistedItems(session?.user._id)).count
+    : 0;
 
   return (
     <div className="font-sans mb-8">
@@ -101,7 +108,12 @@ export default async function ProductDetails({
         <p>{stock} in stock</p>
 
         {session?.user ? (
-          <WishlistButton slug={slug} sku={sku} isInWishlist={isInWishlist} />
+          <WishlistButton
+            slug={slug}
+            sku={sku}
+            isInWishlist={isInWishlist}
+            wishlistCount={count}
+          />
         ) : null}
       </div>
 

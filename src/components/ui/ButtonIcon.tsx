@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 interface ButtonIconProps {
   variant: string;
   additionalClasses?: string;
-  onClick: React.Dispatch<React.SetStateAction<any>>;
+  onClick?: React.Dispatch<React.SetStateAction<any>>;
   children: ReactNode;
   tabIndex?: number;
 }

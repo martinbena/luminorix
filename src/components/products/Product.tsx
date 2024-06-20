@@ -45,7 +45,7 @@ export default function Product({
       ) : null}
 
       <Link
-        className="hover:underline relative aspect-square overflow-hidden"
+        className="relative aspect-square overflow-hidden"
         href={paths.productShow(slug, sku)}
       >
         <Image
