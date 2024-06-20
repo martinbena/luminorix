@@ -1,5 +1,6 @@
 import HeadingSecondary from "@/components/ui/HeadingSecondary";
 import Wishlist from "@/components/user/Wishlist";
+import WishlistSkeleton from "@/components/user/WishlistSkeleton";
 
 import { Metadata } from "next";
 import { Suspense } from "react";
@@ -13,7 +14,7 @@ export default async function UserWishlistPage() {
     <>
       <HeadingSecondary>Your Wishlist</HeadingSecondary>
       <div className="mt-12">
-        <Suspense fallback={<p>Loading...</p>}>
+        <Suspense fallback={<WishlistSkeleton />}>
           <Wishlist />
         </Suspense>
       </div>

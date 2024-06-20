@@ -53,10 +53,10 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
         return (
           <li
             key={item.sku}
-            className="grid grid-cols-[150px_2.5fr_1.5fr] p-8 gap-8 [&:not(:last-child)]:border-b border-zinc-200"
+            className="grid relative grid-cols-[150px_2.5fr_1.5fr] tab-lg:grid-cols-[150px_1fr] mob:grid-cols-1 p-8 mob:px-4 mob:py-6 gap-x-8 gap-y-4 [&:not(:last-child)]:border-b border-zinc-200"
           >
             <Link
-              className="relative aspect-square overflow-hidden"
+              className="relative aspect-square overflow-hidden mob:h-[150px] mob:w-[150px] mob:mx-auto"
               href={paths.productShow(item.slug, item.sku)}
             >
               <Image
@@ -67,9 +67,9 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
               />
             </Link>
 
-            <div className="font-sans flex flex-col justify-center">
+            <div className="font-sans flex flex-col justify-between">
               <div>
-                <h3 className="text-2xl font-semibold">
+                <h3 className="text-2xl font-semibold mob-lg:text-xl">
                   <Link
                     className="hover:underline"
                     href={paths.productShow(item.slug, item.sku)}
@@ -80,25 +80,24 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
                 <p className="mt-2">{item.stock} in stock</p>
               </div>
 
-              <p className="font-semibold text-2xl mt-auto">
+              <p className="font-semibold text-2xl mt-auto mob-lg:text-xl mob:mt-3">
                 {formatCurrency(item.price)}
               </p>
             </div>
-            <div className="flex flex-col justify-between">
-              <div className="self-end">
-                <RemoveFromWishlist
-                  onDelete={handleRemoveItem}
-                  sku={item.sku}
-                  slug={item.slug}
-                />
-              </div>
-
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-col justify-between tab-lg:col-span-2 mob:col-span-1">
+              <div className="mt-auto flex flex-col gap-2">
                 <Button type="secondary">Add to cart</Button>
-                <Button type="primary" beforeBackground="before:bg-amber-100">
+                <Button type="primary" beforeBackground="before:bg-white">
                   Buy now
                 </Button>
               </div>
+            </div>
+            <div className="absolute top-2 right-2">
+              <RemoveFromWishlist
+                onDelete={handleRemoveItem}
+                sku={item.sku}
+                slug={item.slug}
+              />
             </div>
           </li>
         );
