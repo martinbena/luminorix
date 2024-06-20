@@ -1,8 +1,14 @@
-import Product from "@/models/Product";
+import Product, { Rating } from "@/models/Product";
 import mongoose from "mongoose";
 import ConnectDB from "../connectDB";
 
-export async function getUserReviews(userId: string) {
+export interface UserRating {
+  title: string;
+  slug: string;
+  review: Rating;
+}
+
+export async function getUserReviews(userId: string): Promise<UserRating[]> {
   try {
     await ConnectDB();
 
@@ -35,7 +41,7 @@ export async function getUserReviews(userId: string) {
 export async function hasUserReviewedProduct(
   productSlug: string,
   userId: string
-) {
+): Promise<boolean> {
   try {
     await ConnectDB();
 

@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { DeleteItemState } from "@/actions/category";
 import HeadingSecondary from "../ui/HeadingSecondary";
-import { ObjectId } from "mongoose";
 
 interface ConfirmDeleteProps {
   resourceName: string;

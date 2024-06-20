@@ -6,12 +6,12 @@ import StarRating from "./StarRating";
 import { useEffect, useRef } from "react";
 import * as actions from "@/actions";
 import toast from "react-hot-toast";
-import { Rating } from "@/models/Product";
+import { UserRating } from "@/db/queries/user";
 
 interface AddEditRatingFormProps {
   onCloseModal?: () => void;
   isEditSession?: boolean;
-  rating?: { title: string; slug: string; review: Rating };
+  rating?: UserRating;
   productSlug: string;
 }
 
