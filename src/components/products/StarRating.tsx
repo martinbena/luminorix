@@ -4,8 +4,12 @@ import { MAX_RATING } from "@/lib/constants";
 import { useState } from "react";
 import Star from "./Star";
 
-export default function StarRating() {
-  const [rating, setRating] = useState<number>(0);
+interface StarRatingProps {
+  defaultValue: number;
+}
+
+export default function StarRating({ defaultValue }: StarRatingProps) {
+  const [rating, setRating] = useState<number>(defaultValue);
   const [tempRating, setTempRating] = useState<number>(0);
 
   function handleRating(rating: number): void {

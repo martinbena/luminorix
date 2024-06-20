@@ -5,11 +5,23 @@ import Form from "../ui/Form";
 import StarRating from "./StarRating";
 import { useEffect, useRef } from "react";
 import * as actions from "@/actions";
-import { usePathname } from "next/navigation";
 import toast from "react-hot-toast";
+import { Rating } from "@/models/Product";
 
-export default function AddEditRating() {
-  const formAction = actions.addRating;
+interface AddEditRatingFormProps {
+  onCloseModal?: () => void;
+  isEditSession?: boolean;
+  rating?: { title: string; slug: string; review: Rating };
+  productSlug: string;
+}
+
+export default function AddEditRatingForm({
+  onCloseModal,
+  isEditSession = false,
+  rating,
+  productSlug,
+}: AddEditRatingFormProps) {
+  const formAction = isEditSession ? actions.editRating : actions.addRating;
 
   const [formState, action] = useFormState(formAction, {
     errors: {},
@@ -19,14 +31,22 @@ export default function AddEditRating() {
   const formRef = useRef<HTMLFormElement>(null);
   const firstInputRef = useRef<HTMLInputElement>(null);
 
-  const pathname = usePathname();
-  const productSlug = pathname.split("/")[1];
-
   useEffect(() => {
-    if (formState.success) {
-      toast.success(`Your rating has been added!`);
+    if (isEditSession) {
+      firstInputRef.current?.focus();
     }
-  }, [formState]);
+
+    if (formState.success) {
+      toast.success(
+        `Rating was successfully ${isEditSession ? "edited" : "added"}`
+      );
+      onCloseModal?.();
+    }
+
+    if (Object.keys(formState.errors).length === 0) {
+      formRef.current?.reset();
+    }
+  }, [formState, onCloseModal, isEditSession]);
 
   return (
     <Form.Container>
@@ -34,8 +54,10 @@ export default function AddEditRating() {
         <p>Thank you for your rating!</p>
       ) : (
         <Form formAction={action} formRef={formRef}>
-          <Form.Title>Leave a rating</Form.Title>
-          <StarRating />
+          <Form.Title>{isEditSession ? "Edit" : "Leave"} a rating</Form.Title>
+          <StarRating
+            defaultValue={isEditSession ? rating?.review.rating ?? 0 : 0}
+          />
           {formState.errors.rating ? (
             <Form.Error>{formState.errors.rating.join(" | ")}</Form.Error>
           ) : null}
@@ -45,6 +67,7 @@ export default function AddEditRating() {
             error={formState.errors.comment}
             optionalField
             inputRef={firstInputRef}
+            value={rating?.review.comment}
           >
             Optional review
           </Form.InputGroup>

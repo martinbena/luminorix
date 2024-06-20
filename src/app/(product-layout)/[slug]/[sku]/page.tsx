@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import AddEditRating from "@/components/products/AddEditRating";
+import AddEditRatingForm from "@/components/products/AddEditRatingForm";
 import ProductDetails from "@/components/products/ProductDetails";
 import ProductImage from "@/components/products/ProductImage";
 import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
@@ -10,7 +10,10 @@ import {
   getAllSlugSkuCombinations,
   getProductVariantBySku,
 } from "@/db/queries/product";
+import { hasUserReviewedProduct } from "@/db/queries/user";
 import { getProductVariantTitle } from "@/lib/helpers";
+import paths from "@/lib/paths";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import probe from "probe-image-size";
 import { Suspense } from "react";
@@ -54,6 +57,9 @@ export default async function SingleProductPage({
   const { title, image, ratings, averageRating } = product;
   const { width, height } = await probe(image);
   const session = await auth();
+  const hasUserRated = session?.user
+    ? await hasUserReviewedProduct(slug, session?.user._id.toString())
+    : false;
 
   return (
     <>
@@ -74,7 +80,22 @@ export default async function SingleProductPage({
       <div className="grid grid-cols-2 mt-16 mb-4 gap-16 tab-xl:gap-4 tab:grid-cols-1 tab:gap-16">
         <div className="flex flex-col gap-8">
           <RatingDistribution ratings={ratings} averageRating={averageRating} />
-          {session?.user ? <AddEditRating /> : null}
+          {session?.user ? (
+            !hasUserRated ? (
+              <AddEditRatingForm productSlug={slug} />
+            ) : (
+              <p className="text-base text-center">
+                You have already rated this product. Visit your{" "}
+                <Link
+                  className="underline text-amber-600"
+                  href={paths.userReviews()}
+                >
+                  profile
+                </Link>{" "}
+                for edit.
+              </p>
+            )
+          ) : null}
         </div>
         <Ratings ratings={JSON.parse(JSON.stringify(ratings))} />
       </div>
