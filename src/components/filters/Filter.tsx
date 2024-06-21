@@ -6,6 +6,7 @@ import { formatNumber } from "@/lib/helpers";
 import { PropsWithChildren } from "react";
 import { Range, getTrackBackground } from "react-range";
 import { SkeletonAvatar, SkeletonBlock } from "skeleton-elements/react";
+import Stars from "../products/Stars";
 
 function Filter({ children }: PropsWithChildren) {
   return (
@@ -66,12 +67,25 @@ function Box({ filterType, isReversed = false }: BoxProps) {
                     !selectedFilters.includes(item)
                   }
                 />
-                <label className="hover:underline" htmlFor={item}>
+                <label
+                  className="hover:underline flex items-center gap-1"
+                  htmlFor={item}
+                >
                   {selectedFilters.includes(item) ? (
-                    <span className="font-bold">{item}</span>
+                    <span className="font-bold">
+                      {filterType === "ratings" ? (
+                        <Stars rating={+item} />
+                      ) : (
+                        item
+                      )}
+                    </span>
                   ) : (
                     <>
-                      {item}{" "}
+                      {filterType === "ratings" ? (
+                        <Stars rating={+item} />
+                      ) : (
+                        item
+                      )}{" "}
                       <span className="text-amber-700">
                         (
                         {selectedFilters.length &&
