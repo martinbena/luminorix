@@ -54,15 +54,37 @@ export default async function SingleProductPage({
 
   if (!product) notFound();
 
-  const { title, image, ratings, averageRating } = product;
+  const {
+    title,
+    image,
+    ratings,
+    averageRating,
+    price,
+    previousPrice,
+    freeShipping,
+  } = product;
   const { width, height } = await probe(image);
   const session = await auth();
   const hasUserRated = session?.user
-    ? await hasUserReviewedProduct(slug, session?.user._id.toString())
+    ? ratings.some(
+        (rating) => rating.postedBy._id.toString() === session.user._id
+      )
     : false;
 
   return (
     <>
+      {previousPrice > price || freeShipping ? (
+        <div className="flex gap-2 child:py-1 child:px-2 font-sans mb-2">
+          {previousPrice > price ? (
+            <div className="bg-amber-300">
+              - {Math.round(((previousPrice - price) / previousPrice) * 100)}%
+            </div>
+          ) : null}
+          {freeShipping ? (
+            <div className="bg-green-300">Free shipping</div>
+          ) : null}
+        </div>
+      ) : null}
       <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto tab:grid-cols-1 tab:gap-8 text-zinc-800">
         <div className="flex flex-col gap-1.5">
           <ProductImage title={title} image={image} size={{ width, height }} />

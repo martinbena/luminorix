@@ -79,12 +79,6 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    if (filterParams.ratings && filterParams.ratings.length) {
-      const minRating = Math.min(...filterParams.ratings) - 0.3;
-      const maxRating = Math.max(...filterParams.ratings) + 0.7;
-      baseMatchStage.averageRating = { $gte: minRating, $lte: maxRating };
-    }
-
     const generateMatchStage = (
       exclude: "brands" | "colors" | "sizes" | "ratings"
     ) => {

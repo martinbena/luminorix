@@ -1,6 +1,7 @@
 "use client";
 
 import { useFilterContext } from "@/app/contexts/FilterContext";
+import { SKELETON_EFFECT } from "@/lib/constants";
 import { formatNumber } from "@/lib/helpers";
 import { PropsWithChildren } from "react";
 import { Range, getTrackBackground } from "react-range";
@@ -59,8 +60,10 @@ function Box({ filterType, isReversed = false }: BoxProps) {
                   checked={selectedFilters.includes(item)}
                   onChange={() => handleCheckboxChange(filterType, item)}
                   disabled={
-                    itemCounts.find((i) => i.name === item)?.count ===
-                      undefined && !selectedFilters.includes(item)
+                    (itemCounts.find((i) => i.name === item)?.count ===
+                      undefined ||
+                      itemCounts.find((i) => i.name === item)?.count === 0) &&
+                    !selectedFilters.includes(item)
                   }
                 />
                 <label className="hover:underline" htmlFor={item}>
@@ -199,7 +202,7 @@ function SkeletonRange() {
           width="70px"
           height="20px"
           borderRadius="0"
-          effect="wave"
+          effect={SKELETON_EFFECT}
         />
       </div>
       <div className="my-2 flex justify-center items-center child:py-0.5">
@@ -208,7 +211,7 @@ function SkeletonRange() {
           size={30}
           color="#f000000"
           showIcon={false}
-          effect="wave"
+          effect={SKELETON_EFFECT}
           borderRadius="50%"
           iconColor=""
         />
@@ -217,14 +220,14 @@ function SkeletonRange() {
           width="150px"
           height="7px"
           borderRadius="0"
-          effect="wave"
+          effect={SKELETON_EFFECT}
         />
         <SkeletonAvatar
           tag="span"
           size={30}
           color="#f000000"
           showIcon={false}
-          effect="wave"
+          effect={SKELETON_EFFECT}
           borderRadius="50%"
           iconColor=""
         />
@@ -235,14 +238,14 @@ function SkeletonRange() {
           width="40px"
           height="30px"
           borderRadius="0"
-          effect="wave"
+          effect={SKELETON_EFFECT}
         />
         <SkeletonBlock
           tag="span"
           width="40px"
           height="30px"
           borderRadius="0"
-          effect="wave"
+          effect={SKELETON_EFFECT}
         />
       </div>
     </div>
@@ -258,7 +261,7 @@ function SkeletonBox() {
           width="70px"
           height="20px"
           borderRadius="0"
-          effect="wave"
+          effect={SKELETON_EFFECT}
         />
       </div>
       <div className="my-2 flex flex-col child:py-2">
@@ -268,7 +271,7 @@ function SkeletonBox() {
             size={20}
             color="#f000000"
             showIcon={false}
-            effect="wave"
+            effect={SKELETON_EFFECT}
             borderRadius="0"
             iconColor=""
           />
@@ -277,7 +280,7 @@ function SkeletonBox() {
             width="70px"
             height="15px"
             borderRadius="0"
-            effect="wave"
+            effect={SKELETON_EFFECT}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -286,7 +289,7 @@ function SkeletonBox() {
             size={20}
             color="#f000000"
             showIcon={false}
-            effect="wave"
+            effect={SKELETON_EFFECT}
             borderRadius="0"
             iconColor=""
           />
@@ -295,7 +298,7 @@ function SkeletonBox() {
             width="100px"
             height="15px"
             borderRadius="0"
-            effect="wave"
+            effect={SKELETON_EFFECT}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -304,7 +307,7 @@ function SkeletonBox() {
             size={20}
             color="#f000000"
             showIcon={false}
-            effect="wave"
+            effect={SKELETON_EFFECT}
             borderRadius="0"
             iconColor=""
           />
@@ -313,7 +316,7 @@ function SkeletonBox() {
             width="150px"
             height="15px"
             borderRadius="0"
-            effect="wave"
+            effect={SKELETON_EFFECT}
           />
         </div>
       </div>
