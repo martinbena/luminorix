@@ -103,6 +103,7 @@ interface InputGroupProps {
   children: ReactNode;
   value?: string | number;
   inputRef?: React.RefObject<HTMLInputElement>;
+  textareaRef?: React.RefObject<HTMLTextAreaElement>;
   options?: Option[];
   optionalField?: boolean;
   step?: number;
@@ -118,6 +119,7 @@ function InputGroup({
   children,
   value,
   inputRef,
+  textareaRef,
   options,
   optionalField = false,
   step,
@@ -160,7 +162,7 @@ function InputGroup({
         ) : null}
       </label>{" "}
       {inputType === "textarea" ? (
-        <textarea {...commonProps} rows={4} />
+        <textarea {...commonProps} rows={4} ref={textareaRef} />
       ) : inputType === "select" ? (
         <select {...commonProps}>
           {options?.map((option) => (

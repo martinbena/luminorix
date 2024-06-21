@@ -29,7 +29,7 @@ export default function AddEditRatingForm({
   });
 
   const formRef = useRef<HTMLFormElement>(null);
-  const firstInputRef = useRef<HTMLInputElement>(null);
+  const firstInputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (isEditSession) {
@@ -66,7 +66,7 @@ export default function AddEditRatingForm({
             name="comment"
             error={formState.errors.comment}
             optionalField
-            inputRef={firstInputRef}
+            textareaRef={firstInputRef}
             value={rating?.review.comment}
           >
             Optional review
