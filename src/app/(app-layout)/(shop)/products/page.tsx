@@ -1,5 +1,6 @@
 import AllProducts from "@/components/products/AllProducts";
 import MostSoldProducts from "@/components/products/MostSoldProducts";
+import MostSoldProductsSkeleton from "@/components/products/MostSoldProductsSkeleton";
 import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
 import { getCategoryBySlug } from "@/db/queries/categories";
 import { ProductSearchParams } from "@/db/queries/queryOptions";
@@ -24,7 +25,9 @@ export default async function AllProductsPage({
   const { category } = searchParams;
   return (
     <>
-      <MostSoldProducts category={category} />
+      <Suspense fallback={<MostSoldProductsSkeleton />}>
+        <MostSoldProducts category={category} />
+      </Suspense>
       <Suspense
         fallback={
           <ProductRowSkeleton gridSize="large" hasTitle numItems={12} />

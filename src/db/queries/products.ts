@@ -252,6 +252,8 @@ export async function getTopSellingProductVariants(categorySlug?: string) {
   try {
     await ConnectDB();
 
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     let matchStage = {};
 
     if (categorySlug) {
