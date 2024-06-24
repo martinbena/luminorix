@@ -9,7 +9,7 @@ export default function Layout({
   return (
     <div className="max-w-8xl mx-auto py-16 dt-xl:max-w-seventy dt-lg:p-8 dt:p-0">
       <Header />
-      <main className="p-10 tab:px-6 mob:px-4 bg-white min-h-[65vh]">
+      <main className="p-10 pt-0 tab:px-6 mob:px-4 bg-white min-h-[65vh]">
         {children}
       </main>
       <Footer />

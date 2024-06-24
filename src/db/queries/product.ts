@@ -73,6 +73,15 @@ export async function getProductVariantBySku(
         },
       },
       {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      { $unwind: "$category" },
+      {
         $project: productWithVariantFormat,
       },
       { $limit: 1 },

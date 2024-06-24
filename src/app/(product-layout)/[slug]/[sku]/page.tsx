@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import ProductBreadcrumb from "@/components/navigation/ProductBreadcrumb";
 import AddEditRatingForm from "@/components/products/AddEditRatingForm";
 import ProductDetails from "@/components/products/ProductDetails";
 import ProductImage from "@/components/products/ProductImage";
@@ -6,11 +7,11 @@ import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
 import RatingDistribution from "@/components/products/RatingDistribution";
 import Ratings from "@/components/products/Ratings";
 import RelatedProducts from "@/components/products/RelatedProducts";
+import Tags from "@/components/products/Tags";
 import {
   getAllSlugSkuCombinations,
   getProductVariantBySku,
 } from "@/db/queries/product";
-import { hasUserReviewedProduct } from "@/db/queries/user";
 import { getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import Link from "next/link";
@@ -62,6 +63,7 @@ export default async function SingleProductPage({
     price,
     previousPrice,
     freeShipping,
+    category,
   } = product;
   const { width, height } = await probe(image);
   const session = await auth();
@@ -73,18 +75,12 @@ export default async function SingleProductPage({
 
   return (
     <>
-      {previousPrice > price || freeShipping ? (
-        <div className="flex gap-2 child:py-1 child:px-2 font-sans mb-2">
-          {previousPrice > price ? (
-            <div className="bg-amber-300">
-              - {Math.round(((previousPrice - price) / previousPrice) * 100)}%
-            </div>
-          ) : null}
-          {freeShipping ? (
-            <div className="bg-green-300">Free shipping</div>
-          ) : null}
-        </div>
-      ) : null}
+      <ProductBreadcrumb productTitle={title} productCategory={category} />
+      <Tags
+        previousPrice={previousPrice}
+        price={price}
+        freeShipping={freeShipping}
+      />
       <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto tab:grid-cols-1 tab:gap-8 text-zinc-800">
         <div className="flex flex-col gap-1.5">
           <ProductImage title={title} image={image} size={{ width, height }} />

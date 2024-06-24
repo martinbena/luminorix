@@ -1,6 +1,7 @@
 import mongoose, { Types } from "mongoose";
 import { Document } from "mongoose";
 import { User } from "./User";
+import { Category } from "./Category";
 
 export interface Rating extends Document {
   rating: 5 | 4 | 3 | 2 | 1;
@@ -79,7 +80,7 @@ export interface Product extends Document {
   description: string;
   brand: string;
   freeShipping: boolean;
-  category: Types.ObjectId;
+  category: Types.ObjectId & Category;
   soldTotal: number;
   variants: Variant[];
   ratings: Rating[];
