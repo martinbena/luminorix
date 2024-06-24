@@ -247,3 +247,44 @@ export async function getProductsWithFreeShipping(): Promise<
     throw new Error("Could not get products with free shipping");
   }
 }
+
+export async function getTopSellingProductVariants(categorySlug?: string) {
+  try {
+    await ConnectDB();
+
+    let matchStage = {};
+
+    if (categorySlug) {
+      const currentCategory = await Category.findOne({ slug: categorySlug });
+
+      if (currentCategory) {
+        matchStage = { category: currentCategory._id };
+      }
+    }
+
+    const topSellingVariants = await Product.aggregate([
+      {
+        $match: matchStage,
+      },
+      {
+        $unwind: "$variants",
+      },
+      {
+        $sort: {
+          "variants.sold": -1,
+        },
+      },
+      {
+        $limit: 3,
+      },
+      {
+        $project: productWithVariantFormat,
+      },
+    ]);
+
+    return topSellingVariants;
+  } catch (error) {
+    console.error("Error in getTopSellingProductVariants:", error);
+    throw new Error("Could not get top selling product variants");
+  }
+}

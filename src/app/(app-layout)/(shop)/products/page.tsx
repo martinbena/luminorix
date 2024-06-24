@@ -1,4 +1,5 @@
 import AllProducts from "@/components/products/AllProducts";
+import MostSoldProducts from "@/components/products/MostSoldProducts";
 import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
 import { getCategoryBySlug } from "@/db/queries/categories";
 import { ProductSearchParams } from "@/db/queries/queryOptions";
@@ -20,11 +21,17 @@ export async function generateMetadata({ searchParams }: AllProductsPageProps) {
 export default async function AllProductsPage({
   searchParams,
 }: AllProductsPageProps) {
+  const { category } = searchParams;
   return (
-    <Suspense
-      fallback={<ProductRowSkeleton gridSize="large" hasTitle numItems={12} />}
-    >
-      <AllProducts searchParams={searchParams} />
-    </Suspense>
+    <>
+      <MostSoldProducts category={category} />
+      <Suspense
+        fallback={
+          <ProductRowSkeleton gridSize="large" hasTitle numItems={12} />
+        }
+      >
+        <AllProducts searchParams={searchParams} />
+      </Suspense>
+    </>
   );
 }

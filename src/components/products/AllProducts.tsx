@@ -11,13 +11,7 @@ export default async function AllProducts({
     searchParams,
   });
   return (
-    <ProductRow
-      title={currentCategory?.title ?? "All sortiment"}
-      sectionClasses="bg-white"
-      gridSize="large"
-      sort
-      filterTags
-    >
+    <ProductRow sectionClasses="bg-white" gridSize="large" sort filterTags>
       {!products.length && (
         <div className="flex justify-center col-span-3 gap-4 flex-col items-center">
           <GiCardboardBox className="text-zinc-300 h-24 w-24" />

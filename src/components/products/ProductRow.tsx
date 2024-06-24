@@ -7,7 +7,7 @@ import FilterTags from "../filters/FilterTags";
 
 interface ProductRowProps {
   sectionClasses?: string;
-  title: string;
+  title?: string;
   children: ReactNode;
   sort?: boolean;
   filterTags?: boolean;
@@ -28,7 +28,7 @@ export default function ProductRow({
 }: ProductRowProps) {
   return (
     <section className={`px-8 mob:px-5 ${sectionClasses}`}>
-      <HeadingSecondary>{title}</HeadingSecondary>
+      {title && <HeadingSecondary>{title}</HeadingSecondary>}
       {(sort || filterTags) && (
         <div className="my-6 flex justify-between gap-4 mob-lg:flex-col">
           <div>{filterTags ? <FilterTags /> : null}</div>
@@ -40,17 +40,17 @@ export default function ProductRow({
       <div
         className={`mt-8 grid gap-8 dt-sm:gap-4 max-w-8xl mx-auto ${
           gridSize === "small"
-            ? "grid-cols-[repeat(auto-fit,_minmax(14rem,_1fr))] dt-sm:grid-cols-[repeat(auto-fit,_minmax(12rem,_1fr))]"
+            ? "grid-cols-[repeat(auto-fit,_minmax(14.75rem,_1fr))]"
             : "grid-cols-[repeat(auto-fit,_minmax(20rem,_1fr))] dt:grid-cols-[repeat(auto-fit,_minmax(18rem,_1fr))] mob:grid-cols-1"
         }`}
       >
         {children}
-        {Children.count(children) < 3 && (
+        {Children.count(children) < 4 && (
           <>
             <span>&nbsp;</span>{" "}
           </>
         )}
-        {Children.count(children) < 2 && (
+        {Children.count(children) < 3 && (
           <>
             <span>&nbsp;</span>{" "}
           </>
