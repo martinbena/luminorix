@@ -5,6 +5,7 @@ import { formatCurrency, getProductVariantTitle } from "@/lib/helpers";
 import Link from "next/link";
 import paths from "@/lib/paths";
 import Tags from "./Tags";
+import CartActions from "../cart/CartActions";
 
 interface ProductProps {
   product: ProductWithVariant;
@@ -85,12 +86,7 @@ export default function Product({
             <p className="font-sans mb-8">{description}</p>
           ) : null}
         </div>
-        <div className="flex flex-col gap-2">
-          <Button type="secondary">Add to cart</Button>
-          <Button type="primary" beforeBackground="before:bg-amber-100">
-            Buy now
-          </Button>
-        </div>
+        <CartActions product={product} />
       </div>
     </article>
   );
