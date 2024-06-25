@@ -8,7 +8,7 @@ export default function Tags({
   return (
     <>
       {(previousPrice && price && previousPrice > price) || freeShipping ? (
-        <div className="flex gap-2 child:py-1 child:px-2 font-sans mb-2">
+        <div className="flex gap-2 child:py-1 child:px-2 font-sans">
           {previousPrice && price && previousPrice > price ? (
             <div className="bg-amber-300">
               - {Math.round(((previousPrice - price) / previousPrice) * 100)}%

@@ -14,13 +14,13 @@ export default function ProductBreadcrumb({
   productCategory,
 }: ProductBreadcrumbProps) {
   return (
-    <nav className="flex font-sans py-4 items-center  maw-w-fit">
+    <nav className="flex font-sans py-4 items-center">
       <Link href={paths.home()}>
         <FaHouseChimney className="h-5 w-5 text-amber-500 hover:text-amber-600" />
       </Link>
       <Divider />
       <Link
-        className="text-amber-700 hover:underline"
+        className="hover:underline"
         href={`${paths.productShowAll()}?category=${productCategory.slug}`}
       >
         {productCategory.title}

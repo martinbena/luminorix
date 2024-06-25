@@ -76,11 +76,6 @@ export default async function SingleProductPage({
   return (
     <>
       <ProductBreadcrumb productTitle={title} productCategory={category} />
-      <Tags
-        previousPrice={previousPrice}
-        price={price}
-        freeShipping={freeShipping}
-      />
       <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto tab:grid-cols-1 tab:gap-8 text-zinc-800">
         <div className="flex flex-col gap-1.5">
           <ProductImage title={title} image={image} size={{ width, height }} />
