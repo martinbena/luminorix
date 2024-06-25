@@ -13,11 +13,17 @@ import Searchbar from "./Searchbar";
 import { useSession } from "next-auth/react";
 import { ObjectId } from "mongoose";
 import { useWishlistContext } from "@/app/contexts/WishlistContext";
+import { useCartContext } from "@/app/contexts/CartContext";
+import { formatCurrency } from "@/lib/helpers";
 
 export default function HeaderFeatureRow() {
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const { wishlistCount, setWishlistCount } = useWishlistContext();
+  const { getTotalCartQuantity, getTotalCartPrice } = useCartContext();
   const session = useSession();
+
+  const totalCartQuantity = getTotalCartQuantity();
+  const totalCartPrice = getTotalCartPrice();
 
   function toggleSearchVisibility(): void {
     setIsSearchVisible((visible) => !visible);
@@ -57,12 +63,14 @@ export default function HeaderFeatureRow() {
           </HeaderFeature>
         ) : null}
 
-        <HeaderFeature link={paths.cart()}>
+        <HeaderFeature count={totalCartQuantity} link={paths.cart()}>
           <PiShoppingCartSimpleThin />{" "}
           <div>
             <p className="text-base">Cart</p>{" "}
             <span className="font-sans font-semibold tracking-wider dt-sm:text-sm">
-              is empty
+              {totalCartPrice === 0
+                ? "is empty"
+                : formatCurrency(totalCartPrice)}
             </span>
           </div>
         </HeaderFeature>

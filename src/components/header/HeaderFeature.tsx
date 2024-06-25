@@ -23,7 +23,7 @@ export default function HeaderFeature({
           <Link href={link} className={baseClasses}>
             {children}
           </Link>
-          <span className="absolute top-0.5 left-12 bg-amber-200 tab-xl:left-8 tab-xl:top-0 text-zinc-800 tracking-normal min-h-5 min-w-5 text-center rounded-full leading-none flex items-center justify-center pointer-events-none py-[2px] px-1 font-sans mob:left-5 mob:-top-1">
+          <span className="absolute top-0.5 left-12 bg-amber-200 tab-xl:left-8 tab-xl:top-0 text-zinc-800 tracking-normal min-h-5 min-w-5 text-center rounded-full aspect-square leading-none flex items-center justify-center pointer-events-none py-[2px] px-1 font-sans font-medium mob:left-5 mob:-top-1">
             {count || 0}
           </span>
         </>
