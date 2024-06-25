@@ -18,6 +18,7 @@ import VariantSelector from "./VariantSelector";
 import VariantLink from "./VariantLink";
 import { ReactNode } from "react";
 import WishlistButton from "./WishlistButton";
+import CartActions from "../cart/CartActions";
 
 interface ProductDetailsProps {
   product: ProductWithVariant;
@@ -119,10 +120,7 @@ export default async function ProductDetails({
 
       {stock > 0 ? (
         <div className="flex flex-col gap-2 max-w-sixty mob-lg:max-w-full">
-          <Button type="secondary">Add to cart</Button>
-          <Button type="primary" beforeBackground="before:bg-white">
-            Buy now
-          </Button>
+          <CartActions product={JSON.parse(JSON.stringify(product))} />
         </div>
       ) : (
         <p>This product is not available at the moment.</p>

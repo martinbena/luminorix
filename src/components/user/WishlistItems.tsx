@@ -7,9 +7,9 @@ import { WishlistItem } from "@/models/User";
 import Image from "next/image";
 import Link from "next/link";
 import RemoveFromWishlist from "./RemoveFromWishlist";
-import Button from "../ui/Button";
 import { useEffect, useOptimistic } from "react";
 import { useWishlistContext } from "@/app/contexts/WishlistContext";
+import CartActions from "../cart/CartActions";
 
 interface WishlistProps {
   wishlist: WishlistItem[];
@@ -85,11 +85,8 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
               </p>
             </div>
             <div className="flex flex-col justify-between tab-lg:col-span-2 mob:col-span-1">
-              <div className="mt-auto flex flex-col gap-2">
-                <Button type="secondary">Add to cart</Button>
-                <Button type="primary" beforeBackground="before:bg-white">
-                  Buy now
-                </Button>
+              <div className="mt-auto">
+                <CartActions product={JSON.parse(JSON.stringify(item))} />
               </div>
             </div>
             <div className="absolute top-2 right-2">

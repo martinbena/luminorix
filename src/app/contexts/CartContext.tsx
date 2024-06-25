@@ -1,9 +1,10 @@
 "use client";
 
 import { ProductWithVariant } from "@/models/Product";
+import { WishlistItem } from "@/models/User";
 import { PropsWithChildren, createContext, useContext, useState } from "react";
 
-type CartProductProps = Pick<
+export type CartProductProps = Pick<
   ProductWithVariant,
   | "_id"
   | "sku"
@@ -25,7 +26,7 @@ export interface CartItem extends CartProductProps {
 
 interface CartContextProps {
   cartItems: CartItem[];
-  addItem: (product: ProductWithVariant) => void;
+  addItem: (product: ProductWithVariant | WishlistItem) => void;
   deleteItem: (sku: string) => void;
   increaseItemQuantity: (sku: string) => void;
   decreaseItemQuantity: (sku: string) => void;
@@ -41,7 +42,7 @@ const CartContext = createContext({} as CartContextProps);
 function CartProvider({ children }: PropsWithChildren) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  function addItem(product: ProductWithVariant): void {
+  function addItem(product: ProductWithVariant | WishlistItem): void {
     const newItem = {
       _id: product._id,
       sku: product.sku,

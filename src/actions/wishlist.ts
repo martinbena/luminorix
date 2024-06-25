@@ -26,12 +26,15 @@ export async function toggleWishlistProduct(slug: string, sku: string) {
       (item: WishlistItem) => item.sku === sku
     );
 
-    const { title, price, image, color, size, stock } = product;
+    const { title, price, image, color, size, stock, brand, freeShipping } =
+      product;
 
     const wishlistItem = {
       sku,
       product: product._id,
       title,
+      brand,
+      freeShipping,
       color,
       size,
       stock,

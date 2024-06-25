@@ -4,6 +4,8 @@ export interface WishlistItem extends Document {
   sku: string;
   product: Types.ObjectId;
   title: string;
+  brand: string;
+  freeShipping: boolean;
   color: string;
   size: string;
   stock: number;
@@ -20,6 +22,8 @@ const wishlistItemSchema = new mongoose.Schema<WishlistItem>(
       ref: "Product",
     },
     title: String,
+    brand: String,
+    freeShipping: Boolean,
     color: String,
     size: String,
     stock: Number,

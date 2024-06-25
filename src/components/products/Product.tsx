@@ -86,7 +86,10 @@ export default function Product({
             <p className="font-sans mb-8">{description}</p>
           ) : null}
         </div>
-        <CartActions product={product} />
+        <CartActions
+          product={JSON.parse(JSON.stringify(product))}
+          background={"amber-100"}
+        />
       </div>
     </article>
   );
