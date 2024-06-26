@@ -15,11 +15,13 @@ import { ObjectId } from "mongoose";
 import { useWishlistContext } from "@/app/contexts/WishlistContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { formatCurrency } from "@/lib/helpers";
+import HeaderFeatureSkeleton from "./HeaderFeatureSkeleton";
 
 export default function HeaderFeatureRow() {
   const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
   const { wishlistCount, setWishlistCount } = useWishlistContext();
-  const { getTotalCartQuantity, getTotalCartPrice } = useCartContext();
+  const { getTotalCartQuantity, getTotalCartPrice, isCartLoading } =
+    useCartContext();
   const session = useSession();
 
   const totalCartQuantity = getTotalCartQuantity();
@@ -63,17 +65,21 @@ export default function HeaderFeatureRow() {
           </HeaderFeature>
         ) : null}
 
-        <HeaderFeature count={totalCartQuantity} link={paths.cart()}>
-          <PiShoppingCartSimpleThin />{" "}
-          <div>
-            <p className="text-base">Cart</p>{" "}
-            <span className="font-sans font-semibold tracking-wider dt-sm:text-sm">
-              {totalCartPrice === 0
-                ? "is empty"
-                : formatCurrency(totalCartPrice)}
-            </span>
-          </div>
-        </HeaderFeature>
+        {isCartLoading ? (
+          <HeaderFeatureSkeleton />
+        ) : (
+          <HeaderFeature count={totalCartQuantity} link={paths.cart()}>
+            <PiShoppingCartSimpleThin />{" "}
+            <div>
+              <p className="text-base">Cart</p>{" "}
+              <span className="font-sans font-semibold tracking-wider dt-sm:text-sm">
+                {totalCartPrice === 0
+                  ? "is empty"
+                  : formatCurrency(totalCartPrice)}
+              </span>
+            </div>
+          </HeaderFeature>
+        )}
 
         <Searchbar
           isVisible={isSearchVisible}

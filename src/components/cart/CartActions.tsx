@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartContext } from "@/app/contexts/CartContext";
+import { CartItem, useCartContext } from "@/app/contexts/CartContext";
 import { ProductWithVariant } from "@/models/Product";
 import { WishlistItem } from "@/models/User";
 import Button from "../ui/Button";
@@ -8,7 +8,7 @@ import AddToCart from "./AddToCart";
 import UpdateItemQuantity from "./UpdateItemQuantity";
 
 export interface CartActionsProps {
-  product: ProductWithVariant | WishlistItem;
+  product: ProductWithVariant | WishlistItem | CartItem;
   background?: string;
 }
 

@@ -2,7 +2,13 @@
 
 import { ProductWithVariant } from "@/models/Product";
 import { WishlistItem } from "@/models/User";
-import { PropsWithChildren, createContext, useContext, useState } from "react";
+import {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
 
 export type CartProductProps = Pick<
   ProductWithVariant,
@@ -26,6 +32,7 @@ export interface CartItem extends CartProductProps {
 
 interface CartContextProps {
   cartItems: CartItem[];
+  isCartLoading: boolean;
   addItem: (product: ProductWithVariant | WishlistItem) => void;
   deleteItem: (sku: string) => void;
   increaseItemQuantity: (sku: string) => void;
@@ -40,7 +47,24 @@ interface CartContextProps {
 const CartContext = createContext({} as CartContextProps);
 
 function CartProvider({ children }: PropsWithChildren) {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[] | null>(null);
+  const [isCartLoading, setIsCartLoading] = useState(true);
+
+  useEffect(() => {
+    const storedCartItems = localStorage.getItem("cartItems");
+    if (storedCartItems) {
+      setCartItems(JSON.parse(storedCartItems));
+    } else {
+      setCartItems([]);
+    }
+    setIsCartLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (cartItems !== null) {
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+    }
+  }, [cartItems]);
 
   function addItem(product: ProductWithVariant | WishlistItem): void {
     const newItem = {
@@ -56,56 +80,60 @@ function CartProvider({ children }: PropsWithChildren) {
       slug: product.slug,
       stock: product.stock,
     } as CartProductProps;
-    setCartItems([
-      ...cartItems,
+    setCartItems((prevItems) => [
+      ...(prevItems || []),
       { ...newItem, quantity: 1, totalPrice: product.price },
     ]);
   }
 
   function deleteItem(sku: string): void {
-    const updatedItems = cartItems.filter((item) => item.sku !== sku);
-    setCartItems(updatedItems);
+    setCartItems((prevItems) =>
+      (prevItems || []).filter((item) => item.sku !== sku)
+    );
   }
 
   function increaseItemQuantity(sku: string): void {
-    const itemIndex = cartItems.findIndex((item) => item.sku === sku);
-    if (itemIndex === -1) return;
-    const item = cartItems[itemIndex];
-    if (item.quantity === item.stock) return;
+    setCartItems((prevItems) => {
+      const items = prevItems || [];
+      const itemIndex = items.findIndex((item) => item.sku === sku);
+      if (itemIndex === -1) return items;
+      const item = items[itemIndex];
+      if (item.quantity === item.stock) return items;
 
-    const updatedItem = {
-      ...item,
-      quantity: item.quantity + 1,
-      totalPrice: (item.quantity + 1) * item.price,
-    };
-    const newCartItems = [
-      ...cartItems.slice(0, itemIndex),
-      updatedItem,
-      ...cartItems.slice(itemIndex + 1),
-    ];
-    setCartItems(newCartItems);
+      const updatedItem = {
+        ...item,
+        quantity: item.quantity + 1,
+        totalPrice: (item.quantity + 1) * item.price,
+      };
+      return [
+        ...items.slice(0, itemIndex),
+        updatedItem,
+        ...items.slice(itemIndex + 1),
+      ];
+    });
   }
 
   function decreaseItemQuantity(sku: string): void {
-    const itemIndex = cartItems.findIndex((item) => item.sku === sku);
-    if (itemIndex === -1) return;
-    const item = cartItems[itemIndex];
-    if (item.quantity === 1) {
-      deleteItem(sku);
-      return;
-    }
+    setCartItems((prevItems) => {
+      const items = prevItems || [];
+      const itemIndex = items.findIndex((item) => item.sku === sku);
+      if (itemIndex === -1) return items;
+      const item = items[itemIndex];
+      if (item.quantity === 1) {
+        return items.filter((item) => item.sku !== sku);
+      }
 
-    const updatedItem = {
-      ...item,
-      quantity: item.quantity - 1,
-      totalPrice: (item.quantity - 1) * item.price,
-    };
-    const newCartItems = [
-      ...cartItems.slice(0, itemIndex),
-      updatedItem,
-      ...cartItems.slice(itemIndex + 1),
-    ];
-    setCartItems(newCartItems);
+      const updatedItem = {
+        ...item,
+        quantity: item.quantity - 1,
+        totalPrice: (item.quantity - 1) * item.price,
+      };
+      return [
+        ...items.slice(0, itemIndex),
+        updatedItem,
+        ...items.slice(itemIndex + 1),
+      ];
+    });
   }
 
   function clearCart(): void {
@@ -113,25 +141,34 @@ function CartProvider({ children }: PropsWithChildren) {
   }
 
   function getTotalCartQuantity(): number {
-    return cartItems.reduce((sum, item) => sum + item.quantity, 0);
+    return (cartItems || []).reduce((sum, item) => sum + item.quantity, 0);
   }
 
   function getTotalCartPrice(): number {
-    return cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
+    return (cartItems || []).reduce((sum, item) => sum + item.totalPrice, 0);
   }
 
   function getCurrentItemQuantity(sku: string): number {
-    return cartItems.find((item) => item.sku === sku)?.quantity ?? 0;
+    return (cartItems || []).find((item) => item.sku === sku)?.quantity ?? 0;
   }
 
   function getCartStatus(sku: string): boolean {
-    return cartItems.some((item) => item.sku === sku);
+    return (cartItems || []).some((item) => item.sku === sku);
   }
+
+  // if (cartItems === null) {
+  //   return (
+  //     <div className="flex items-center justify-center">
+  //       <div className="form__loader" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <CartContext.Provider
       value={{
-        cartItems,
+        cartItems: cartItems ?? [],
+        isCartLoading,
         addItem,
         deleteItem,
         increaseItemQuantity,
