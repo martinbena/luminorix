@@ -69,7 +69,7 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
 
             <div className="font-sans flex flex-col justify-between">
               <div>
-                <h3 className="text-2xl font-semibold mob-lg:text-xl">
+                <h3 className="text-2xl font-serif font-semibold mob-lg:text-xl">
                   <Link
                     className="hover:underline"
                     href={paths.productShow(item.slug, item.sku)}

@@ -31,7 +31,7 @@ export default async function Reviews() {
             return (
               <li key={item.title} className="flex border border-amber-500">
                 <div className="px-6 py-3 flex-grow">
-                  <h3 className="font-semibold font-sans text-2xl mb-2">
+                  <h3 className="font-semibold text-2xl mb-2">
                     <Link
                       className="hover:underline"
                       href={`/${item.slug}/${slugSkuPairs[item.slug]}`}

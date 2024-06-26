@@ -158,7 +158,11 @@ interface ProductDetailProps {
 }
 
 function Heading({ children }: ProductDetailProps) {
-  return <h2 className="font-semibold text-3xl mob-sm:text-2xl">{children}</h2>;
+  return (
+    <h2 className="font-semibold font-serif text-3xl mob-sm:text-2xl">
+      {children}
+    </h2>
+  );
 }
 
 function Description({ children }: ProductDetailProps) {
