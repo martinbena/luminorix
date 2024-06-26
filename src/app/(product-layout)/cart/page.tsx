@@ -1,6 +1,7 @@
 "use client";
 
 import { useCartContext } from "@/app/contexts/CartContext";
+import CartSkeleton from "@/components/cart/CartSkeleton";
 import UpdateItemQuantity from "@/components/cart/UpdateItemQuantity";
 import Button from "@/components/ui/Button";
 import { formatCurrency, getProductVariantTitle } from "@/lib/helpers";
@@ -32,7 +33,7 @@ export default function CartPage() {
 
   return (
     <>
-      <div className="pt-10 max-w-6xl mx-auto">
+      <div className="pt-10 max-w-6xl mx-auto text-zinc-800">
         <section>
           <StepsContainer>
             <Step step={1} currentStep={currentStep}>
@@ -50,7 +51,8 @@ export default function CartPage() {
         </section>
 
         {isCartLoading ? (
-          <p>Loading...</p>
+          // <p>Loading...</p>
+          <CartSkeleton />
         ) : cartItems.length ? (
           <section className="mt-16 grid grid-cols-[2fr_1fr] gap-8">
             <div>
@@ -79,12 +81,12 @@ export default function CartPage() {
                       </div>
                       <div className="flex flex-col justify-between flex-1">
                         <div>
-                          <Link
-                            className="hover:underline text-xl font-semibold"
-                            href={paths.productShow(item.slug, item.sku)}
-                          >
-                            {composedTitle}
-                          </Link>
+                          <h3 className="hover:underline text-xl font-semibold">
+                            <Link href={paths.productShow(item.slug, item.sku)}>
+                              {composedTitle}
+                            </Link>
+                          </h3>
+
                           <p className="mt-7 font-sans text-lg">
                             {formatCurrency(item.price)}
                           </p>
@@ -141,7 +143,7 @@ export default function CartPage() {
                       </div>
 
                       <div className="flex flex-col justify-between flex-1">
-                        <p>{composedTitle}</p>
+                        <h4>{composedTitle}</h4>
                         <div className="flex items-center justify-between">
                           <p className="font-sans text-base">
                             {formatCurrency(item.price)}
