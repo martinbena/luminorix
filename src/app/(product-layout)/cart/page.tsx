@@ -4,18 +4,46 @@ import { useCartContext } from "@/app/contexts/CartContext";
 import CartSkeleton from "@/components/cart/CartSkeleton";
 import UpdateItemQuantity from "@/components/cart/UpdateItemQuantity";
 import Button from "@/components/ui/Button";
+import Form from "@/components/ui/Form";
 import { formatCurrency, getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import Image from "next/image";
 import Link from "next/link";
-import { PropsWithChildren, ReactNode, useState } from "react";
+import {
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import * as actions from "@/actions";
+import { useFormState } from "react-dom";
+import { useSession } from "next-auth/react";
+
+interface ContactDetails {
+  email: string | undefined;
+  telephone: string | undefined;
+}
 
 export default function CartPage() {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState<number>(1);
   const { cartItems, isCartLoading, getTotalCartPrice, getTotalCartQuantity } =
     useCartContext();
   const totalCartItemsQuantity = getTotalCartQuantity();
   const totalCartPrice = getTotalCartPrice();
+
+  const [formState, action] = useFormState(actions.checkContactDetails, {
+    errors: {},
+    success: false,
+  });
+  const formRef = useRef<HTMLFormElement>(null);
+  const [contactDetails, setContactDetails] = useState<ContactDetails>({
+    email: "",
+    telephone: "",
+  });
+
+  const { data } = useSession();
+  const userEmail = data?.user.email;
 
   function handleStepIncrement() {
     if (currentStep < 3) {
@@ -31,6 +59,21 @@ export default function CartPage() {
     return;
   }
 
+  useEffect(() => {
+    if (formState.success) {
+      handleStepIncrement();
+      setContactDetails({
+        email: formState?.data?.email,
+        telephone: formState?.data?.telephone,
+      });
+    }
+
+    if (Object.keys(formState.errors).length === 0) {
+      formRef.current?.reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formState]);
+
   return (
     <>
       <div className="pt-10 max-w-6xl mx-auto text-zinc-800">
@@ -45,77 +88,133 @@ export default function CartPage() {
               <StepNumber>2</StepNumber> Contact Details
             </Step>
             <Step step={3} currentStep={currentStep}>
-              <StepNumber>3</StepNumber> Payment
+              <StepNumber>3</StepNumber> Payment Method
             </Step>
           </StepsContainer>
         </section>
 
         {isCartLoading ? (
-          // <p>Loading...</p>
           <CartSkeleton />
         ) : cartItems.length ? (
           <section className="mt-16 grid grid-cols-[2fr_1fr] gap-8">
             <div>
               <div className="w-full bg-amber-200 py-2 font-sans text-center text-base mb-8">
-                <p>Review Cart / Adjust Quantity</p>
+                <p>
+                  {currentStep === 1 && (
+                    <span>Review Cart / Adjust Quantity</span>
+                  )}
+                  {currentStep === 2 && <span>Contact Details</span>}
+                  {currentStep === 3 && <span>Payment Method</span>}
+                </p>
               </div>
-              <ul className="flex flex-col gap-4">
-                {cartItems.map((item) => {
-                  const composedTitle = getProductVariantTitle(
-                    item.title,
-                    item.color,
-                    item.size
-                  );
-                  return (
-                    <li
-                      key={item.sku}
-                      className="flex gap-6 border border-zinc-300 rounded-md p-2"
-                    >
-                      <div className="relative aspect-square w-48">
-                        <Image
-                          src={item.image}
-                          alt={composedTitle}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="flex flex-col justify-between flex-1">
-                        <div>
-                          <h3 className="hover:underline text-xl font-semibold">
-                            <Link href={paths.productShow(item.slug, item.sku)}>
-                              {composedTitle}
-                            </Link>
-                          </h3>
-
-                          <p className="mt-7 font-sans text-lg">
-                            {formatCurrency(item.price)}
-                          </p>
+              {currentStep === 1 && (
+                <ul className="flex flex-col gap-4">
+                  {cartItems.map((item) => {
+                    const composedTitle = getProductVariantTitle(
+                      item.title,
+                      item.color,
+                      item.size
+                    );
+                    return (
+                      <li
+                        key={item.sku}
+                        className="flex gap-6 border border-zinc-300 rounded-md p-2"
+                      >
+                        <div className="relative aspect-square w-48">
+                          <Image
+                            src={item.image}
+                            alt={composedTitle}
+                            fill
+                            className="object-cover"
+                          />
                         </div>
-                        <UpdateItemQuantity product={item} />
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-              <div className="flex justify-between items-center mt-6">
-                {currentStep > 1 ? (
-                  <Button type="tertiary" onClick={() => handleStepDecrement()}>
-                    Previous step
-                  </Button>
-                ) : (
-                  <span>&nbsp;</span>
-                )}
-                {currentStep < 3 ? (
-                  <Button
-                    type="secondary"
-                    onClick={() => handleStepIncrement()}
+                        <div className="flex flex-col justify-between flex-1">
+                          <div>
+                            <h3 className="hover:underline text-xl font-semibold">
+                              <Link
+                                href={paths.productShow(item.slug, item.sku)}
+                              >
+                                {composedTitle}
+                              </Link>
+                            </h3>
+
+                            <p className="mt-7 font-sans text-lg">
+                              {formatCurrency(item.price)}
+                            </p>
+                          </div>
+                          <UpdateItemQuantity product={item} />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              {currentStep === 2 && (
+                <Form formAction={action} formRef={formRef}>
+                  <Form.InputGroup
+                    name="email"
+                    inputType="email"
+                    placeholder="john.smith@example.com"
+                    error={formState?.errors?.email}
+                    value={contactDetails.email || userEmail || ""}
                   >
-                    Next step
-                  </Button>
-                ) : (
-                  <span>&nbsp;</span>
-                )}
-              </div>
+                    Email
+                  </Form.InputGroup>
+                  <Form.InputGroup
+                    name="telephone"
+                    inputType="tel"
+                    placeholder="+15555555555"
+                    value={contactDetails.telephone || ""}
+                    error={formState?.errors?.telephone}
+                  >
+                    Telephone
+                  </Form.InputGroup>
+                  <div className="bg-zinc-200 py-4 text-center text-lg">
+                    <p>The delivery address is filled during payment.</p>
+                  </div>
+                  <div className="flex justify-between items-center mt-6">
+                    {currentStep > 1 ? (
+                      <Button
+                        type="tertiary"
+                        onClick={() => handleStepDecrement()}
+                      >
+                        Previous step
+                      </Button>
+                    ) : (
+                      <span>&nbsp;</span>
+                    )}
+                    {currentStep < 3 ? (
+                      <Button type="secondary">Next step</Button>
+                    ) : (
+                      <span>&nbsp;</span>
+                    )}
+                  </div>
+                </Form>
+              )}
+              {currentStep !== 2 && (
+                <div className="flex justify-between items-center mt-6">
+                  {currentStep > 1 ? (
+                    <Button
+                      type="tertiary"
+                      onClick={() => handleStepDecrement()}
+                    >
+                      Previous step
+                    </Button>
+                  ) : (
+                    <span>&nbsp;</span>
+                  )}
+                  {currentStep < 3 ? (
+                    <Button
+                      type="secondary"
+                      onClick={() => handleStepIncrement()}
+                    >
+                      Next step
+                    </Button>
+                  ) : (
+                    <span>&nbsp;</span>
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <div className="w-full bg-amber-200 py-2 font-sans text-center text-base mb-8">

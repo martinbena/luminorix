@@ -105,6 +105,7 @@ export default function Filters() {
     };
 
     fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, searchParams.category, fetchFilterOptions]);
 
   useEffect(() => {
@@ -125,6 +126,7 @@ export default function Filters() {
       },
     });
     setIsLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (error)
