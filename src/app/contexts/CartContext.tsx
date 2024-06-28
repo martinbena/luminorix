@@ -42,6 +42,7 @@ interface CartContextProps {
   getTotalCartPrice: () => number;
   getCurrentItemQuantity: (sku: string) => number;
   getCartStatus: (sku: string) => boolean;
+  getShippingStatus: () => boolean;
 }
 
 const CartContext = createContext({} as CartContextProps);
@@ -156,13 +157,9 @@ function CartProvider({ children }: PropsWithChildren) {
     return (cartItems || []).some((item) => item.sku === sku);
   }
 
-  // if (cartItems === null) {
-  //   return (
-  //     <div className="flex items-center justify-center">
-  //       <div className="form__loader" />
-  //     </div>
-  //   );
-  // }
+  function getShippingStatus(): boolean {
+    return (cartItems || []).some((item) => item.freeShipping);
+  }
 
   return (
     <CartContext.Provider
@@ -178,6 +175,7 @@ function CartProvider({ children }: PropsWithChildren) {
         getTotalCartPrice,
         getCurrentItemQuantity,
         getCartStatus,
+        getShippingStatus,
       }}
     >
       {children}

@@ -9,38 +9,32 @@ import { formatCurrency, getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  PropsWithChildren,
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { PropsWithChildren, ReactNode, useRef, useState } from "react";
 import * as actions from "@/actions";
 import { useFormState } from "react-dom";
 import { useSession } from "next-auth/react";
-
-interface ContactDetails {
-  email: string | undefined;
-  telephone: string | undefined;
-}
+import { SHIPPING_RATE } from "@/lib/constants";
 
 export default function CartPage() {
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const { cartItems, isCartLoading, getTotalCartPrice, getTotalCartQuantity } =
-    useCartContext();
+  const {
+    cartItems,
+    isCartLoading,
+    getTotalCartPrice,
+    getTotalCartQuantity,
+    getShippingStatus,
+  } = useCartContext();
   const totalCartItemsQuantity = getTotalCartQuantity();
   const totalCartPrice = getTotalCartPrice();
+  const isShippingFree = getShippingStatus();
 
-  const [formState, action] = useFormState(actions.checkContactDetails, {
-    errors: {},
-    success: false,
-  });
+  const [formState, action] = useFormState(
+    actions.checkContactDetails.bind(null, cartItems),
+    {
+      errors: {},
+    }
+  );
   const formRef = useRef<HTMLFormElement>(null);
-  const [contactDetails, setContactDetails] = useState<ContactDetails>({
-    email: "",
-    telephone: "",
-  });
 
   const { data } = useSession();
   const userEmail = data?.user.email;
@@ -59,21 +53,6 @@ export default function CartPage() {
     return;
   }
 
-  useEffect(() => {
-    if (formState.success) {
-      handleStepIncrement();
-      setContactDetails({
-        email: formState?.data?.email,
-        telephone: formState?.data?.telephone,
-      });
-    }
-
-    if (Object.keys(formState.errors).length === 0) {
-      formRef.current?.reset();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formState]);
-
   return (
     <>
       <div className="pt-10 max-w-6xl mx-auto text-zinc-800">
@@ -85,10 +64,10 @@ export default function CartPage() {
             </Step>
 
             <Step step={2} currentStep={currentStep}>
-              <StepNumber>2</StepNumber> Contact Details
+              <StepNumber>2</StepNumber> Payment Method
             </Step>
             <Step step={3} currentStep={currentStep}>
-              <StepNumber>3</StepNumber> Payment Method
+              <StepNumber>3</StepNumber> Contact Details
             </Step>
           </StepsContainer>
         </section>
@@ -103,8 +82,8 @@ export default function CartPage() {
                   {currentStep === 1 && (
                     <span>Review Cart / Adjust Quantity</span>
                   )}
-                  {currentStep === 2 && <span>Contact Details</span>}
-                  {currentStep === 3 && <span>Payment Method</span>}
+                  {currentStep === 2 && <span>Payment Method</span>}
+                  {currentStep === 3 && <span>Contact Details</span>}
                 </p>
               </div>
               {currentStep === 1 && (
@@ -150,13 +129,25 @@ export default function CartPage() {
                 </ul>
               )}
               {currentStep === 2 && (
+                <div className="flex flex-col gap-8">
+                  <p className="text-center text-3xl">🔒 💳</p>
+                  <div className="bg-zinc-200 py-4 flex flex-col text-center gap-2 text-lg font-sans">
+                    <p>We currently only accept card payments.</p>
+                    <p>
+                      All orders that do not include at least one free shipping
+                      item are subject to a flat $5 shipping fee.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {currentStep === 3 && (
                 <Form formAction={action} formRef={formRef}>
                   <Form.InputGroup
                     name="email"
                     inputType="email"
                     placeholder="john.smith@example.com"
                     error={formState?.errors?.email}
-                    value={contactDetails.email || userEmail || ""}
+                    value={userEmail || ""}
                   >
                     Email
                   </Form.InputGroup>
@@ -164,34 +155,35 @@ export default function CartPage() {
                     name="telephone"
                     inputType="tel"
                     placeholder="+15555555555"
-                    value={contactDetails.telephone || ""}
                     error={formState?.errors?.telephone}
                   >
                     Telephone
                   </Form.InputGroup>
-                  <div className="bg-zinc-200 py-4 text-center text-lg">
+                  {formState.errors._form ? (
+                    <Form.Error>
+                      {formState.errors._form.join(" | ")}
+                    </Form.Error>
+                  ) : null}
+                  <div className="bg-zinc-200 py-4 flex flex-col text-center gap-2 text-lg">
                     <p>The delivery address is filled during payment.</p>
+                    <p>
+                      Click &quot;Place Order&quot; and you will be redirected
+                      securely to the payment gateway to complete your order.
+                    </p>
                   </div>
                   <div className="flex justify-between items-center mt-6">
-                    {currentStep > 1 ? (
-                      <Button
-                        type="tertiary"
-                        onClick={() => handleStepDecrement()}
-                      >
-                        Previous step
-                      </Button>
-                    ) : (
-                      <span>&nbsp;</span>
-                    )}
-                    {currentStep < 3 ? (
-                      <Button type="secondary">Next step</Button>
-                    ) : (
-                      <span>&nbsp;</span>
-                    )}
+                    <Button
+                      type="tertiary"
+                      onClick={() => handleStepDecrement()}
+                    >
+                      Previous step
+                    </Button>
+
+                    <Form.Button>Place order</Form.Button>
                   </div>
                 </Form>
               )}
-              {currentStep !== 2 && (
+              {currentStep !== 3 && (
                 <div className="flex justify-between items-center mt-6">
                   {currentStep > 1 ? (
                     <Button
@@ -253,6 +245,12 @@ export default function CartPage() {
                     </li>
                   );
                 })}
+                <div className="flex items-center justify-between font-sans">
+                  <p>Shipping:</p>{" "}
+                  <p className="text-lg">
+                    {formatCurrency(isShippingFree ? 0 : SHIPPING_RATE)}
+                  </p>
+                </div>
                 <div className="flex justify-between font-sans items-center">
                   <p className="text-base">
                     {" "}
@@ -261,7 +259,11 @@ export default function CartPage() {
                     }:`}
                   </p>
                   <span className="text-2xl font-medium">
-                    {formatCurrency(totalCartPrice)}
+                    {formatCurrency(
+                      isShippingFree
+                        ? totalCartPrice
+                        : totalCartPrice + SHIPPING_RATE
+                    )}
                   </span>
                 </div>
               </ul>
