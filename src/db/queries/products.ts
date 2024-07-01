@@ -288,3 +288,62 @@ export async function getTopSellingProductVariants(categorySlug?: string) {
     throw new Error("Could not get top selling product variants");
   }
 }
+
+export async function updateVariantStockBySku(
+  sku: string,
+  quantity: number,
+  operation: "increment" | "decrement"
+): Promise<void> {
+  try {
+    await ConnectDB();
+
+    const updateOperation =
+      operation === "increment"
+        ? { $inc: { "variants.$.stock": quantity } }
+        : { $inc: { "variants.$.stock": -quantity } };
+
+    const result = await Product.updateOne(
+      { "variants.sku": sku },
+      updateOperation
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error(`Variant with SKU ${sku} not found.`);
+    }
+
+    console.log(`Variant with SKU ${sku} successfully updated.`);
+  } catch (error) {
+    console.error("Error in updateVariantStockBySku:", error);
+    throw new Error("Could not update variant stock by SKU");
+  }
+}
+
+export async function updateProductAndVariantSold(
+  sku: string,
+  quantity: number,
+  operation: "increment" | "decrement"
+) {
+  try {
+    await ConnectDB();
+
+    const adjustment = operation === "increment" ? quantity : -quantity;
+
+    const result = await Product.updateOne(
+      { "variants.sku": sku },
+      {
+        $inc: {
+          soldTotal: adjustment,
+          "variants.$.sold": adjustment,
+        },
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      throw new Error(`No product found with variant SKU: ${sku}`);
+    }
+
+    console.log(`Successfully updated product and variant for SKU: ${sku}`);
+  } catch (error) {
+    console.error("Error updating product and variant sold counts:", error);
+  }
+}

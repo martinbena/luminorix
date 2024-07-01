@@ -21,15 +21,17 @@ export async function getFirstVariantSkuBySlug(slug: string): Promise<string> {
   }
 }
 
-export async function getProductVariantBySku(
-  sku: string
-): Promise<ProductWithVariant> {
+export async function getProductVariantsBySkus(
+  skus: string | string[]
+): Promise<ProductWithVariant[]> {
   try {
     await ConnectDB();
 
+    const skusArray = Array.isArray(skus) ? skus : [skus];
+
     const result = await Product.aggregate([
       { $unwind: "$variants" },
-      { $match: { "variants.sku": sku } },
+      { $match: { "variants.sku": { $in: skusArray } } },
       {
         $addFields: {
           averageRating: { $avg: "$ratings.rating" },
@@ -84,10 +86,9 @@ export async function getProductVariantBySku(
       {
         $project: productWithVariantFormat,
       },
-      { $limit: 1 },
     ]);
 
-    return result[0];
+    return result;
   } catch (error) {
     console.error("Error in getProductVariantBySku:", error);
     throw new Error("Could not get product variant by SKU");
@@ -308,5 +309,22 @@ export async function getRelatedProductsBySku(
   } catch (error) {
     console.error("Error in getRelatedProductsBySku:", error);
     throw new Error("Could not get related products by SKU");
+  }
+}
+
+export async function hasFreeShipping(skus: string[]): Promise<boolean> {
+  try {
+    await ConnectDB();
+    const result = await Product.aggregate([
+      { $match: { "variants.sku": { $in: skus } } },
+      { $project: { freeShipping: 1 } },
+      { $match: { freeShipping: true } },
+      { $limit: 1 },
+    ]);
+
+    return result.length > 0;
+  } catch (error) {
+    console.error("Error checking for freeShipping:", error);
+    throw new Error("Error checking for freeShipping");
   }
 }

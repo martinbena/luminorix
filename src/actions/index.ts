@@ -14,4 +14,4 @@ export { addRating } from "./rating";
 export { editRating } from "./rating";
 export { deleteRating } from "./rating";
 export { toggleWishlistProduct } from "./wishlist";
-export { checkContactDetails } from "./order";
+export { createPaymentSession } from "./order";

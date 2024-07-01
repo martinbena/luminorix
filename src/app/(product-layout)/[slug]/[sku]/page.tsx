@@ -7,10 +7,9 @@ import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
 import RatingDistribution from "@/components/products/RatingDistribution";
 import Ratings from "@/components/products/Ratings";
 import RelatedProducts from "@/components/products/RelatedProducts";
-import Tags from "@/components/products/Tags";
 import {
   getAllSlugSkuCombinations,
-  getProductVariantBySku,
+  getProductVariantsBySkus,
 } from "@/db/queries/product";
 import { getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
@@ -25,7 +24,7 @@ export async function generateMetadata({
   params: { slug: string; sku: string };
 }) {
   const { sku } = params;
-  const product = await getProductVariantBySku(sku);
+  const [product] = await getProductVariantsBySkus(sku);
 
   if (!product) notFound();
   const { title, color, size, description } = product;
@@ -51,20 +50,11 @@ export default async function SingleProductPage({
   params: { slug: string; sku: string };
 }) {
   const { sku, slug } = params;
-  const product = await getProductVariantBySku(sku);
+  const [product] = await getProductVariantsBySkus(sku);
 
   if (!product) notFound();
 
-  const {
-    title,
-    image,
-    ratings,
-    averageRating,
-    price,
-    previousPrice,
-    freeShipping,
-    category,
-  } = product;
+  const { title, image, ratings, averageRating, category } = product;
   const { width, height } = await probe(image);
   const session = await auth();
   const hasUserRated = session?.user

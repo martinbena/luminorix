@@ -3,7 +3,10 @@
 import { CartItem } from "@/app/contexts/CartContext";
 import { auth } from "@/auth";
 import ConnectDB from "@/db/connectDB";
-import { getProductVariantBySku } from "@/db/queries/product";
+import {
+  getProductVariantsBySkus,
+  hasFreeShipping,
+} from "@/db/queries/product";
 import { getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import { isRedirectError } from "next/dist/client/components/redirect";
@@ -12,7 +15,7 @@ import { z } from "zod";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
-const checkContactDetailsSchema = z.object({
+const createPaymentSessionSchema = z.object({
   email: z.string().regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, {
     message: "Please enter a correct e-mail address",
   }),
@@ -21,7 +24,7 @@ const checkContactDetailsSchema = z.object({
   }),
 });
 
-interface CheckContactDetailsFormState {
+interface CreatePaymentSessionFormState {
   errors: {
     email?: string[];
     telephone?: string[];
@@ -29,12 +32,12 @@ interface CheckContactDetailsFormState {
   };
 }
 
-export async function checkContactDetails(
+export async function createPaymentSession(
   cartItems: CartItem[],
-  formState: CheckContactDetailsFormState,
+  formState: CreatePaymentSessionFormState,
   formData: FormData
-): Promise<CheckContactDetailsFormState> {
-  const result = checkContactDetailsSchema.safeParse({
+): Promise<CreatePaymentSessionFormState> {
+  const result = createPaymentSessionSchema.safeParse({
     email: formData.get("email"),
     telephone: formData.get("telephone"),
   });
@@ -60,7 +63,7 @@ export async function checkContactDetails(
 
     const lineItems = await Promise.all(
       cartItems.map(async (item) => {
-        const product = await getProductVariantBySku(item.sku);
+        const [product] = await getProductVariantsBySkus(item.sku);
         return {
           price_data: {
             currency: "usd",
@@ -80,6 +83,10 @@ export async function checkContactDetails(
       })
     );
 
+    const freeShipping = await hasFreeShipping(
+      cartItems.map((item) => item.sku)
+    );
+
     const metadata = {
       cartItems: JSON.stringify(
         cartItems.map((item) => {
@@ -90,6 +97,7 @@ export async function checkContactDetails(
         })
       ),
       userId: userId || "not-logged-in",
+      telephone: result.data.telephone,
     };
 
     const countryCodes = (process.env.STRIPE_COUNTRY_CODES ?? "").split(",");
@@ -103,15 +111,19 @@ export async function checkContactDetails(
       payment_intent_data: {
         metadata,
       },
-      shipping_options: [{ shipping_rate: process.env.STRIPE_SHIPPING_RATE }],
+      shipping_options: [
+        {
+          shipping_rate: freeShipping
+            ? process.env.STRIPE_FREE_SHIPPING_RATE
+            : process.env.STRIPE_SHIPPING_RATE,
+        },
+      ],
       shipping_address_collection: {
         allowed_countries: countryCodes,
       },
       // discounts: [{ coupon: couponCode }],
       customer_email: result.data.email,
     });
-
-    // console.log(paymentSession);
 
     redirect(paymentSession.url);
   } catch (error: unknown) {
@@ -125,65 +137,4 @@ export async function checkContactDetails(
       },
     };
   }
-
-  return {
-    errors: {},
-  };
 }
-
-// export async function POST(req) {
-//   await dbConnect();
-//   const { cartItems, couponCode } = await req.json();
-//   // const user = await currentUser();
-//   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-//   const user = token?.user;
-
-//   try {
-//     const lineItems = await Promise.all(
-//       cartItems.map(async (item) => {
-//         const product = await Product.findById(item._id);
-//         const unitAmount = product.price * 100;
-//         return {
-//           price_data: {
-//             currency: "usd",
-//             product_data: {
-//               name: product.title,
-//               images: [product.images[0].secure_url],
-//             },
-//             unit_amount: unitAmount,
-//           },
-//           tax_rates: [process.env.STRIPE_TAX_RATE],
-//           quantity: item.quantity,
-//         };
-//       })
-//     );
-
-//     const session = await stripe.checkout.sessions.create({
-//       line_items: lineItems,
-//       success_url: `${process.env.DOMAIN}/dashboard/user/stripe/success`,
-//       client_reference_id: user._id,
-//       mode: "payment",
-//       payment_method_types: ["card"],
-//       payment_intent_data: {
-//         metadata: {
-//           cartItems: JSON.stringify(cartItems),
-//           userId: user._id,
-//         },
-//       },
-//       shipping_options: [{ shipping_rate: process.env.STRIPE_SHIPPING_RATE }],
-//       shipping_address_collection: {
-//         allowed_countries: ["AU", "CZ"],
-//       },
-//       discounts: [{ coupon: couponCode }],
-//       customer_email: user.email,
-//     });
-
-//     return NextResponse.json(session);
-//   } catch (error) {
-//     console.log(error);
-//     return NextResponse.json(
-//       { error: "Server error. Please try again." },
-//       { status: 500 }
-//     );
-//   }
-// }

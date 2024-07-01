@@ -29,7 +29,7 @@ export default function CartPage() {
   const isShippingFree = getShippingStatus();
 
   const [formState, action] = useFormState(
-    actions.checkContactDetails.bind(null, cartItems),
+    actions.createPaymentSession.bind(null, cartItems),
     {
       errors: {},
     }
@@ -251,20 +251,25 @@ export default function CartPage() {
                     {formatCurrency(isShippingFree ? 0 : SHIPPING_RATE)}
                   </p>
                 </div>
-                <div className="flex justify-between font-sans items-center">
+                <div className="flex justify-between font-sans">
                   <p className="text-base">
                     {" "}
                     {`Total ${totalCartItemsQuantity} ${
                       totalCartItemsQuantity > 1 ? "items" : "item"
                     }:`}
                   </p>
-                  <span className="text-2xl font-medium">
-                    {formatCurrency(
-                      isShippingFree
-                        ? totalCartPrice
-                        : totalCartPrice + SHIPPING_RATE
-                    )}
-                  </span>
+                  <p>
+                    <span className="text-2xl font-medium">
+                      {formatCurrency(
+                        isShippingFree
+                          ? totalCartPrice
+                          : totalCartPrice + SHIPPING_RATE
+                      )}
+                    </span>
+                    <span className="block text-right text-zinc-500">
+                      (tax incl.)
+                    </span>
+                  </p>
                 </div>
               </ul>
             </div>
