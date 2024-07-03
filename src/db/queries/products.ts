@@ -124,6 +124,15 @@ export async function getProductsWithAllVariants({
       },
       { $match: matchStage },
       { $sort: (sortOption as any) ?? { "variants.createdAt": -1 } },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      { $unwind: "$category" },
       { $project: productWithVariantFormat },
       { $unset: ["lowercaseTitle", "lowercaseBrand"] },
       { $skip: limit ? skip : 0 },
@@ -152,10 +161,20 @@ export async function getNewestProductsWithVariants(): Promise<
 
     const products = await Product.aggregate([
       { $unwind: "$variants" },
+      { $match: { "variants.stock": { $gt: 0 } } },
       {
         $sort: { "variants.createdAt": -1 },
       },
       { $limit: 3 },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      { $unwind: "$category" },
       {
         $project: productWithVariantFormat,
       },
@@ -167,11 +186,25 @@ export async function getNewestProductsWithVariants(): Promise<
   }
 }
 
+type DiscountsMatchStage = {
+  discountPercentage: { $gt: number };
+  [key: string]: any;
+};
+
 export async function getProductsWithDiscounts(
-  limit?: number
+  limit?: number,
+  checkStock: boolean = false
 ): Promise<ProductWithVariant[]> {
   try {
     await ConnectDB();
+
+    const matchStage: DiscountsMatchStage = {
+      discountPercentage: { $gt: 0 },
+    };
+
+    if (checkStock) {
+      matchStage["variants.stock"] = { $gt: 0 };
+    }
 
     const products = await Product.aggregate([
       { $unwind: "$variants" },
@@ -202,14 +235,21 @@ export async function getProductsWithDiscounts(
         },
       },
       {
-        $match: {
-          discountPercentage: { $gt: 0 },
-        },
+        $match: matchStage,
       },
       {
         $sort: { discountPercentage: -1 },
       },
       { $limit: limit ?? 10000 },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      { $unwind: "$category" },
       {
         $project: productWithVariantFormat,
       },
@@ -237,6 +277,15 @@ export async function getProductsWithFreeShipping(): Promise<
       {
         $sort: { "variants.createdAt": -1 },
       },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      { $unwind: "$category" },
       {
         $project: productWithVariantFormat,
       },

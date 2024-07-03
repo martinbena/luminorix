@@ -1,6 +1,6 @@
 "use server";
 
-import { CartItem } from "@/app/contexts/CartContext";
+import { CartItem, DiscountCoupon } from "@/app/contexts/CartContext";
 import { auth } from "@/auth";
 import ConnectDB from "@/db/connectDB";
 import {
@@ -9,9 +9,12 @@ import {
 } from "@/db/queries/product";
 import { getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
+import { Category } from "@/models/Category";
 import { isRedirectError } from "next/dist/client/components/redirect";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { v4 as uuidv4 } from "uuid";
+import { CartSession } from "@/models/Order";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -23,6 +26,62 @@ const createPaymentSessionSchema = z.object({
     message: "Please enter a correct telephone number with your area code",
   }),
 });
+const applyDiscountCouponSchema = z.object({
+  coupon: z.string().min(5, { message: "Please enter a valid coupon code" }),
+});
+
+interface ApplyDiscountCouponFormState {
+  errors: {
+    coupon?: string[];
+    _form?: string[];
+  };
+  coupon?: DiscountCoupon;
+}
+
+export async function applyDiscountCoupon(
+  formState: ApplyDiscountCouponFormState,
+  formData: FormData
+): Promise<ApplyDiscountCouponFormState> {
+  const result = applyDiscountCouponSchema.safeParse({
+    coupon: formData.get("coupon"),
+  });
+
+  if (!result.success) {
+    return {
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    const coupons = await stripe.promotionCodes.list({
+      code: result.data.coupon,
+      active: true,
+    });
+
+    if (coupons.data.length === 0) {
+      throw new Error("Promotion code not found");
+    }
+    const coupon = coupons.data[0];
+    return {
+      errors: {},
+      coupon: JSON.parse(JSON.stringify(coupon)),
+    };
+  } catch (error: unknown) {
+    console.log(error);
+    if (error instanceof Error) {
+      return {
+        errors: {
+          _form: [error?.message],
+        },
+      };
+    }
+    return {
+      errors: {
+        _form: ["Something went wrong"],
+      },
+    };
+  }
+}
 
 interface CreatePaymentSessionFormState {
   errors: {
@@ -34,6 +93,7 @@ interface CreatePaymentSessionFormState {
 
 export async function createPaymentSession(
   cartItems: CartItem[],
+  discountCoupon: DiscountCoupon | null,
   formState: CreatePaymentSessionFormState,
   formData: FormData
 ): Promise<CreatePaymentSessionFormState> {
@@ -60,42 +120,55 @@ export async function createPaymentSession(
     await ConnectDB();
     const session = await auth();
     const userId = session?.user._id;
+    const cartSessionId = uuidv4();
 
     const lineItems = await Promise.all(
       cartItems.map(async (item) => {
         const [product] = await getProductVariantsBySkus(item.sku);
+        const composedTitle = getProductVariantTitle(
+          product.title,
+          product.color,
+          product.size
+        );
+        if (item.stock > product.stock) {
+          throw new Error(
+            `There is only ${product.stock} pieces of ${composedTitle} in stock. You have ${item.quantity} pieces in your cart `
+          );
+        }
+        const finalPrice =
+          discountCoupon &&
+          (product.category as Category).title ===
+            discountCoupon.metadata.category
+            ? product.price * (1 - discountCoupon.coupon.percent_off / 100)
+            : product.price;
         return {
           price_data: {
             currency: "usd",
             product_data: {
-              name: getProductVariantTitle(
-                product.title,
-                product.color,
-                product.size
-              ),
+              name: composedTitle,
               images: [product.image],
+              metadata: {
+                sku: product.sku,
+              },
             },
-            unit_amount: product.price * 100,
-          },
-          // tax_rates: [process.env.STRIPE_TAX_RATE],
+            unit_amount: finalPrice * 100,
+          },         
           quantity: item.quantity,
         };
       })
     );
+
+    await CartSession.create({
+      sessionId: cartSessionId,
+      lineItems,
+    });
 
     const freeShipping = await hasFreeShipping(
       cartItems.map((item) => item.sku)
     );
 
     const metadata = {
-      cartItems: JSON.stringify(
-        cartItems.map((item) => {
-          return {
-            sku: item.sku,
-            quantity: item.quantity,
-          };
-        })
-      ),
+      sessionId: cartSessionId,
       userId: userId || "not-logged-in",
       telephone: result.data.telephone,
     };
@@ -120,8 +193,7 @@ export async function createPaymentSession(
       ],
       shipping_address_collection: {
         allowed_countries: countryCodes,
-      },
-      // discounts: [{ coupon: couponCode }],
+      },     
       customer_email: result.data.email,
     });
 
@@ -129,6 +201,13 @@ export async function createPaymentSession(
   } catch (error: unknown) {
     if (isRedirectError(error)) {
       throw error;
+    }
+    if (error instanceof Error) {
+      return {
+        errors: {
+          _form: [error?.message],
+        },
+      };
     }
     console.log(error);
     return {

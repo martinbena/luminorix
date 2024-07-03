@@ -30,6 +30,7 @@
     "skeleton-elements": "^4.0.1",
     "slugify": "^1.6.6",
     "stripe": "^16.0.0",
+    "uuidv4": "^6.2.13",
     "zod": "^3.22.4"
   },
   "devDependencies": {

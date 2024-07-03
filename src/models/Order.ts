@@ -72,3 +72,52 @@ const orderSchema = new mongoose.Schema(
 );
 
 export default mongoose.models?.Order || mongoose.model("Order", orderSchema);
+
+export interface LineItem {
+  price_data: {
+    currency: string;
+    product_data: {
+      name: string;
+      images: string[];
+      metadata: {
+        sku: string;
+      };
+    };
+    unit_amount: number;
+  };
+  quantity: number;
+}
+
+interface CartSession extends Document {
+  sessionId: string;
+  lineItems: LineItem[];
+  createdAt: Date;
+}
+
+const LineItemSchema = new mongoose.Schema<LineItem>(
+  {
+    price_data: {
+      currency: { type: String, required: true },
+      product_data: {
+        name: { type: String, required: true },
+        images: [{ type: String, required: true }],
+        metadata: {
+          sku: { type: String, required: true },
+        },
+      },
+      unit_amount: { type: Number, required: true },
+    },
+    quantity: { type: Number, required: true },
+  },
+  { _id: false }
+);
+
+const CartSessionSchema = new mongoose.Schema<CartSession>({
+  sessionId: { type: String, required: true, unique: true },
+  lineItems: [LineItemSchema],
+  createdAt: { type: Date, default: Date.now, expires: "24h" },
+});
+
+export const CartSession =
+  mongoose.models?.CartSession ||
+  mongoose.model<CartSession>("CartSession", CartSessionSchema);

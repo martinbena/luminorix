@@ -5,12 +5,13 @@ import {
   updateProductAndVariantSold,
   updateVariantStockBySku,
 } from "@/db/queries/products";
-import Order from "@/models/Order";
+import Order, { CartSession, LineItem } from "@/models/Order";
 import { NextResponse, NextRequest } from "next/server";
 
 interface MetadataCartItem {
   sku: string;
   quantity: number;
+  price: number;
 }
 
 interface ProductMap {
@@ -37,7 +38,23 @@ export async function POST(req: NextRequest) {
         const chargeSucceeded = event.data.object;
         const { id, ...rest } = chargeSucceeded;
 
-        const cartItems = JSON.parse(chargeSucceeded.metadata.cartItems);
+        const cartSession = await CartSession.findOne({
+          sessionId: chargeSucceeded.metadata.sessionId,
+        });
+
+        if (!cartSession) {
+          throw new Error("Cart session not found");
+        }
+
+        const { lineItems } = cartSession;
+
+        const cartItems = lineItems.map((item: LineItem) => {
+          return {
+            sku: item?.price_data?.product_data?.metadata?.sku,
+            price: item.price_data.unit_amount / 100,
+            quantity: item.quantity,
+          };
+        });
         const productSkus = cartItems.map((item: MetadataCartItem) => item.sku);
         const products = await getProductVariantsBySkus(productSkus);
 
@@ -54,6 +71,7 @@ export async function POST(req: NextRequest) {
             brand: product.brand,
             stock: product.stock,
             freeShipping: product.freeShipping,
+            category: product.category,
           };
           return map;
         }, {} as ProductMap);
@@ -61,6 +79,7 @@ export async function POST(req: NextRequest) {
         const cartItemsWithProductDetails = cartItems.map(
           (item: MetadataCartItem) => ({
             ...productMap[item.sku],
+            price: item.price,
             quantity: item.quantity,
           })
         );
@@ -88,6 +107,10 @@ export async function POST(req: NextRequest) {
             "increment"
           );
         }
+
+        await CartSession.deleteOne({
+          sessionId: chargeSucceeded.metadata.sessionId,
+        });
 
         return NextResponse.json({ ok: true });
     }

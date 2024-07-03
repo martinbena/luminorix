@@ -231,6 +231,15 @@ export async function getRelatedVariantsBySku(
             { $unwind: "$variants" },
             { $match: { $expr: { $ne: ["$variants.sku", "$$excludedSku"] } } },
             {
+              $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "category",
+              },
+            },
+            { $unwind: "$category" },
+            {
               $project: productWithVariantFormat,
             },
             // { $sample: { size: 4 } },
@@ -270,13 +279,24 @@ export async function getRelatedProductsBySku(
             { $unwind: "$variants" },
             { $match: { $expr: { $ne: ["$variants.sku", "$$excludedSku"] } } },
             {
+              $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "category",
+              },
+            },
+            { $unwind: "$category" },
+            {
               $group: {
                 _id: "$_id",
                 product: {
                   $first: {
+                    _id: "$_id",
                     title: "$title",
                     slug: "$slug",
                     description: "$description",
+                    category: "$category",
                     brand: "$brand",
                     freeShipping: "$freeShipping",
                     soldTotal: "$soldTotal",
@@ -300,7 +320,7 @@ export async function getRelatedProductsBySku(
           as: "relatedProducts",
         },
       },
-      { $project: { _id: 0, relatedProducts: 1 } },
+      { $project: { relatedProducts: 1 } },
       { $unwind: "$relatedProducts" },
       { $replaceRoot: { newRoot: "$relatedProducts.product" } },
     ]);

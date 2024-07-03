@@ -10,7 +10,7 @@ export default function UpdateItemQuantity({ product }: CartActionsProps) {
     decreaseItemQuantity,
     deleteItem,
   } = useCartContext();
-  const { sku, title, color, size } = product;
+  const { sku, title, color, size, stock } = product;
   const composedTitle = getProductVariantTitle(title, color, size);
   const quantity = getCurrentItemQuantity(sku);
   return (
@@ -20,6 +20,8 @@ export default function UpdateItemQuantity({ product }: CartActionsProps) {
           aria-label={`Add one ${composedTitle} to your cart`}
           type="button"
           onClick={() => increaseItemQuantity(sku)}
+          disabled={quantity === stock}
+          className="disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <IoChevronUp />
         </button>

@@ -32,7 +32,10 @@ export async function getAllWishlistedItems(
   try {
     await ConnectDB();
 
-    const user = await User.findById(userId).select("wishlist");
+    const user = await User.findById(userId).select("wishlist").populate({
+      path: "wishlist.category",
+      model: "Category",
+    });
     if (!user) {
       throw new Error("User not found");
     }

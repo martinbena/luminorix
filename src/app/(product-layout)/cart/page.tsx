@@ -9,11 +9,18 @@ import { formatCurrency, getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import Image from "next/image";
 import Link from "next/link";
-import { PropsWithChildren, ReactNode, useRef, useState } from "react";
+import {
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import * as actions from "@/actions";
 import { useFormState } from "react-dom";
 import { useSession } from "next-auth/react";
 import { SHIPPING_RATE } from "@/lib/constants";
+import { Category } from "@/models/Category";
 
 export default function CartPage() {
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -23,15 +30,26 @@ export default function CartPage() {
     getTotalCartPrice,
     getTotalCartQuantity,
     getShippingStatus,
+    discountCoupon,
+    handleDiscountCouponApply,
+    getDiscountedAmount,
   } = useCartContext();
   const totalCartItemsQuantity = getTotalCartQuantity();
   const totalCartPrice = getTotalCartPrice();
   const isShippingFree = getShippingStatus();
+  const couponDiscountAmount = getDiscountedAmount();
 
   const [formState, action] = useFormState(
-    actions.createPaymentSession.bind(null, cartItems),
+    actions.createPaymentSession.bind(null, cartItems, discountCoupon),
     {
       errors: {},
+    }
+  );
+  const [couponFormState, couponAction] = useFormState(
+    actions.applyDiscountCoupon,
+    {
+      errors: {},
+      coupon: undefined,
     }
   );
   const formRef = useRef<HTMLFormElement>(null);
@@ -52,6 +70,12 @@ export default function CartPage() {
     }
     return;
   }
+
+  useEffect(() => {
+    if (couponFormState.coupon) {
+      handleDiscountCouponApply(couponFormState.coupon);
+    }
+  }, [handleDiscountCouponApply, couponFormState.coupon]);
 
   return (
     <>
@@ -88,44 +112,69 @@ export default function CartPage() {
               </div>
               {currentStep === 1 && (
                 <ul className="flex flex-col gap-4">
-                  {cartItems.map((item) => {
-                    const composedTitle = getProductVariantTitle(
-                      item.title,
-                      item.color,
-                      item.size
-                    );
-                    return (
-                      <li
-                        key={item.sku}
-                        className="flex gap-6 border border-zinc-300 rounded-md p-2"
-                      >
-                        <div className="relative aspect-square w-48">
-                          <Image
-                            src={item.image}
-                            alt={composedTitle}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <div className="flex flex-col justify-between flex-1">
-                          <div>
-                            <h3 className="hover:underline text-xl font-semibold">
-                              <Link
-                                href={paths.productShow(item.slug, item.sku)}
-                              >
-                                {composedTitle}
-                              </Link>
-                            </h3>
-
-                            <p className="mt-7 font-sans text-lg">
-                              {formatCurrency(item.price)}
-                            </p>
+                  {cartItems
+                    .slice()
+                    .sort((a, b) => {
+                      const titleA = (a.category as Category).title;
+                      const titleB = (b.category as Category).title;
+                      return titleA.localeCompare(titleB);
+                    })
+                    .map((item) => {
+                      const composedTitle = getProductVariantTitle(
+                        item.title,
+                        item.color,
+                        item.size
+                      );
+                      const isDiscount =
+                        discountCoupon &&
+                        (item.category as Category).title ===
+                          discountCoupon?.metadata.category;
+                      return (
+                        <li
+                          key={item.sku}
+                          className="flex gap-6 border border-zinc-300 rounded-md p-2"
+                        >
+                          <div className="relative aspect-square w-48">
+                            <Image
+                              src={item.image}
+                              alt={composedTitle}
+                              fill
+                              className="object-cover"
+                            />
                           </div>
-                          <UpdateItemQuantity product={item} />
-                        </div>
-                      </li>
-                    );
-                  })}
+                          <div className="flex flex-col justify-between flex-1">
+                            <div>
+                              <h3 className="hover:underline text-xl font-semibold">
+                                <Link
+                                  href={paths.productShow(item.slug, item.sku)}
+                                >
+                                  {composedTitle}
+                                </Link>
+                              </h3>
+
+                              <div
+                                className={`mt-7 font-sans text-lg flex justify-between items-center gap-2 ${
+                                  isDiscount ? "text-amber-700" : ""
+                                }`}
+                              >
+                                <p>{formatCurrency(item.price)}</p>
+                                {isDiscount ? (
+                                  <p className="bg-amber-100 px-2 py-1 text-zinc-800 font-medium">
+                                    {" "}
+                                    <span>
+                                      {" "}
+                                      {`- ${discountCoupon.coupon.percent_off}%`}
+                                    </span>{" "}
+                                    <span className="text-xs">{`(${discountCoupon.code})`}</span>
+                                  </p>
+                                ) : null}
+                              </div>
+                            </div>
+                            <UpdateItemQuantity product={item} />
+                          </div>
+                        </li>
+                      );
+                    })}
                 </ul>
               )}
               {currentStep === 2 && (
@@ -213,45 +262,75 @@ export default function CartPage() {
                 <p>Order Summary</p>
               </div>
               <ul className="flex flex-col gap-4">
-                {cartItems.map((item) => {
-                  const composedTitle = getProductVariantTitle(
-                    item.title,
-                    item.color,
-                    item.size
-                  );
-                  return (
-                    <li
-                      key={item.sku}
-                      className="flex gap-6 border border-zinc-300 rounded-md p-2"
-                    >
-                      <div className="relative aspect-square w-16">
-                        <Image
-                          src={item.image}
-                          alt={composedTitle}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="flex flex-col justify-between flex-1">
-                        <h4>{composedTitle}</h4>
-                        <div className="flex items-center justify-between">
-                          <p className="font-sans text-base">
-                            {formatCurrency(item.price)}
-                          </p>
-                          <p className="text-zinc-500">Qty: {item.quantity}</p>
+                {cartItems
+                  .slice()
+                  .sort((a, b) => {
+                    const titleA = (a.category as Category).title;
+                    const titleB = (b.category as Category).title;
+                    return titleA.localeCompare(titleB);
+                  })
+                  .map((item) => {
+                    const composedTitle = getProductVariantTitle(
+                      item.title,
+                      item.color,
+                      item.size
+                    );
+                    const isDiscount =
+                      discountCoupon &&
+                      (item.category as Category).title ===
+                        discountCoupon?.metadata.category;
+                    return (
+                      <li
+                        key={item.sku}
+                        className="flex gap-6 border border-zinc-300 rounded-md p-2"
+                      >
+                        <div className="relative aspect-square w-16">
+                          <Image
+                            src={item.image}
+                            alt={composedTitle}
+                            fill
+                            className="object-cover"
+                          />
                         </div>
-                      </div>
-                    </li>
-                  );
-                })}
-                <div className="flex items-center justify-between font-sans">
+
+                        <div className="flex flex-col justify-between flex-1">
+                          <h4>{composedTitle}</h4>
+                          <div className="flex items-center justify-between">
+                            <p
+                              className={`font-sans text-base ${
+                                isDiscount ? "text-amber-700" : ""
+                              }`}
+                            >
+                              {formatCurrency(item.price)}
+                            </p>
+                            <p className="text-zinc-500">
+                              Qty: {item.quantity}
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+              </ul>
+              <div className="flex flex-col gap-2 my-4 font-sans">
+                {discountCoupon ? (
+                  <div className="flex justify-between bg-amber-100 py-3 px-4 font-semibold">
+                    <div className="flex flex-col gap-1">
+                      <p>{discountCoupon.code}</p>
+                      <p>{discountCoupon.coupon.name}</p>
+                    </div>
+                    <p className="mt-auto text-base">
+                      - {formatCurrency(couponDiscountAmount)}
+                    </p>
+                  </div>
+                ) : null}
+                <div className="flex items-center justify-between">
                   <p>Shipping:</p>{" "}
                   <p className="text-lg">
                     {formatCurrency(isShippingFree ? 0 : SHIPPING_RATE)}
                   </p>
                 </div>
-                <div className="flex justify-between font-sans">
+                <div className="flex justify-between">
                   <p className="text-base">
                     {" "}
                     {`Total ${totalCartItemsQuantity} ${
@@ -271,7 +350,26 @@ export default function CartPage() {
                     </span>
                   </p>
                 </div>
-              </ul>
+              </div>
+              {!discountCoupon ? (
+                <Form formAction={couponAction}>
+                  <Form.InputGroup
+                    name="coupon"
+                    error={couponFormState.errors?.coupon}
+                    inputType="text"
+                    placeholder="Enter coupon"
+                    optionalField
+                  >
+                    Discount coupon
+                  </Form.InputGroup>
+                  {couponFormState.errors._form ? (
+                    <Form.Error>
+                      {couponFormState.errors._form.join(" | ")}
+                    </Form.Error>
+                  ) : null}
+                  <Form.Button type="secondary">Apply</Form.Button>
+                </Form>
+              ) : null}
             </div>
           </section>
         ) : (

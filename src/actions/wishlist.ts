@@ -1,7 +1,7 @@
 "use server";
 
 import { auth } from "@/auth";
-import { getProductVariantBySku } from "@/db/queries/product";
+import { getProductVariantsBySkus } from "@/db/queries/product";
 import paths from "@/lib/paths";
 import User, { WishlistItem } from "@/models/User";
 import { revalidatePath } from "next/cache";
@@ -15,7 +15,7 @@ export async function toggleWishlistProduct(slug: string, sku: string) {
       );
     }
 
-    const product = await getProductVariantBySku(sku);
+    const [product] = await getProductVariantsBySkus(sku);
     if (!product) return;
 
     const user = await User.findById(session.user._id).exec();
@@ -26,12 +26,22 @@ export async function toggleWishlistProduct(slug: string, sku: string) {
       (item: WishlistItem) => item.sku === sku
     );
 
-    const { title, price, image, color, size, stock, brand, freeShipping } =
-      product;
+    const {
+      title,
+      price,
+      image,
+      color,
+      size,
+      stock,
+      brand,
+      freeShipping,
+      category,
+    } = product;
 
     const wishlistItem = {
       sku,
       product: product._id,
+      category,
       title,
       brand,
       freeShipping,

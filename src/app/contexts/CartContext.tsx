@@ -1,5 +1,6 @@
 "use client";
 
+import { Category } from "@/models/Category";
 import { ProductWithVariant } from "@/models/Product";
 import { WishlistItem } from "@/models/User";
 import {
@@ -8,6 +9,9 @@ import {
   useContext,
   useState,
   useEffect,
+  Dispatch,
+  SetStateAction,
+  useCallback,
 } from "react";
 
 export type CartProductProps = Pick<
@@ -23,15 +27,30 @@ export type CartProductProps = Pick<
   | "slug"
   | "stock"
   | "title"
+  | "category"
 >;
 
 export interface CartItem extends CartProductProps {
   quantity: number;
   totalPrice: number;
+  originalPrice: number;
+}
+
+export interface DiscountCoupon {
+  code: string;
+  metadata: {
+    category: string;
+  };
+  coupon: {
+    id: string;
+    name: string;
+    percent_off: number;
+  };
 }
 
 interface CartContextProps {
   cartItems: CartItem[];
+  discountCoupon: DiscountCoupon | null;
   isCartLoading: boolean;
   addItem: (product: ProductWithVariant | WishlistItem) => void;
   deleteItem: (sku: string) => void;
@@ -43,6 +62,9 @@ interface CartContextProps {
   getCurrentItemQuantity: (sku: string) => number;
   getCartStatus: (sku: string) => boolean;
   getShippingStatus: () => boolean;
+  setDiscountCoupon: Dispatch<SetStateAction<DiscountCoupon | null>>;
+  handleDiscountCouponApply: (discountCoupon: DiscountCoupon) => void;
+  getDiscountedAmount: () => number;
 }
 
 const CartContext = createContext({} as CartContextProps);
@@ -50,6 +72,9 @@ const CartContext = createContext({} as CartContextProps);
 function CartProvider({ children }: PropsWithChildren) {
   const [cartItems, setCartItems] = useState<CartItem[] | null>(null);
   const [isCartLoading, setIsCartLoading] = useState(true);
+  const [discountCoupon, setDiscountCoupon] = useState<DiscountCoupon | null>(
+    null
+  );
 
   useEffect(() => {
     const storedCartItems = localStorage.getItem("cartItems");
@@ -62,17 +87,39 @@ function CartProvider({ children }: PropsWithChildren) {
   }, []);
 
   useEffect(() => {
+    const storedDiscountCoupon = localStorage.getItem("discountCoupon");
+    if (storedDiscountCoupon) {
+      setDiscountCoupon(JSON.parse(storedDiscountCoupon));
+    } else {
+      setDiscountCoupon(null);
+    }
+  }, []);
+
+  useEffect(() => {
     if (cartItems !== null) {
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
     }
   }, [cartItems]);
 
+  useEffect(() => {
+    if (discountCoupon !== null) {
+      localStorage.setItem("discountCoupon", JSON.stringify(discountCoupon));
+    }
+  }, [discountCoupon]);
+
   function addItem(product: ProductWithVariant | WishlistItem): void {
+    const isDiscountApplicable =
+      discountCoupon &&
+      discountCoupon?.metadata.category ===
+        (product.category as Category).title;
+
     const newItem = {
       _id: product._id,
       sku: product.sku,
       title: product.title,
-      price: product.price,
+      price: isDiscountApplicable
+        ? product.price * (1 - discountCoupon.coupon.percent_off / 100)
+        : product.price,
       brand: product.brand,
       freeShipping: product.freeShipping,
       image: product.image,
@@ -80,10 +127,16 @@ function CartProvider({ children }: PropsWithChildren) {
       size: product.size,
       slug: product.slug,
       stock: product.stock,
+      category: product.category,
     } as CartProductProps;
     setCartItems((prevItems) => [
       ...(prevItems || []),
-      { ...newItem, quantity: 1, totalPrice: product.price },
+      {
+        ...newItem,
+        quantity: 1,
+        totalPrice: newItem.price,
+        originalPrice: product.price,
+      },
     ]);
   }
 
@@ -161,12 +214,49 @@ function CartProvider({ children }: PropsWithChildren) {
     return (cartItems || []).some((item) => item.freeShipping);
   }
 
+  const handleDiscountCouponApply = useCallback(
+    (discountCoupon: DiscountCoupon) => {
+      setDiscountCoupon(discountCoupon);
+      setCartItems((prevItems) => {
+        return (prevItems || []).map((item) => {
+          if (
+            (item.category as Category).title ===
+            discountCoupon.metadata.category
+          ) {
+            const discountedPrice =
+              item.price * (1 - discountCoupon.coupon.percent_off / 100);
+            return {
+              ...item,
+              price: discountedPrice,
+              totalPrice: discountedPrice * item.quantity,
+            };
+          }
+          return item;
+        });
+      });
+    },
+    []
+  );
+
+  function getDiscountedAmount(): number {
+    return (
+      (cartItems || [])
+        .filter((item) => item.price < item.originalPrice)
+        .reduce((sum, item) => sum + item.quantity * item.originalPrice, 0) -
+      (cartItems || [])
+        .filter((item) => item.price < item.originalPrice)
+        .reduce((sum, item) => sum + item.totalPrice, 0)
+    );
+  }
+
   return (
     <CartContext.Provider
       value={{
         cartItems: cartItems ?? [],
+        discountCoupon,
         isCartLoading,
         addItem,
+        setDiscountCoupon,
         deleteItem,
         increaseItemQuantity,
         decreaseItemQuantity,
@@ -176,6 +266,8 @@ function CartProvider({ children }: PropsWithChildren) {
         getCurrentItemQuantity,
         getCartStatus,
         getShippingStatus,
+        handleDiscountCouponApply,
+        getDiscountedAmount,
       }}
     >
       {children}

@@ -4,7 +4,7 @@ import paths from "@/lib/paths";
 import Product from "./Product";
 
 export default async function TopDiscounts() {
-  const topDiscounts = await getProductsWithDiscounts(4);
+  const topDiscounts = await getProductsWithDiscounts(4, true);
   return (
     <ProductRow
       title="Top discounts"
