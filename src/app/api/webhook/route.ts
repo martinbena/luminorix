@@ -6,6 +6,7 @@ import {
   updateVariantStockBySku,
 } from "@/db/queries/products";
 import Order, { CartSession, LineItem } from "@/models/Order";
+import User, { WishlistItem } from "@/models/User";
 import { NextResponse, NextRequest } from "next/server";
 
 interface MetadataCartItem {
@@ -37,10 +38,9 @@ export async function POST(req: NextRequest) {
       case "charge.succeeded":
         const chargeSucceeded = event.data.object;
         const { id, ...rest } = chargeSucceeded;
+        const { userId, sessionId, telephone } = chargeSucceeded.metadata;
 
-        const cartSession = await CartSession.findOne({
-          sessionId: chargeSucceeded.metadata.sessionId,
-        });
+        const cartSession = await CartSession.findOne({ sessionId });
 
         if (!cartSession) {
           throw new Error("Cart session not found");
@@ -87,8 +87,8 @@ export async function POST(req: NextRequest) {
         const orderData = {
           ...rest,
           chargeId: id,
-          userId: chargeSucceeded.metadata.userId,
-          delivery_telephone: chargeSucceeded.metadata.telephone,
+          userId,
+          delivery_telephone: telephone,
           delivery_email: chargeSucceeded.receipt_email,
           cartItems: cartItemsWithProductDetails,
         };
@@ -111,6 +111,25 @@ export async function POST(req: NextRequest) {
         await CartSession.deleteOne({
           sessionId: chargeSucceeded.metadata.sessionId,
         });
+
+        if (userId !== "not-logged-in") {
+          const user = await User.findById(userId);
+          if (!user) return;
+
+          const wishlistSkus = user.wishlist.map(
+            (item: WishlistItem) => item.sku
+          );
+          const skusToRemove = wishlistSkus.filter((sku: string) =>
+            productSkus.includes(sku)
+          );
+
+          if (skusToRemove.length > 0) {
+            user.wishlist = user.wishlist.filter(
+              (item: WishlistItem) => !skusToRemove.includes(item.sku)
+            );
+            await user.save();
+          }
+        }
 
         return NextResponse.json({ ok: true });
     }

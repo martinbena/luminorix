@@ -130,7 +130,7 @@ export async function createPaymentSession(
           product.color,
           product.size
         );
-        if (item.stock > product.stock) {
+        if (item.quantity > product.stock) {
           throw new Error(
             `There is only ${product.stock} pieces of ${composedTitle} in stock. You have ${item.quantity} pieces in your cart `
           );
@@ -152,7 +152,7 @@ export async function createPaymentSession(
               },
             },
             unit_amount: finalPrice * 100,
-          },         
+          },
           quantity: item.quantity,
         };
       })
@@ -193,7 +193,7 @@ export async function createPaymentSession(
       ],
       shipping_address_collection: {
         allowed_countries: countryCodes,
-      },     
+      },
       customer_email: result.data.email,
     });
 
