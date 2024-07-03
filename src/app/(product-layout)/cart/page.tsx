@@ -37,8 +37,8 @@ export default function CartPage() {
       {isCartLoading ? (
         <CartSkeleton />
       ) : cartItems.length ? (
-        <section className="mt-16 grid grid-cols-[2fr_1fr] gap-8">
-          <div>
+        <section className="mt-16 grid grid-cols-[2fr_1fr] tab:grid-cols-1 gap-8">
+          <div className="tab:order-2">
             <Headline>
               {currentStep === 1 && <span>Review Cart / Adjust Quantity</span>}
               {currentStep === 2 && <span>Payment Method</span>}
@@ -61,7 +61,7 @@ export default function CartPage() {
               />
             ) : null}
           </div>
-          <div>
+          <div className="tab:order-1">
             <Headline>Order Summary</Headline>
             <CartItems type="summary" />
             <TotalPrice />
@@ -77,7 +77,7 @@ export default function CartPage() {
 
 function Headline({ children }: PropsWithChildren) {
   return (
-    <div className="w-full bg-amber-200 py-2 font-sans text-center text-base mb-8">
+    <div className="w-full bg-amber-200 py-2 px-3 font-sans text-center text-base mb-8">
       <p>{children}</p>
     </div>
   );

@@ -15,7 +15,7 @@ export default function UpdateItemQuantity({ product }: CartActionsProps) {
   const quantity = getCurrentItemQuantity(sku);
   return (
     <div className="w-full flex justify-center items-center gap-2">
-      <div className="flex items-center gap-5 text-xl bg-white px-3.5 font-sans py-1.5 border-2 border-zinc-200 rounded-full">
+      <div className="flex items-center gap-4 mob-sm:gap-2 text-xl bg-white px-3.5 font-sans py-1.5 border-2 border-zinc-200 rounded-full">
         <button
           aria-label={`Add one ${composedTitle} to your cart`}
           type="button"

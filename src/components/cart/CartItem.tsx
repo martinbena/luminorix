@@ -26,10 +26,10 @@ export default function CartItem({ item, type = "cart" }: CartItemProps) {
   );
 
   return (
-    <li className="flex gap-6 border border-zinc-300 rounded-md p-2">
+    <li className="flex gap-6 tab-lg:gap-4 border border-zinc-300 rounded-md p-2">
       <div
         className={`relative aspect-square ${
-          type === "cart" ? "w-48" : "w-16"
+          type === "cart" ? "w-48 mob-sm:w-16 mob-sm:h-16" : "w-16"
         }`}
       >
         <Image
@@ -39,18 +39,21 @@ export default function CartItem({ item, type = "cart" }: CartItemProps) {
           className="object-cover"
         />
       </div>
-      <div className="flex flex-col justify-between flex-1">
+      <div
+        className={`flex flex-col justify-between flex-1 ${
+          type === "cart" ? "" : ""
+        } `}
+      >
         {type === "cart" && (
           <>
             <div>
-              <h3 className="hover:underline text-xl font-semibold">
+              <h3 className="hover:underline text-xl font-semibold mob:text-lg mob-sm:text-base">
                 <Link href={paths.productShow(item.slug, item.sku)}>
                   {composedTitle}
                 </Link>
               </h3>
-
               <div
-                className={`mt-7 font-sans text-lg flex justify-between items-center gap-2 ${
+                className={`mt-7 mob:mt-3 mob:mb-6 font-sans text-lg mob:text-base flex justify-between items-center gap-2 ${
                   isDiscount ? "text-amber-700" : ""
                 }`}
               >
@@ -62,7 +65,7 @@ export default function CartItem({ item, type = "cart" }: CartItemProps) {
                       {" "}
                       {`- ${discountCoupon.coupon.percent_off}%`}
                     </span>{" "}
-                    <span className="text-xs">{`(${discountCoupon.code})`}</span>
+                    <span className="text-xs mob:hidden">{`(${discountCoupon.code})`}</span>
                   </p>
                 ) : null}
               </div>

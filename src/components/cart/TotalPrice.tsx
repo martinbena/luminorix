@@ -21,13 +21,13 @@ export default function TotalPrice() {
   return (
     <div className="flex flex-col gap-2 my-4 font-sans">
       {discountCoupon ? (
-        <div className="flex justify-between bg-amber-100 py-3 px-4 font-semibold">
+        <div className="flex justify-between gap-4 bg-amber-100 py-3 px-4 font-semibold">
           <div className="flex flex-col gap-1">
             <p>{discountCoupon.code}</p>
             <p>{discountCoupon.coupon.name}</p>
           </div>
-          <p className="mt-auto text-base">
-            - {formatCurrency(couponDiscountAmount)}
+          <p className="mt-auto text-base text-nowrap">
+            {`- ${formatCurrency(couponDiscountAmount)}`}
           </p>
         </div>
       ) : null}
@@ -39,10 +39,8 @@ export default function TotalPrice() {
       </div>
       <div className="flex justify-between">
         <p className="text-base">
-          {" "}
-          {`Total ${totalCartItemsQuantity} ${
-            totalCartItemsQuantity > 1 ? "items" : "item"
-          }:`}
+          Total <span className="font-semibold">{totalCartItemsQuantity}</span>{" "}
+          {totalCartItemsQuantity > 1 ? "items" : "item"}:
         </p>
         <p>
           <span className="text-2xl font-medium">
@@ -50,7 +48,9 @@ export default function TotalPrice() {
               isShippingFree ? totalCartPrice : totalCartPrice + SHIPPING_RATE
             )}
           </span>
-          <span className="block text-right text-zinc-500">(tax incl.)</span>
+          <span className="block text-right text-zinc-500 font-medium">
+            (tax incl.)
+          </span>
         </p>
       </div>
     </div>

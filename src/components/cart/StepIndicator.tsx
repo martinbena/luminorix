@@ -26,7 +26,7 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
 
 function StepsContainer({ children }: PropsWithChildren) {
   return (
-    <div className="grid grid-cols-3 justify-items-center font-sans font-medium text-lg">
+    <div className="grid grid-cols-3 justify-items-center font-sans font-medium text-lg mob-lg:text-base">
       {children}
     </div>
   );
@@ -43,7 +43,7 @@ function Step({ children, step, currentStep }: StepProps) {
     <div
       className={`${
         step <= currentStep ? "bg-amber-500" : "bg-amber-400"
-      } flex w-full py-4 justify-center items-center gap-3 border-r border-amber-600 transition-colors duration-300 ease-out`}
+      } flex mob-lg:flex-col w-full py-4 justify-center items-center mob:justify-start text-center gap-3 border-r px-3 border-amber-600 transition-colors duration-300 ease-out`}
     >
       {children}
     </div>

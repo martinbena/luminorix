@@ -14,7 +14,7 @@ export default function SetStepButtons({
 }: SetStepButtonsProps) {
   return (
     <div
-      className={`flex justify-between items-center ${
+      className={`flex justify-between items-center mob-sm:flex-col mob-sm:child:w-full gap-4 ${
         currentStep === 3 ? "" : "mt-6"
       }`}
     >
@@ -31,7 +31,7 @@ export default function SetStepButtons({
           Next step
         </Button>
       ) : (
-        <div className="max-w-40 w-full">
+        <div className="max-w-40 mob-sm:max-w-full w-full">
           <Form.Button>Place order</Form.Button>
         </div>
       )}
