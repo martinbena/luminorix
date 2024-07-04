@@ -28,7 +28,7 @@ export async function getAllProducts(): Promise<ProductType[]> {
 interface ProductsWithVatriantsProps {
   products: ProductWithVariant[];
   totalCount: number;
-  currentCategory: CategoryType;
+  currentCategory: CategoryType | undefined | null;
 }
 
 export async function getProductsWithAllVariants({

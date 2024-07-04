@@ -13,7 +13,7 @@ export default function ProductRowSkeleton({
   numItems = 4,
 }: ProductRowSkeletonProps) {
   return (
-    <section className={`px-8 mob:px-5`}>
+    <section className={`px-8 py-16 mob:px-5`}>
       {hasTitle && (
         <SkeletonBlock
           tag="h2"

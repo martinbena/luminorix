@@ -7,7 +7,7 @@ import Button from "../ui/Button";
 import AddToCart from "./AddToCart";
 import UpdateItemQuantity from "./UpdateItemQuantity";
 
-export interface CartActionsProps {
+interface CartActionsProps {
   product: ProductWithVariant | WishlistItem | CartItem;
   background?: string;
 }
@@ -22,9 +22,9 @@ export default function CartActions({
   return (
     <div className="flex flex-col gap-2">
       {isInCart ? (
-        <UpdateItemQuantity product={product} />
+        <UpdateItemQuantity product={product as CartItem} />
       ) : (
-        <AddToCart product={product} />
+        <AddToCart product={product as ProductWithVariant | WishlistItem} />
       )}
       <Button type="primary" beforeBackground={`before:bg-${background}`}>
         Buy now

@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Model } from "mongoose";
 
 export interface Category extends Document {
   title: string;
@@ -25,5 +25,8 @@ const categorySchema = new mongoose.Schema<Category>(
   { timestamps: true }
 );
 
-export default mongoose.models?.Category ||
+const CategoryModel: Model<Category> =
+  mongoose.models.Category ||
   mongoose.model<Category>("Category", categorySchema);
+
+export default CategoryModel;

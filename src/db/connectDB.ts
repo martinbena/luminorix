@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import CategoryModel from "@/models/Category";
 
 interface ProcessEnv {
   MONGODB_USERNAME: string;
@@ -20,6 +21,7 @@ export default async function ConnectDB(): Promise<void> {
     await mongoose.connect(
       `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@${process.env.MONGODB_CLUSTERNAME}.itm23iu.mongodb.net/${process.env.MONGODB_DATABASE}?retryWrites=true&w=majority`
     );
+    mongoose.modelNames();
   } catch (error: unknown) {
     console.log(error);
   }

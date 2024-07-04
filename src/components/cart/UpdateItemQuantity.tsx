@@ -1,9 +1,14 @@
-import { useCartContext } from "@/app/contexts/CartContext";
-import { CartActionsProps } from "./CartActions";
+import { CartItem, useCartContext } from "@/app/contexts/CartContext";
 import { IoChevronDown, IoChevronUp, IoClose } from "react-icons/io5";
 import { getProductVariantTitle } from "@/lib/helpers";
 
-export default function UpdateItemQuantity({ product }: CartActionsProps) {
+interface UpdateItemQuantityProps {
+  product: CartItem;
+}
+
+export default function UpdateItemQuantity({
+  product,
+}: UpdateItemQuantityProps) {
   const {
     getCurrentItemQuantity,
     increaseItemQuantity,

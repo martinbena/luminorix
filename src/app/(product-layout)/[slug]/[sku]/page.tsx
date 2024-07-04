@@ -13,6 +13,7 @@ import {
 } from "@/db/queries/product";
 import { getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
+import { Category } from "@/models/Category";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import probe from "probe-image-size";
@@ -62,10 +63,12 @@ export default async function SingleProductPage({
         (rating) => rating.postedBy._id.toString() === session.user._id
       )
     : false;
-
   return (
     <>
-      <ProductBreadcrumb productTitle={title} productCategory={category} />
+      <ProductBreadcrumb
+        productTitle={title}
+        productCategory={category as Category}
+      />
       <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto tab:grid-cols-1 tab:gap-8 text-zinc-800">
         <div className="flex flex-col gap-1.5">
           <ProductImage title={title} image={image} size={{ width, height }} />

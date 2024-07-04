@@ -2,9 +2,14 @@
 
 import { useCartContext } from "@/app/contexts/CartContext";
 import Button from "../ui/Button";
-import { CartActionsProps } from "./CartActions";
+import { ProductWithVariant } from "@/models/Product";
+import { WishlistItem } from "@/models/User";
 
-export default function AddToCart({ product }: CartActionsProps) {
+interface AddToCartProps {
+  product: ProductWithVariant | WishlistItem;
+}
+
+export default function AddToCart({ product }: AddToCartProps) {
   const { addItem } = useCartContext();
   return (
     <Button type="secondary" onClick={() => addItem(product)}>

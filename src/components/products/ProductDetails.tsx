@@ -12,7 +12,6 @@ import {
   isProductInWishlist,
 } from "@/db/queries/wishlist";
 import { PiCalendarBlank, PiTruck } from "react-icons/pi";
-import Button from "../ui/Button";
 import SocialNetworks from "../ui/SocialNetworks";
 import VariantSelector from "./VariantSelector";
 import VariantLink from "./VariantLink";
