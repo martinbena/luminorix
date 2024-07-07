@@ -177,7 +177,9 @@ export async function createPaymentSession(
 
     const paymentSession = await stripe.checkout.sessions.create({
       line_items: lineItems,
-      success_url: `${process.env.BASE_URL}${paths.home()}`,
+      success_url: `${process.env.BASE_URL}${paths.orderSuccess(
+        cartSessionId
+      )}`,
       client_reference_id: userId || "not-logged-in",
       mode: "payment",
       payment_method_types: ["card"],

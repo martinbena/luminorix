@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
           delivery_telephone: telephone,
           delivery_email: chargeSucceeded.receipt_email,
           cartItems: cartItemsWithProductDetails,
+          success_token: sessionId
         };
 
         await Order.create(orderData);
@@ -108,9 +109,7 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        await CartSession.deleteOne({
-          sessionId: chargeSucceeded.metadata.sessionId,
-        });
+        await CartSession.deleteOne({ sessionId });
 
         if (userId !== "not-logged-in") {
           const user = await User.findById(userId);

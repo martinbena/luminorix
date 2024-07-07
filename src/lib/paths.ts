@@ -65,6 +65,9 @@ const paths = {
   cart() {
     return "/cart";
   },
+  orderSuccess(successToken: string) {
+    return `/order-success/${successToken}`;
+  },
   search() {
     return "/search";
   },

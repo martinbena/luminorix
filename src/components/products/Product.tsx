@@ -86,10 +86,10 @@ export default function Product({
             <p className="font-sans mb-8">{description}</p>
           ) : null}
         </div>
-        {stock > 1 ? (
+        {stock >= 1 ? (
           <CartActions
             product={JSON.parse(JSON.stringify(product))}
-            background={"amber-100"}
+            beforeBackground={"before:bg-amber-100"}
           />
         ) : (
           <p className="bg-pink-100 py-2 px-4 text-pink-800 uppercase text-center tracking-[0.2em]">

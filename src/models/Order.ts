@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import Product from "./Product";
 import User from "./User";
 
-interface CartItemSchema extends CartProductProps {
+export interface CartItemSchema extends CartProductProps {
   quantity: number;
 }
 
@@ -28,7 +28,47 @@ const cartItemSchema = new mongoose.Schema<CartItemSchema>(
   { timestamps: true }
 );
 
-const orderSchema = new mongoose.Schema(
+interface Address {
+  city: string;
+  country: string;
+  line1: string;
+  line2?: string;
+  postal_code: string;
+  state?: string;
+}
+
+interface Shipping {
+  address: Address;
+  name: string;
+}
+
+export interface Order extends Document {
+  _id: mongoose.Schema.Types.ObjectId;
+  chargeId: string;
+  payment_intent: string;
+  receipt_url: string;
+  refunded: boolean;
+  status: string;
+  amount_captured: number;
+  currency: string;
+  shipping: Shipping;
+  userId: mongoose.Schema.Types.ObjectId;
+  delivery_telephone: string;
+  delivery_email: string;
+  cartItems: CartItemSchema[];
+  success_token: string;
+  delivery_status:
+    | "Not Processed"
+    | "Processing"
+    | "Dispatched"
+    | "Refunded"
+    | "Cancelled"
+    | "Delivered";
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const orderSchema = new mongoose.Schema<Order>(
   {
     chargeId: String,
     payment_intent: String,
@@ -55,6 +95,7 @@ const orderSchema = new mongoose.Schema(
     delivery_telephone: String,
     delivery_email: String,
     cartItems: [cartItemSchema],
+    success_token: String,
     delivery_status: {
       type: String,
       default: "Not Processed",
@@ -71,7 +112,8 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models?.Order || mongoose.model("Order", orderSchema);
+export default mongoose.models?.Order ||
+  mongoose.model<Order>("Order", orderSchema);
 
 export interface LineItem {
   price_data: {

@@ -65,6 +65,7 @@ interface CartContextProps {
   setDiscountCoupon: Dispatch<SetStateAction<DiscountCoupon | null>>;
   handleDiscountCouponApply: (discountCoupon: DiscountCoupon) => void;
   getDiscountedAmount: () => number;
+  clearCartAndDiscount: () => void;
 }
 
 const CartContext = createContext({} as CartContextProps);
@@ -249,6 +250,13 @@ function CartProvider({ children }: PropsWithChildren) {
     );
   }
 
+  function clearCartAndDiscount(): void {
+    clearCart();
+    setDiscountCoupon(null);
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("discountCoupon");
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -268,6 +276,7 @@ function CartProvider({ children }: PropsWithChildren) {
         getShippingStatus,
         handleDiscountCouponApply,
         getDiscountedAmount,
+        clearCartAndDiscount,
       }}
     >
       {children}

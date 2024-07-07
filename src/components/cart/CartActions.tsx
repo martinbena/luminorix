@@ -9,12 +9,12 @@ import UpdateItemQuantity from "./UpdateItemQuantity";
 
 interface CartActionsProps {
   product: ProductWithVariant | WishlistItem | CartItem;
-  background?: string;
+  beforeBackground?: string;
 }
 
 export default function CartActions({
   product,
-  background = "white",
+  beforeBackground = "before:bg-white",
 }: CartActionsProps) {
   const { getCartStatus } = useCartContext();
   const isInCart = getCartStatus(product.sku);
@@ -26,7 +26,7 @@ export default function CartActions({
       ) : (
         <AddToCart product={product as ProductWithVariant | WishlistItem} />
       )}
-      <Button type="primary" beforeBackground={`before:bg-${background}`}>
+      <Button type="primary" beforeBackground={beforeBackground}>
         Buy now
       </Button>
     </div>
