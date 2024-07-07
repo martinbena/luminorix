@@ -1,14 +1,20 @@
 import Order from "@/models/Order";
 import ConnectDB from "../connectDB";
 
-export async function getAllSuccessTokens(): Promise<string[]> {
+interface SuccessToken {
+  successToken: string;
+}
+
+export async function getAllSuccessTokens(): Promise<SuccessToken[]> {
   try {
     await ConnectDB();
     const successTokens = await Order.find()
       .select("success_token -_id")
       .exec();
 
-    const tokensArray = successTokens.map((doc) => doc.success_token);
+    const tokensArray = successTokens.map((doc) => ({
+      successToken: doc.success_token,
+    }));
 
     return tokensArray;
   } catch (error) {
