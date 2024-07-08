@@ -10,11 +10,11 @@ import PlaceOrderForm from "@/components/cart/PlaceOrderForm";
 import SetStepButtons from "@/components/cart/SetStepButtons";
 import StepIndicator from "@/components/cart/StepIndicator";
 import TotalPrice from "@/components/cart/TotalPrice";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useEffect } from "react";
 
 export default function CartPage() {
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const { cartItems, isCartLoading } = useCartContext();
+  const { cartItems, isCartLoading, currentStep, setCurrentStep } =
+    useCartContext();
 
   function handleStepIncrement() {
     if (currentStep < 3) {
@@ -30,9 +30,20 @@ export default function CartPage() {
     return;
   }
 
+  useEffect(() => {
+    if (currentStep === 3) {
+      setCurrentStep(3);
+    }
+
+    return () => {
+      setCurrentStep(1);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setCurrentStep]);
+
   return (
     <div className="pt-10 max-w-6xl mx-auto text-zinc-800">
-      <StepIndicator currentStep={currentStep} />
+      {cartItems.length ? <StepIndicator currentStep={currentStep} /> : null}
 
       {isCartLoading ? (
         <CartSkeleton />

@@ -3,6 +3,7 @@
 import { Category } from "@/models/Category";
 import { ProductWithVariant } from "@/models/Product";
 import { WishlistItem } from "@/models/User";
+import { useRouter } from "next/navigation";
 import {
   PropsWithChildren,
   createContext,
@@ -52,6 +53,7 @@ interface CartContextProps {
   cartItems: CartItem[];
   discountCoupon: DiscountCoupon | null;
   isCartLoading: boolean;
+  currentStep: number;
   addItem: (product: ProductWithVariant | WishlistItem) => void;
   deleteItem: (sku: string) => void;
   increaseItemQuantity: (sku: string) => void;
@@ -66,6 +68,8 @@ interface CartContextProps {
   handleDiscountCouponApply: (discountCoupon: DiscountCoupon) => void;
   getDiscountedAmount: () => number;
   clearCartAndDiscount: () => void;
+  buyNowItem: (product: ProductWithVariant | WishlistItem) => void;
+  setCurrentStep: Dispatch<SetStateAction<number>>;
 }
 
 const CartContext = createContext({} as CartContextProps);
@@ -76,6 +80,8 @@ function CartProvider({ children }: PropsWithChildren) {
   const [discountCoupon, setDiscountCoupon] = useState<DiscountCoupon | null>(
     null
   );
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const router = useRouter();
 
   useEffect(() => {
     const storedCartItems = localStorage.getItem("cartItems");
@@ -257,6 +263,17 @@ function CartProvider({ children }: PropsWithChildren) {
     localStorage.removeItem("discountCoupon");
   }
 
+  function buyNowItem(product: ProductWithVariant | WishlistItem): void {
+    const isItemInCart = cartItems?.some((item) => item.sku === product.sku);
+
+    if (!isItemInCart) {
+      addItem(product);
+    }
+
+    setCurrentStep(3);
+    router.push("/cart");
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -277,6 +294,9 @@ function CartProvider({ children }: PropsWithChildren) {
         handleDiscountCouponApply,
         getDiscountedAmount,
         clearCartAndDiscount,
+        buyNowItem,
+        currentStep,
+        setCurrentStep,
       }}
     >
       {children}

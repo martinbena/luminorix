@@ -16,7 +16,7 @@ export default function CartActions({
   product,
   beforeBackground = "before:bg-white",
 }: CartActionsProps) {
-  const { getCartStatus } = useCartContext();
+  const { getCartStatus, buyNowItem } = useCartContext();
   const isInCart = getCartStatus(product.sku);
 
   return (
@@ -26,7 +26,11 @@ export default function CartActions({
       ) : (
         <AddToCart product={product as ProductWithVariant | WishlistItem} />
       )}
-      <Button type="primary" beforeBackground={beforeBackground}>
+      <Button
+        type="primary"
+        onClick={() => buyNowItem(product as ProductWithVariant | WishlistItem)}
+        beforeBackground={beforeBackground}
+      >
         Buy now
       </Button>
     </div>
