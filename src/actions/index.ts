@@ -16,3 +16,4 @@ export { deleteRating } from "./rating";
 export { toggleWishlistProduct } from "./wishlist";
 export { applyDiscountCoupon } from "./order";
 export { createPaymentSession } from "./order";
+export { cancelOrder } from "./order";

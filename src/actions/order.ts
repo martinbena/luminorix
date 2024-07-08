@@ -14,7 +14,13 @@ import { isRedirectError } from "next/dist/client/components/redirect";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-import { CartSession } from "@/models/Order";
+import Order, { CartSession } from "@/models/Order";
+import { DeleteItemState } from "./category";
+import { revalidatePath } from "next/cache";
+import {
+  updateProductAndVariantSold,
+  updateVariantStockBySku,
+} from "@/db/queries/products";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -216,6 +222,73 @@ export async function createPaymentSession(
       errors: {
         _form: ["Something went wrong"],
       },
+    };
+  }
+}
+
+export async function cancelOrder(id: string): Promise<DeleteItemState> {
+  try {
+    await ConnectDB();
+    const session = await auth();
+
+    const updatedOrder = await Order.findById(id);
+
+    if (!updatedOrder) {
+      return {
+        error: "Order not found",
+      };
+    }
+
+    if (updatedOrder.delivery_status !== "Not Processed") {
+      return {
+        error: "This order cannot be cancelled",
+      };
+    }
+
+    if (session?.user._id.toString() !== updatedOrder.userId.toString()) {
+      return {
+        error: "You are not authorized to cancel this order",
+      };
+    }
+
+    const refund = stripe.refunds.create({
+      payment_intent: updatedOrder.payment_intent,
+      reason: "requested_by_customer",
+    });
+
+    updatedOrder.status = "Refunded";
+    updatedOrder.refunded = true;
+    updatedOrder.delivery_status = "Cancelled";
+    updatedOrder.refundId = refund.id;
+
+    await updatedOrder.save();
+
+    for (const cartItem of updatedOrder.cartItems) {
+      await updateVariantStockBySku(
+        cartItem.sku,
+        cartItem.quantity,
+        "increment"
+      );
+      await updateProductAndVariantSold(
+        cartItem.sku,
+        cartItem.quantity,
+        "decrement"
+      );
+    }
+
+    revalidatePath(paths.userOrderShowAll());
+    revalidatePath(paths.adminOrderShow());
+    return {
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+      };
+    }
+    return {
+      error: "Order could not be cancelled. Please try again",
     };
   }
 }

@@ -88,11 +88,12 @@ export function TableRow({
 
 interface FooterProps {
   children: ReactNode;
+  justifyContent?: string
 }
 
-export function TableFooter({ children }: FooterProps) {
+export function TableFooter({ children, justifyContent = "justify-center" }: FooterProps) {
   return (
-    <footer className="p-3 bg-zinc-100 flex justify-center [&:not(:has(*))]:hidden">
+    <footer className={`p-3 bg-zinc-100 flex ${justifyContent} [&:not(:has(*))]:hidden`}>
       {children}
     </footer>
   );

@@ -43,7 +43,7 @@ interface Shipping {
 }
 
 export interface Order extends Document {
-  _id: mongoose.Schema.Types.ObjectId;
+  _id: mongoose.Types.ObjectId;
   chargeId: string;
   payment_intent: string;
   receipt_url: string;
@@ -52,7 +52,7 @@ export interface Order extends Document {
   amount_captured: number;
   currency: string;
   shipping: Shipping;
-  userId: mongoose.Schema.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   delivery_telephone: string;
   delivery_email: string;
   cartItems: CartItemSchema[];
