@@ -4,3 +4,11 @@ export const HIGHEST_POSSIBLE_PRICE = 500000;
 export const MAX_RATING = 5;
 export const SKELETON_EFFECT = "wave";
 export const SHIPPING_RATE = 5;
+export const ORDER_STATUS_FILTER_OPTIONS = [
+  "All",
+  "Not Processed",
+  "Processing",
+  "Dispatched",
+  "Cancelled",
+  "Delivered",
+];
