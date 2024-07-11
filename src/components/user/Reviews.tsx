@@ -2,10 +2,10 @@ import { auth } from "@/auth";
 import { getUserReviews } from "@/db/queries/user";
 import { format } from "date-fns";
 import Link from "next/link";
-import { TfiNotepad } from "react-icons/tfi";
 import Stars from "../products/Stars";
 import ReviewActions from "./ReviewActions";
 import { getFirstVariantSkuBySlug } from "@/db/queries/product";
+import EmptyItemList from "../admin/EmptyItemList";
 
 interface SlugSkuPairs {
   [slug: string]: string;
@@ -57,10 +57,7 @@ export default async function Reviews() {
           })}
         </ul>
       ) : (
-        <div className="flex flex-col items-center justify-center gap-4">
-          <TfiNotepad className="text-zinc-300 h-24 w-24" />
-          <p className="text-lg">You have not written any reviews yet</p>
-        </div>
+        <EmptyItemList message="You have not written any reviews yet" />
       )}
     </>
   );

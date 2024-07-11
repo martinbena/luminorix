@@ -98,3 +98,15 @@ export function getProductVariantTitle(
     color ? ` ${color}` : ""
   }${size ? ` ${size}` : ""}`;
 }
+
+export function areAddressesDifferent(obj1: any, obj2: any) {
+  const keys2 = Object.keys(obj2);
+
+  for (const key of keys2) {
+    if (obj1[key] !== obj2[key]) {
+      return true;
+    }
+  }
+
+  return false;
+}

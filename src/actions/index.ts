@@ -17,3 +17,4 @@ export { toggleWishlistProduct } from "./wishlist";
 export { applyDiscountCoupon } from "./order";
 export { createPaymentSession } from "./order";
 export { cancelOrder } from "./order";
+export { editOrder } from "./order";

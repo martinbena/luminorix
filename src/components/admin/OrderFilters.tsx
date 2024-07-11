@@ -31,7 +31,7 @@ export default function OrderFilters({
   const currentFilter = searchParams.get(filterField) || options[0].status;
 
   return (
-    <div className="border border-zinc-100 rounded-md p-1 flex gap-1 mb-8 shadow-sm max-w-max mob:flex-wrap">
+    <div className="border border-zinc-100 rounded-md p-1 flex gap-1 shadow-sm max-w-max mob:flex-wrap">
       {options.map((option) => {
         const disabled = option.count === 0;
         const isActive = currentFilter === option.status;

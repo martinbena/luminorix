@@ -1,9 +1,9 @@
 import { UserOrdersPageProps } from "@/app/(app-layout)/(user)/profile/orders/page";
 import { auth } from "@/auth";
-import { getOrdersByUserId } from "@/db/queries/orders";
+import { getOrders } from "@/db/queries/orders";
 import OrderFilters from "../admin/OrderFilters";
 import UserOrderItems from "./UserOrderItems";
-import { TfiNotepad } from "react-icons/tfi";
+import EmptyItemList from "../admin/EmptyItemList";
 
 export default async function UserOrders({
   searchParams,
@@ -12,9 +12,9 @@ export default async function UserOrders({
 
   if (!session?.user) return null;
 
-  const { orders, statusCounts } = await getOrdersByUserId(
-    session?.user._id,
-    searchParams
+  const { orders, statusCounts } = await getOrders(
+    searchParams,
+    session?.user._id
   );
 
   return (
@@ -23,9 +23,8 @@ export default async function UserOrders({
       {orders.length ? (
         <UserOrderItems orders={orders} />
       ) : (
-        <div className="flex flex-col items-center justify-center gap-4 mt-32">
-          <TfiNotepad className="text-zinc-300 h-24 w-24" />
-          <p className="text-lg">No orders were found</p>
+        <div className="mt-32">
+          <EmptyItemList message="No orders were found" />
         </div>
       )}
     </>

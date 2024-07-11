@@ -21,7 +21,11 @@ interface TableContainerProps {
 }
 
 export function TableContainer({ children }: TableContainerProps) {
-  return <div className="flex justify-center mx-auto">{children}</div>;
+  return (
+    <div className="flex justify-center mob-lg:justify-start relative pb-2">
+      {children}
+    </div>
+  );
 }
 
 interface TableHeaderProps {
@@ -88,12 +92,13 @@ export function TableRow({
 
 interface FooterProps {
   children: ReactNode;
-  justifyContent?: string
 }
 
-export function TableFooter({ children, justifyContent = "justify-center" }: FooterProps) {
+export function TableFooter({ children }: FooterProps) {
   return (
-    <footer className={`p-3 bg-zinc-100 flex ${justifyContent} [&:not(:has(*))]:hidden`}>
+    <footer
+      className={`p-3 bg-zinc-100 flex justify-center [&:not(:has(*))]:hidden`}
+    >
       {children}
     </footer>
   );

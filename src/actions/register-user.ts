@@ -10,6 +10,7 @@ const registerUserSchema = z
     name: z
       .string()
       .max(50)
+      // @ts-ignore
       .regex(/^[\p{L}'’\-]{2,}(?:\s[\p{L}'’\-]{2,})+$/u, {
         message: "Please enter a correct full name",
       }),

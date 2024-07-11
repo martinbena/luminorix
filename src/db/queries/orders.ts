@@ -1,7 +1,7 @@
 import Order, { Order as OrderType } from "@/models/Order";
 import ConnectDB from "../connectDB";
 import mongoose from "mongoose";
-import { ORDER_STATUS_FILTER_OPTIONS } from "@/lib/constants";
+import { ORDER_STATUS_FILTER_OPTIONS, PAGE_LIMIT } from "@/lib/constants";
 
 interface SuccessToken {
   successToken: string;
@@ -35,25 +35,27 @@ interface UserOrderResponse {
   statusCounts: OrderStatusCount[];
 }
 
-export async function getOrdersByUserId(
-  userId: mongoose.ObjectId,
-  searchParams: { deliveryStatus?: string }
+export async function getOrders(
+  searchParams: { deliveryStatus?: string; page?: string },
+  userId?: mongoose.ObjectId
 ): Promise<UserOrderResponse> {
   try {
     await ConnectDB();
 
-    const query: { userId: mongoose.ObjectId; delivery_status?: string } = {
-      userId: userId,
-    };
+    const currentPage = +(searchParams?.page ?? 1);
+    const skip = (currentPage - 1) * PAGE_LIMIT;
 
-    if (searchParams.deliveryStatus) {
-      query["delivery_status"] = searchParams.deliveryStatus;
+    const query: {
+      userId?: mongoose.Types.ObjectId;
+      delivery_status?: string;
+    } = {};
+
+    if (userId) {
+      query.userId = new mongoose.Types.ObjectId(userId?.toString());
     }
 
-    const orders = await Order.find(query).exec();
-
     const statusCounts = await Order.aggregate([
-      { $match: { userId: new mongoose.Types.ObjectId(userId.toString()) } },
+      { $match: query },
       {
         $group: {
           _id: "$delivery_status",
@@ -75,6 +77,15 @@ export async function getOrdersByUserId(
         const found = statusCounts.find((item) => item.status === status);
         return { status, count: found ? found.count : 0 };
       });
+
+    if (searchParams.deliveryStatus && searchParams.deliveryStatus !== "All") {
+      query.delivery_status = searchParams.deliveryStatus;
+    }
+
+    const orders: OrderType[] = await Order.find(query)
+      .skip(userId ? 0 : skip)
+      .limit(userId ? 0 : PAGE_LIMIT)
+      .exec();
 
     return { orders, statusCounts: fullStatusCounts };
   } catch (error) {

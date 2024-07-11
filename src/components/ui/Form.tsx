@@ -94,6 +94,7 @@ function Error({ children }: ErrorProps) {
 }
 
 type Option = Document & { title: string };
+type SelectOption = Option | string;
 
 interface InputGroupProps {
   name: string;
@@ -104,7 +105,7 @@ interface InputGroupProps {
   value?: string | number;
   inputRef?: React.RefObject<HTMLInputElement>;
   textareaRef?: React.RefObject<HTMLTextAreaElement>;
-  options?: Option[];
+  options?: SelectOption[];
   optionalField?: boolean;
   step?: number;
   checked?: boolean;
@@ -165,11 +166,17 @@ function InputGroup({
         <textarea {...commonProps} rows={4} ref={textareaRef} />
       ) : inputType === "select" ? (
         <select {...commonProps}>
-          {options?.map((option) => (
-            <option key={option._id} value={option._id}>
-              {option.title}
-            </option>
-          ))}
+          {options?.map((option) =>
+            typeof option === "string" ? (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ) : (
+              <option key={option._id} value={option._id}>
+                {option.title}
+              </option>
+            )
+          )}
         </select>
       ) : (
         <input

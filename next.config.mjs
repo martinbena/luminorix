@@ -24,6 +24,7 @@ const nextConfig = {
   },
   env: {
     BASE_URL: process.env.BASE_URL,
+    STRIPE_COUNTRY_CODES: process.env.STRIPE_COUNTRY_CODES,
   },
 };
 

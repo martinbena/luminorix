@@ -14,6 +14,7 @@ import * as actions from "@/actions";
 import { formatCurrency } from "@/lib/helpers";
 import Link from "next/link";
 import UserOrderItem from "./UserOrderItem";
+import OrderDeliveryStatus from "../admin/OrderDeliveryStatus";
 
 interface UserOrderItemsProps {
   orders: Order[];
@@ -21,7 +22,7 @@ interface UserOrderItemsProps {
 
 export default function UserOrderItems({ orders }: UserOrderItemsProps) {
   return (
-    <div className="flex flex-col gap-6 child:w-full">
+    <div className="flex flex-col gap-6 mt-16 child:w-full">
       {orders.map((order: Order) => {
         const {
           _id: id,
@@ -129,24 +130,10 @@ interface OrderStatusProps {
 
 function OrderStatus({ deliveryStatus, id }: OrderStatusProps) {
   return (
-    <div className="flex w-full justify-between items-center px-2 mob-sm:flex-col mob-sm:gap-2">
+    <div className="flex w-full justify-between items-center px-3.5 mob-sm:flex-col mob-sm:gap-2">
       <div className="flex items-center gap-2">
-        <span>Status:</span>{" "}
-        <span
-          className={`px-3 py-1 rounded-full uppercase ${
-            deliveryStatus === "Not Processed"
-              ? "text-orange-700 bg-orange-100"
-              : deliveryStatus === "Processing"
-              ? "text-sky-700 bg-sky-100"
-              : deliveryStatus === "Dispatched"
-              ? "text-lime-700 bg-lime-100"
-              : deliveryStatus === "Delivered"
-              ? "text-green-700 bg-green-100"
-              : "text-red-700 bg-red-100"
-          } font-semibold`}
-        >
-          {deliveryStatus}
-        </span>
+        <p className="font-medium">Status:</p>{" "}
+        <OrderDeliveryStatus deliveryStatus={deliveryStatus} />
       </div>
       {deliveryStatus === "Not Processed" && (
         <div className="text-center">

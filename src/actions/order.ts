@@ -7,7 +7,7 @@ import {
   getProductVariantsBySkus,
   hasFreeShipping,
 } from "@/db/queries/product";
-import { getProductVariantTitle } from "@/lib/helpers";
+import { areAddressesDifferent, getProductVariantTitle } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import { Category } from "@/models/Category";
 import { isRedirectError } from "next/dist/client/components/redirect";
@@ -21,6 +21,8 @@ import {
   updateProductAndVariantSold,
   updateVariantStockBySku,
 } from "@/db/queries/products";
+import mongoose from "mongoose";
+import { ORDER_STATUSES } from "@/lib/constants";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -34,6 +36,24 @@ const createPaymentSessionSchema = z.object({
 });
 const applyDiscountCouponSchema = z.object({
   coupon: z.string().min(5, { message: "Please enter a valid coupon code" }),
+});
+
+const editOrderSchema = z.object({
+  ...createPaymentSessionSchema.shape,
+  // @ts-ignore
+  name: z.string().regex(/^[\p{L}'’\-]{2,}(?:\s[\p{L}'’\-]{2,})+$/u, {
+    message: "Please enter a correct full name",
+  }),
+  country: z
+    .string()
+    .min(2, { message: "Please enter a valid country code" })
+    .max(2, { message: "Please enter a valid country code" }),
+  city: z.string().min(2, { message: "Please enter a valid city" }),
+  street: z.string().min(2, { message: "Please enter a valid street" }),
+  postalCode: z
+    .string()
+    .min(2, { message: "Please enter a valid postal code" }),
+  deliveryStatus: z.enum(ORDER_STATUSES),
 });
 
 interface ApplyDiscountCouponFormState {
@@ -239,13 +259,22 @@ export async function cancelOrder(id: string): Promise<DeleteItemState> {
       };
     }
 
-    if (updatedOrder.delivery_status !== "Not Processed") {
+    if (
+      updatedOrder.delivery_status !== "Not Processed" &&
+      !(
+        session?.user.role === "admin" &&
+        updatedOrder.delivery_status === "Processing"
+      )
+    ) {
       return {
         error: "This order cannot be cancelled",
       };
     }
 
-    if (session?.user._id.toString() !== updatedOrder.userId.toString()) {
+    if (
+      session?.user._id.toString() !== updatedOrder.userId.toString() ||
+      session?.user.role !== "admin"
+    ) {
       return {
         error: "You are not authorized to cancel this order",
       };
@@ -278,6 +307,7 @@ export async function cancelOrder(id: string): Promise<DeleteItemState> {
 
     revalidatePath(paths.userOrderShowAll());
     revalidatePath(paths.adminOrderShow());
+    revalidatePath(paths.orderSuccess(updatedOrder.success_token));
     return {
       success: true,
     };
@@ -290,5 +320,183 @@ export async function cancelOrder(id: string): Promise<DeleteItemState> {
     return {
       error: "Order could not be cancelled. Please try again",
     };
+  }
+}
+
+interface EditOrderFormState {
+  errors: {
+    telephone?: string[];
+    email?: string[];
+    name?: string[];
+    country?: string[];
+    city?: string[];
+    street?: string[];
+    postalCode?: string[];
+    deliveryStatus?: string[];
+    _form?: string[];
+  };
+  success?: boolean;
+}
+
+export async function editOrder(
+  id: mongoose.Types.ObjectId,
+  formState: EditOrderFormState,
+  formData: FormData
+): Promise<EditOrderFormState> {
+  const result = editOrderSchema.safeParse({
+    email: formData.get("edit-delivery-email"),
+    telephone: formData.get("edit-delivery-telephone"),
+    name: formData.get("edit-recipient-name"),
+    country: formData.get("edit-recipient-country"),
+    city: formData.get("edit-recipient-city"),
+    street: formData.get("edit-recipient-street"),
+    postalCode: formData.get("edit-recipient-postal-code"),
+    deliveryStatus: formData.get("edit-delivery-status"),
+  });
+
+  if (!result.success) {
+    return {
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  const session = await auth();
+  if (session?.user.role !== "admin") {
+    return {
+      errors: {
+        _form: ["You are not authorized to do this"],
+      },
+    };
+  }
+
+  try {
+    await ConnectDB();
+
+    const updatedOrder = await Order.findById(id);
+
+    if (!updatedOrder) {
+      return {
+        errors: { _form: ["Order not found"] },
+      };
+    }
+
+    const { delivery_status: deliveryStatus, shipping } = updatedOrder;
+    const {
+      email,
+      telephone,
+      name,
+      country,
+      city,
+      street,
+      postalCode,
+      deliveryStatus: newDeliveryStatus,
+    } = result.data;
+
+    if (deliveryStatus === "Cancelled" || deliveryStatus === "Delivered") {
+      return { errors: { _form: ["This order cannot be edited"] } };
+    }
+
+    const oldAddress = {
+      name: shipping.name,
+      ...shipping.address,
+    };
+
+    const newAddress = {
+      name,
+      country,
+      city,
+      line1: street,
+      postal_code: postalCode,
+    };
+
+    const addressHasChanged = areAddressesDifferent(oldAddress, newAddress);
+
+    if (
+      ((deliveryStatus !== "Not Processed" &&
+        deliveryStatus !== "Processing") ||
+        (newDeliveryStatus !== "Not Processed" &&
+          newDeliveryStatus !== "Processing")) &&
+      (addressHasChanged ||
+        updatedOrder.delivery_email !== email ||
+        updatedOrder.delivery_telephone !== telephone)
+    ) {
+      return {
+        errors: {
+          _form: ["Contact details cannot be changed at this stage"],
+        },
+      };
+    }
+
+    if (deliveryStatus === "Dispatched" && newDeliveryStatus !== "Delivered") {
+      return {
+        errors: {
+          _form: [
+            "Order cannot be cancelled or returned to staff at this stage",
+          ],
+        },
+      };
+    }
+
+    updatedOrder.delivery_email = email;
+    updatedOrder.delivery_telephone = telephone;
+    updatedOrder.shipping.name = name;
+    updatedOrder.shipping.address = {
+      country,
+      city,
+      line1: street,
+      postal_code: postalCode,
+    };
+    updatedOrder.delivery_status = newDeliveryStatus;
+
+    await updatedOrder.save();
+
+    if (newDeliveryStatus === "Cancelled") {
+      const refund = stripe.refunds.create({
+        payment_intent: updatedOrder.payment_intent,
+        reason: "requested_by_customer",
+      });
+
+      updatedOrder.status = "Refunded";
+      updatedOrder.refunded = true;
+      updatedOrder.delivery_status = "Cancelled";
+      updatedOrder.refundId = refund.id;
+
+      await updatedOrder.save();
+
+      for (const cartItem of updatedOrder.cartItems) {
+        await updateVariantStockBySku(
+          cartItem.sku,
+          cartItem.quantity,
+          "increment"
+        );
+        await updateProductAndVariantSold(
+          cartItem.sku,
+          cartItem.quantity,
+          "decrement"
+        );
+      }
+    }
+
+    revalidatePath(paths.adminOrderShow());
+    revalidatePath(paths.userOrderShowAll());
+    revalidatePath(paths.orderSuccess(updatedOrder.success_token));
+    return {
+      errors: {},
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        errors: {
+          _form: [error.message],
+        },
+      };
+    } else {
+      return {
+        errors: {
+          _form: ["Something went wrong"],
+        },
+      };
+    }
   }
 }

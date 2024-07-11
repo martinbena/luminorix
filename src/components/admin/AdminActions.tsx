@@ -13,7 +13,7 @@ import { DeleteItemState } from "@/actions/category";
 import { ReactElement } from "react";
 
 interface AdminActionsProps<T extends Document> {
-  item: T & { title: string; color?: string; size?: string };
+  item: T & { title?: string; color?: string; size?: string };
   onDelete: () => Promise<DeleteItemState>;
   editForm: ReactElement;
 }
@@ -41,11 +41,13 @@ export default function AdminActions<T extends Document>({
           <Modal.Content name="edit">{editForm}</Modal.Content>
           <Modal.Content name="delete">
             <ConfirmDelete
-              resourceName={`${item?.title}${
-                item?.color || item?.size ? "," : ""
-              }${item?.color ? ` ${item.color}` : ""}${
-                item?.size ? ` ${item.size}` : ""
-              }`}
+              resourceName={
+                item?.title || item?.color || item?.size
+                  ? `${item?.title}${item?.color || item?.size ? "," : ""}${
+                      item?.color ? ` ${item.color}` : ""
+                    }${item?.size ? ` ${item.size}` : ""}`
+                  : `Order no. ${item._id.toString().slice(-5)}`
+              }
               onConfirm={onDelete}
             />
           </Modal.Content>

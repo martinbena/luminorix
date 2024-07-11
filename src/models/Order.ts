@@ -2,6 +2,7 @@ import { CartProductProps } from "@/app/contexts/CartContext";
 import mongoose from "mongoose";
 import Product from "./Product";
 import User from "./User";
+import { Document } from "mongoose";
 
 export interface CartItemSchema extends CartProductProps {
   quantity: number;
