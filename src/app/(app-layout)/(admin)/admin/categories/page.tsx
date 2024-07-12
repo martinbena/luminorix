@@ -23,36 +23,41 @@ export default async function AdminCategoriesPage() {
 
   return (
     <>
-      <HeadingSecondary>Manage all categories</HeadingSecondary>
-      <section className="mt-12 py-8 flex flex-col gap-16">
-        <AddEditCategoryForm />
+      <div className="max-w-2xl mx-auto">
+        <HeadingSecondary>Manage all categories</HeadingSecondary>
+        <div className="mt-12 py-8 flex flex-col gap-16">
+          <AddEditCategoryForm />
 
-        <div>
-          <TableContainer>
-            <Table maxWidth="max-w-2xl">
-              <TableHeader>Categories</TableHeader>
-              <TableBody
-                data={categories}
-                render={(category: Category) => (
-                  <TableRow key={category._id}>
-                    <ItemTitle>{category.title}</ItemTitle>
-                    <AdminActions
-                      item={category}
-                      onDelete={actions.deleteCategory.bind(null, category._id)}
-                      editForm={
-                        <AddEditCategoryForm
-                          isEditSession={true}
-                          category={category}
-                        />
-                      }
-                    />
-                  </TableRow>
-                )}
-              />
-            </Table>
-          </TableContainer>
+          <div>
+            <TableContainer>
+              <Table maxWidth="max-w-2xl">
+                <TableHeader>Categories</TableHeader>
+                <TableBody
+                  data={categories}
+                  render={(category: Category) => (
+                    <TableRow key={category._id}>
+                      <ItemTitle>{category.title}</ItemTitle>
+                      <AdminActions
+                        item={category}
+                        onDelete={actions.deleteCategory.bind(
+                          null,
+                          category._id
+                        )}
+                        editForm={
+                          <AddEditCategoryForm
+                            isEditSession={true}
+                            category={category}
+                          />
+                        }
+                      />
+                    </TableRow>
+                  )}
+                />
+              </Table>
+            </TableContainer>
+          </div>
         </div>
-      </section>
+      </div>
     </>
   );
 }

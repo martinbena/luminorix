@@ -17,11 +17,11 @@ export default function UserOrdersPage({ searchParams }: UserOrdersPageProps) {
   return (
     <>
       <HeadingSecondary>Your orders</HeadingSecondary>
-      <section className="mt-12 max-w-5xl mx-auto">
+      <div className="mt-12">
         <Suspense fallback={<UserOrdersSkeleton />}>
           <UserOrders searchParams={searchParams} />
         </Suspense>
-      </section>
+      </div>
     </>
   );
 }

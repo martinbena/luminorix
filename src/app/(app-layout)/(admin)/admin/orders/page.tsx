@@ -42,7 +42,7 @@ export default async function AdminOrdersPage({
     <>
       <HeadingSecondary>Manage orders</HeadingSecondary>
 
-      <section className="mt-12 py-8 flex flex-col gap-16 max-w-5xl mx-auto">
+      <div className="mt-12 py-8 flex flex-col gap-16">
         <OrderFilters filterField="deliveryStatus" options={statusCounts} />
         <div>
           <TableContainer>
@@ -110,7 +110,7 @@ export default async function AdminOrdersPage({
             </Table>
           </TableContainer>
         </div>
-      </section>
+      </div>
     </>
   );
 }

@@ -19,7 +19,7 @@ export default function AdminLayout({
     <>
       <Navbar mode="admin" />
       <main className="bg-white text-zinc-800 p-8 mob-lg:px-4 min-h-[65vh]">
-        {children}
+        <section className="max-w-5xl mx-auto">{children}</section>
       </main>
     </>
   );

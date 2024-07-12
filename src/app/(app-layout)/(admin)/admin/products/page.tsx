@@ -48,7 +48,7 @@ export default async function AdminAllProductsPage({
   return (
     <>
       <HeadingSecondary>Manage all products</HeadingSecondary>
-      <section className="mt-12 py-8 mob:mt-8 [&>*:nth-child(2)]:mt-12 mob:[&>*:nth-child(2)]:mt-4 max-w-5xl mx-auto">
+      <div className="mt-12 py-8 mob:mt-8 [&>*:nth-child(2)]:mt-12 mob:[&>*:nth-child(2)]:mt-4">
         <div className="flex justify-between mob:flex-col mob:gap-8 items-center mob:items-start">
           <div>
             <Button type="secondary" href={paths.adminProductCreate()}>
@@ -126,7 +126,7 @@ export default async function AdminAllProductsPage({
             </TableFooter>
           </Table>
         </TableContainer>
-      </section>
+      </div>
     </>
   );
 }

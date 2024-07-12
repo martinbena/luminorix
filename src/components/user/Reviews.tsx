@@ -26,7 +26,7 @@ export default async function Reviews() {
   return (
     <>
       {reviews.length > 0 ? (
-        <ul className="max-w-5xl mx-auto flex flex-col gap-6">
+        <ul className="flex flex-col gap-6">
           {reviews.map((item) => {
             return (
               <li key={item.title} className="flex border border-amber-500">

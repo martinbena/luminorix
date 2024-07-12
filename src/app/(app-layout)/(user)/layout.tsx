@@ -19,7 +19,7 @@ export default function UserLayout({
     <>
       <Navbar mode="user" />
       <main className="bg-white text-zinc-800 mob-lg:px-4 p-8 min-h-[65vh]">
-        {children}
+        <section className="max-w-5xl mx-auto">{children}</section>
       </main>
     </>
   );

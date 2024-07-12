@@ -10,7 +10,7 @@ export default async function Wishlist() {
   return (
     <>
       {wishlist.length > 0 ? (
-        <ul className="border border-zinc-300 max-w-5xl mx-auto rounded-md">
+        <ul className="border border-zinc-300 rounded-md">
           <WishlistItems
             wishlist={JSON.parse(JSON.stringify(wishlist))}
             count={count}
