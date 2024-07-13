@@ -45,9 +45,15 @@ interface SubmitButtonProps {
   children: ReactNode;
   width?: string;
   type?: "primary" | "secondary" | "tertiary";
+  isDisabled?: boolean;
 }
 
-function SubmitButton({ children, width, type }: SubmitButtonProps) {
+function SubmitButton({
+  children,
+  width,
+  type,
+  isDisabled,
+}: SubmitButtonProps) {
   const { pending } = useFormStatus();
 
   return (
@@ -55,7 +61,7 @@ function SubmitButton({ children, width, type }: SubmitButtonProps) {
       <Button
         type={type ?? "primary"}
         beforeBackground="before:bg-white"
-        disabled={pending}
+        disabled={pending || isDisabled}
       >
         {!pending ? (
           children
@@ -185,7 +191,12 @@ function InputGroup({
           {...commonProps}
           ref={inputRef}
           {...(inputType === "checkbox" ? { defaultChecked: checked } : {})}
-          {...(inputType === "text" && isReadOnly ? { readOnly: true } : {})}
+          {...((inputType === "text" ||
+            inputType === "password" ||
+            inputType === "email") &&
+          isReadOnly
+            ? { readOnly: true }
+            : {})}
         />
       )}
       {error && <Error>{error?.join(" | ")}</Error>}
@@ -198,6 +209,7 @@ interface ImagePickerProps {
   error: string[] | undefined;
   optionalField?: boolean;
   isReset: boolean;
+  isDisabled?: boolean;
 }
 
 function ImagePicker({
@@ -205,6 +217,7 @@ function ImagePicker({
   error,
   optionalField = false,
   isReset,
+  isDisabled,
 }: ImagePickerProps) {
   const [pickedImage, setPickedImage] = useState<string | null>(null);
   const imageInput = useRef<HTMLInputElement>(null);
@@ -291,8 +304,13 @@ function ImagePicker({
           name={name}
           ref={imageInput}
           onChange={handleImageChange}
+          disabled={isDisabled}
         />
-        <Button type="secondary" onClick={handlePickClick}>
+        <Button
+          disabled={isDisabled}
+          type="secondary"
+          onClick={handlePickClick}
+        >
           Pick Image
         </Button>
       </div>

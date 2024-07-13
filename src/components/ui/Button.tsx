@@ -21,20 +21,25 @@ export default function Button({
   beforeBackground,
 }: ButtonProps) {
   let buttonStyle =
-    "relative uppercase py-3 px-4 min-w-24 min-h-11 tracking-[0.2em] font-serif transition-all duration-[400ms] ease-in-out text-center";
+    "relative uppercase py-3 px-4 min-w-24 min-h-11 tracking-[0.2em] font-serif transition-all duration-[400ms] ease-in-out text-center disabled:opacity-70 disabled:cursor-not-allowed";
 
   switch (type) {
     case "primary":
-      buttonStyle += ` before:shadow-button bg-zinc-800 text-zinc-200 hover:text-zinc-800 hover:font-medium before:content-[''] before:absolute before:top-0 before:left-0 before:h-full before:w-0 before:transition-all before:duration-500 hover:before:w-full ${beforeBackground} ${
-        disabled ? "cursor-not-allowed" : ""
+      buttonStyle += ` before:shadow-button bg-zinc-800 text-zinc-200 before:content-[''] before:absolute before:top-0 before:left-0 before:h-full before:w-0 before:transition-all before:duration-500  ${beforeBackground} ${
+        !disabled
+          ? "hover:text-zinc-800 hover:before:w-full hover:font-medium"
+          : ""
       }`;
       break;
     case "secondary":
-      buttonStyle += " bg-amber-300 text-zinc-800 hover:bg-amber-400";
+      buttonStyle += ` bg-amber-300 text-zinc-800 ${
+        !disabled ? "hover:bg-amber-400" : ""
+      }`;
       break;
     case "tertiary":
-      buttonStyle +=
-        " shadow-button bg-transparent text-zinc-800 hover:shadow-button-hover font-medium";
+      buttonStyle += ` shadow-button bg-transparent text-zinc-800 font-medium ${
+        !disabled ? "hover:shadow-button-hover" : ""
+      }`;
       break;
     default:
       buttonStyle;

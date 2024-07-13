@@ -53,7 +53,18 @@ export const authConfig: NextAuthConfig = {
       }
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update" && session) {
+        token = {
+          ...token,
+          name: session.name,
+          email: session.email,
+          image: session.image,
+          user: session,
+        };
+        return token;
+      }
+
       if (user) {
         await ConnectDB();
         const userByEmail = await User.findOne({ email: user.email });
@@ -61,6 +72,8 @@ export const authConfig: NextAuthConfig = {
         userByEmail.resetCode = undefined;
         userByEmail.wishlist = undefined;
         token.user = userByEmail;
+
+        return token;
       }
       return token;
     },

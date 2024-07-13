@@ -58,6 +58,14 @@ export async function registerUser(
     };
   }
 
+  if (result.data.email.includes("@gmail.com")) {
+    return {
+      errors: {
+        _form: ["To use Gmail, please login with Google"],
+      },
+    };
+  }
+
   try {
     await ConnectDB();
 
