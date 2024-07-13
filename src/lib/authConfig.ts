@@ -50,6 +50,11 @@ export const authConfig: NextAuthConfig = {
             image: picture,
           });
         }
+        if (dbUser && (name !== dbUser.name || picture !== dbUser.image)) {
+          dbUser.image = picture;
+          dbUser.name = name;
+          await dbUser.save();
+        }
       }
       return true;
     },
