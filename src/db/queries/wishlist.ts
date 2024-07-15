@@ -27,26 +27,6 @@ interface WishlistResponse {
   count: number;
 }
 
-// export async function getAllWishlistedItems(
-//   userId: ObjectId | undefined
-// ): Promise<WishlistResponse> {
-//   try {
-//     await ConnectDB();
-
-//     const user = await User.findById(userId).select("wishlist").populate({
-//       path: "wishlist.category",
-//       model: "Category",
-//     });
-//     if (!user) {
-//       throw new Error("User not found");
-//     }
-//     return { wishlist: user.wishlist, count: user.wishlist.length };
-//   } catch (error) {
-//     console.error(error);
-//     throw new Error("Could not get user's wishlist");
-//   }
-// }
-
 export async function getAllWishlistedItems(
   userId: ObjectId | undefined
 ): Promise<WishlistResponse> {

@@ -15,13 +15,13 @@ export interface UserOrdersPageProps {
 
 export default function UserOrdersPage({ searchParams }: UserOrdersPageProps) {
   return (
-    <>
+    <section className="max-w-5xl mx-auto">
       <HeadingSecondary>Your orders</HeadingSecondary>
       <div className="mt-12">
         <Suspense fallback={<UserOrdersSkeleton />}>
           <UserOrders searchParams={searchParams} />
         </Suspense>
       </div>
-    </>
+    </section>
   );
 }

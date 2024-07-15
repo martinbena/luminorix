@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 
 export default function UserReviewsPage() {
   return (
-    <>
+    <section className="max-w-5xl mx-auto">
       <HeadingSecondary>Your reviews</HeadingSecondary>
       <div className="mt-12">
         <Suspense fallback={<ReviewsSkeleton />}>
           <Reviews />
         </Suspense>
       </div>
-    </>
+    </section>
   );
 }

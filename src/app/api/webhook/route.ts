@@ -5,6 +5,7 @@ import {
   updateProductAndVariantSold,
   updateVariantStockBySku,
 } from "@/db/queries/products";
+import { Category } from "@/models/Category";
 import Order, { CartSession, LineItem } from "@/models/Order";
 import User, { WishlistItem } from "@/models/User";
 import { NextResponse, NextRequest } from "next/server";
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
             brand: product.brand,
             stock: product.stock,
             freeShipping: product.freeShipping,
-            category: product.category,
+            category: (product.category as Category).title,
           };
           return map;
         }, {} as ProductMap);
@@ -91,7 +92,7 @@ export async function POST(req: NextRequest) {
           delivery_telephone: telephone,
           delivery_email: chargeSucceeded.receipt_email,
           cartItems: cartItemsWithProductDetails,
-          success_token: sessionId
+          success_token: sessionId,
         };
 
         await Order.create(orderData);

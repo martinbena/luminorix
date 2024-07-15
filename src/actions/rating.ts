@@ -8,6 +8,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { DeleteItemState } from "./category";
 import paths from "@/lib/paths";
+import Order from "@/models/Order";
 
 const productRatingSchema = z.object({
   rating: z.preprocess(
@@ -89,18 +90,21 @@ export async function addRating(
       };
     }
 
-    // const userPurchased = await Order.findOne({
-    //   userId: token.user._id,
-    //   "cartItems._id": productId,
-    // });
+    const userPurchased = await Order.findOne({
+      userId: session.user._id,
+      "cartItems._id": product._id,
+      delivery_status: "Delivered",
+    });
 
-    // if (userPurchased) {
-    //   return {
-    //     errors: {
-    //       _form: ["You can only leave rating for products you have purchased"],
-    //     },
-    //   };
-    // }
+    if (!userPurchased) {
+      return {
+        errors: {
+          _form: [
+            "You can only leave rating for products you have purchased and got delivered",
+          ],
+        },
+      };
+    }
 
     product.ratings.push({
       rating: result.data.rating,
@@ -110,6 +114,7 @@ export async function addRating(
     await product.save();
 
     revalidatePath(`/${result.data.productSlug}`, "layout");
+    revalidatePath(paths.userProfile());
     return {
       errors: {},
       success: true,
@@ -209,7 +214,7 @@ export async function deleteRating(
   userId: string
 ): Promise<DeleteItemState> {
   try {
-    await ConnectDB();    
+    await ConnectDB();
     const result = await Product.updateOne(
       { slug: productSlug },
       { $pull: { ratings: { postedBy: new mongoose.Types.ObjectId(userId) } } }

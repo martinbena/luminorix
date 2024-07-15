@@ -80,7 +80,7 @@ export interface Product extends Document {
   description: string;
   brand: string;
   freeShipping: boolean;
-  category: Types.ObjectId | Category;
+  category: Types.ObjectId | Category | string;
   soldTotal: number;
   variants: Variant[];
   ratings: Rating[];

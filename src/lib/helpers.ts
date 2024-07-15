@@ -6,6 +6,18 @@ export const formatCurrency = (value: number) =>
     value
   );
 
+export const formatLargeCurrency = (value: number) => {
+  if (value < 1000) {
+    return `$${value}`;
+  } else if (value >= 1000 && value < 1000000) {
+    const thousandValue = (value / 1000).toFixed(2);
+    return `$${thousandValue}K`;
+  } else {
+    const millionValue = (value / 1000000).toFixed(2);
+    return `$${millionValue}M`;
+  }
+};
+
 export const formatNumber = (number: string | number) => {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,

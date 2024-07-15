@@ -17,7 +17,9 @@ export default async function Wishlist() {
           />
         </ul>
       ) : (
-        <EmptyItemList message="Your wishlist is empty" />
+        <div className="mt-40">
+          <EmptyItemList message="Your wishlist is empty" />
+        </div>
       )}
     </>
   );

@@ -1,3 +1,4 @@
+import { SKELETON_EFFECT } from "@/lib/constants";
 import { SkeletonAvatar } from "skeleton-elements/react";
 
 export default function UserLoadingSkeleton() {
@@ -8,7 +9,7 @@ export default function UserLoadingSkeleton() {
           size={48}
           color="#d4d4d4"
           iconColor="#27272A"
-          effect="wave"
+          effect={SKELETON_EFFECT}
           tag="span"
           showIcon={false}
           borderRadius="50%"
@@ -19,7 +20,7 @@ export default function UserLoadingSkeleton() {
           size={48}
           color="#d4d4d4"
           iconColor="#27272A"
-          effect="wave"
+          effect={SKELETON_EFFECT}
           tag="span"
           showIcon={true}
           borderRadius="50%"

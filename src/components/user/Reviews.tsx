@@ -13,9 +13,8 @@ interface SlugSkuPairs {
 
 export default async function Reviews() {
   const session = await auth();
-  const reviews = session?.user
-    ? await getUserReviews(session?.user._id.toString())
-    : [];
+
+  const { reviews } = await getUserReviews(session!.user._id.toString());
   const slugSkuPairs: SlugSkuPairs = {};
   for (const review of reviews) {
     const { slug } = review;

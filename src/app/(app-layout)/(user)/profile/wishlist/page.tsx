@@ -11,13 +11,13 @@ export const metadata: Metadata = {
 
 export default async function UserWishlistPage() {
   return (
-    <>
+    <section className="max-w-5xl mx-auto">
       <HeadingSecondary>Your Wishlist</HeadingSecondary>
       <div className="mt-12">
         <Suspense fallback={<WishlistSkeleton />}>
           <Wishlist />
         </Suspense>
       </div>
-    </>
+    </section>
   );
 }

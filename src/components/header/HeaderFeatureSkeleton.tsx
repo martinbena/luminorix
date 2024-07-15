@@ -6,12 +6,12 @@ export default function HeaderFeatureSkeleton() {
   return (
     <div>
       <div className="[&>*:nth-child(1)]:h-16 [&>*:nth-child(1)]:w-16 tab-xl:[&>*:nth-child(1)]:h-12 tab-xl:[&>*:nth-child(1)]:w-12 mob:[&>*:nth-child(1)]:w-9 mob:[&>*:nth-child(1)]:h-9 flex items-center gap-3 tab-xl:[&>*:nth-child(2)]:hidden">
-        <div className="pl-[0.1px] bg-amber-200 rounded-[25%]">
+        <div className="pl-[0.1px] bg-amber-200 rounded-full">
           <SkeletonBlock
             tag="span"
             height="100%"
             width="100%"
-            borderRadius="25%"
+            borderRadius="50%"
             effect={SKELETON_EFFECT}
           />
         </div>

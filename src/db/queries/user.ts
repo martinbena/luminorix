@@ -8,30 +8,47 @@ export interface UserRating {
   review: Rating;
 }
 
-export async function getUserReviews(userId: string): Promise<UserRating[]> {
+export interface UserReviewsResponse {
+  reviews: UserRating[];
+  totalReviews: number;
+}
+
+export async function getUserReviews(
+  userId: string
+): Promise<UserReviewsResponse> {
   try {
     await ConnectDB();
 
-    const reviews = await Product.aggregate([
+    const results = await Product.aggregate([
       { $unwind: "$ratings" },
       { $match: { "ratings.postedBy": new mongoose.Types.ObjectId(userId) } },
       {
-        $project: {
-          _id: 0,
-          title: 1,
-          slug: 1,
-          review: {
-            rating: "$ratings.rating",
-            comment: "$ratings.comment",
-            postedBy: "$ratings.postedBy",
-            createdAt: "$ratings.createdAt",
-            updatedAt: "$ratings.updatedAt",
-          },
+        $facet: {
+          reviews: [
+            {
+              $project: {
+                _id: 0,
+                title: 1,
+                slug: 1,
+                review: {
+                  rating: "$ratings.rating",
+                  comment: "$ratings.comment",
+                  postedBy: "$ratings.postedBy",
+                  createdAt: "$ratings.createdAt",
+                  updatedAt: "$ratings.updatedAt",
+                },
+              },
+            },
+          ],
+          totalReviews: [{ $count: "count" }],
         },
       },
     ]);
 
-    return reviews;
+    const reviews = results[0].reviews;
+    const totalReviews = results[0].totalReviews[0]?.count ?? 0;
+
+    return { reviews, totalReviews };
   } catch (error) {
     console.error("Error fetching user reviews:", error);
     throw error;

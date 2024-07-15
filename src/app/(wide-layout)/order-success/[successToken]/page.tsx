@@ -31,7 +31,7 @@ export default async function OrderSuccessPage({
   return (
     <section className="max-w-5xl mx-auto font-sans">
       <Navigation />
-      <Headings id={id.toString()} />
+      <Headings id={id.toString().slice(-5)} />
       <OrderDetails order={order} />
       <OrderSummary cartItems={cartItems} />
       <TotalPrice price={totalPrice} />

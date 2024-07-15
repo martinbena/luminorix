@@ -67,6 +67,7 @@ export async function toggleWishlistProduct(slug: string, sku: string) {
     };
   } finally {
     revalidatePath(paths.userWishlist());
+    revalidatePath(paths.userProfile());
     revalidatePath(paths.productShow(slug, sku));
   }
 }

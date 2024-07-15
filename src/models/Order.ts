@@ -3,9 +3,11 @@ import mongoose from "mongoose";
 import Product from "./Product";
 import User from "./User";
 import { Document } from "mongoose";
+import CategoryModel from "./Category";
 
 export interface CartItemSchema extends CartProductProps {
   quantity: number;
+  createdAt: Date;
 }
 
 const cartItemSchema = new mongoose.Schema<CartItemSchema>(
@@ -25,6 +27,8 @@ const cartItemSchema = new mongoose.Schema<CartItemSchema>(
     stock: Number,
     freeShipping: Boolean,
     quantity: Number,
+    category: String,
+    createdAt: Date,
   },
   { timestamps: true }
 );
