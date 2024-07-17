@@ -1,3 +1,12 @@
+import Dashboard from "@/components/admin/Dashboard";
+import DashboardLayout from "@/components/admin/DashboardLayout";
+
+export const revalidate = 300;
+
 export default function AdminPage() {
-  return <div>AdminPage</div>;
+  return (
+    <DashboardLayout>
+      <Dashboard />
+    </DashboardLayout>
+  );
 }

@@ -44,7 +44,7 @@ function Title({ children, textAlign = "center" }: TitleProps) {
 interface SubmitButtonProps {
   children: ReactNode;
   width?: string;
-  type?: "primary" | "secondary" | "tertiary";
+  type?: "primary" | "secondary" | "tertiary" | "small";
   isDisabled?: boolean;
 }
 
@@ -55,6 +55,22 @@ function SubmitButton({
   isDisabled,
 }: SubmitButtonProps) {
   const { pending } = useFormStatus();
+
+  if (type === "small")
+    return (
+      <button
+        className="py-1 px-2 min-h-7 min-w-20 bg-sky-700 w-full hover:bg-sky-600 text-white rounded-md uppercase font-semibold disabled:opacity-75"
+        disabled={pending || isDisabled}
+      >
+        {!pending ? (
+          children
+        ) : (
+          <div className="flex justify-center">
+            <div className="form__loader" />
+          </div>
+        )}
+      </button>
+    );
 
   return (
     <div className={`child:w-full ${width}`}>

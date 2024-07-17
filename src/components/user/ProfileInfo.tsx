@@ -38,7 +38,7 @@ export default function ProfileInfo({ user }: ProfileInfoProps) {
         } py-4`}
       >
         <div className="flex flex-col gap-4">
-          <p className="font-semibold text-3xl mob:text-2xl">{user.name}</p>
+          <h2 className="font-semibold text-3xl mob:text-2xl">{user.name}</h2>
           <p className="font-medium text-base mob:text-sm">{user.email}</p>
         </div>
 

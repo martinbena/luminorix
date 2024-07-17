@@ -15,7 +15,7 @@ export default async function AdminAddProductPage() {
   const products = await getAllProducts();
 
   return (
-    <section className="[&>*:nth-child(2)]:my-20">
+    <section className="[&>*:nth-child(2)]:my-20 max-w-2xl mx-auto">
       <Button type="secondary" href={paths.adminProductShow()}>
         Back to all products
       </Button>

@@ -1,12 +1,13 @@
 "use client";
 
 import { Rating } from "@/models/Product";
+import { formatDistanceToNowStrict } from "date-fns";
 import Image from "next/image";
-import UserImagePlaceholder from "/public/images/UserImagePlaceholder.jpg";
-import Stars from "./Stars";
-import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import Button from "../ui/Button";
+import Stars from "./Stars";
+import UserImagePlaceholder from "/public/images/UserImagePlaceholder.jpg";
+import { PiClock } from "react-icons/pi";
 
 interface RatingsProps {
   ratings: Rating[];
@@ -37,11 +38,12 @@ export default function Ratings({ ratings }: RatingsProps) {
               className="rounded-full justify-self-center mob:justify-self-start"
             />
             <div className="flex flex-col justify-between">
-              <p className="text-base">{rating.postedBy.name}</p>
+              <p className="text-base font-medium">{rating.postedBy.name}</p>
               <Stars rating={rating.rating} />
             </div>
-            <p className="self-end mob:text-xs">
-              {formatDistanceToNow(new Date(rating.createdAt))} ago
+            <p className="self-end mob:text-xs flex gap-1 items-center text-zinc-500">
+              <PiClock />{" "}
+              {formatDistanceToNowStrict(new Date(rating.createdAt))} ago
             </p>
             <span className="mob:hidden">&nbsp;</span>
             <div className="text-base mob:col-span-3">{rating.comment}</div>

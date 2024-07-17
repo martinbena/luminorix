@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 
-interface ProfileStatProps {
+interface DashboardStatProps {
   color: string;
   iconColor: string;
   icon: ReactElement;
@@ -8,13 +8,13 @@ interface ProfileStatProps {
   value: number | string;
 }
 
-export default function ProfileStat({
+export default function DashboardStat({
   color,
   icon,
   iconColor,
   title,
   value,
-}: ProfileStatProps) {
+}: DashboardStatProps) {
   return (
     <div className="p-4 flex items-center gap-4 shadow-form rounded-md">
       <div

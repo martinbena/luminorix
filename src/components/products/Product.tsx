@@ -46,6 +46,7 @@ export default function Product({
       <Link
         className="relative aspect-square overflow-hidden"
         href={paths.productShow(slug, sku)}
+        tabIndex={-1}
       >
         <Image
           src={image}

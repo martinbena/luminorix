@@ -39,7 +39,7 @@ export default async function AdminOrdersPage({
     "grid-cols-[0.6fr_1fr_2.4fr_1.4fr_1fr_0.4fr] mob-lg:grid-cols-[0.6fr_1fr_2.4fr_1.4fr_0.4fr] mob:grid-cols-[0.6fr_1fr_2.4fr_0.4fr] mob-sm:grid-cols-[0.6fr_1fr_0.4fr]";
 
   return (
-    <>
+    <section className="max-w-5xl mx-auto">
       <HeadingSecondary>Manage orders</HeadingSecondary>
 
       <div className="mt-12 py-8 flex flex-col gap-16">
@@ -111,6 +111,6 @@ export default async function AdminOrdersPage({
           </TableContainer>
         </div>
       </div>
-    </>
+    </section>
   );
 }

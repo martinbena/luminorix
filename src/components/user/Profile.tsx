@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
-import ProfileFeature from "@/components/user/ProfileFeature";
+import DashboardFeature from "@/components/admin/DashboardFeature";
+import DashboardStats from "@/components/admin/DashboardStats";
 import ProfileInfo from "@/components/user/ProfileInfo";
-import ProfileStats from "@/components/user/ProfileStats";
 import RecentOrders from "@/components/user/RecentOrders";
 import SpendingsChart from "@/components/user/SpendingsChart";
 import { getOrders, getRecentCartItemsByUserId } from "@/db/queries/orders";
@@ -24,7 +24,8 @@ export default async function Profile() {
   return (
     <>
       <ProfileInfo user={user} />
-      <ProfileStats
+      <DashboardStats
+        mode="user"
         orderCount={totalOrdersCount}
         totalSpent={totalSpent}
         wishlistCount={wishlistCount}
@@ -32,12 +33,12 @@ export default async function Profile() {
       />
 
       <div className="grid grid-cols-2 gap-4 tab-xl:grid-cols-1">
-        <ProfileFeature title="Recent orders">
+        <DashboardFeature title="Recent orders">
           <RecentOrders recentOrderItems={recentOrderItems} />
-        </ProfileFeature>
-        <ProfileFeature title="Spending stats">
+        </DashboardFeature>
+        <DashboardFeature title="Spending stats">
           <SpendingsChart data={categoryCounts} />
-        </ProfileFeature>
+        </DashboardFeature>
       </div>
     </>
   );

@@ -46,7 +46,7 @@ export default async function AdminAllProductsPage({
   const tableColumns =
     "grid-cols-[0.6fr_2.5fr_1.2fr_1.5fr_1fr_0.4fr] mob-lg:grid-cols-[0.6fr_3fr_1.7fr_1.5fr_0.4fr] mob:grid-cols-[0.6fr_4fr_2.2fr_0.4fr] mob-sm:grid-cols-[0.6fr_6.2fr_0.4fr]";
   return (
-    <>
+    <section className="max-w-5xl mx-auto">
       <HeadingSecondary>Manage all products</HeadingSecondary>
       <div className="mt-12 py-8 mob:mt-8 [&>*:nth-child(2)]:mt-12 mob:[&>*:nth-child(2)]:mt-4">
         <div className="flex justify-between mob:flex-col mob:gap-8 items-center mob:items-start">
@@ -127,6 +127,6 @@ export default async function AdminAllProductsPage({
           </Table>
         </TableContainer>
       </div>
-    </>
+    </section>
   );
 }

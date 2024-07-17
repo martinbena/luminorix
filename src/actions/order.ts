@@ -306,6 +306,7 @@ export async function cancelOrder(id: string): Promise<DeleteItemState> {
     }
 
     revalidatePath(paths.userOrderShowAll());
+    revalidatePath(paths.admin());
     revalidatePath(paths.adminOrderShow());
     revalidatePath(paths.orderSuccess(updatedOrder.success_token));
     return {
@@ -477,6 +478,7 @@ export async function editOrder(
       }
     }
 
+    revalidatePath(paths.admin());
     revalidatePath(paths.adminOrderShow());
     revalidatePath(paths.userOrderShowAll());
     revalidatePath(paths.orderSuccess(updatedOrder.success_token));
@@ -496,6 +498,67 @@ export async function editOrder(
         errors: {
           _form: ["Something went wrong"],
         },
+      };
+    }
+  }
+}
+
+interface ProcessOrderFormState {
+  error: string;
+}
+
+export async function processOrder(
+  id: mongoose.Types.ObjectId,
+  formState: ProcessOrderFormState,
+  formData: FormData
+): Promise<ProcessOrderFormState> {
+  const session = await auth();
+  if (session?.user.role !== "admin") {
+    return {
+      error: "You are not authorized to do this",
+    };
+  }
+
+  try {
+    await ConnectDB();
+
+    const updatedOrder = await Order.findById(id);
+
+    if (!updatedOrder) {
+      return {
+        error: "Order not found",
+      };
+    }
+
+    const { delivery_status: deliveryStatus } = updatedOrder;
+
+    if (deliveryStatus !== "Not Processed") {
+      return { error: "This order cannot be edited" };
+    }
+
+    updatedOrder.delivery_status = "Processing";
+
+    await updatedOrder.save();
+
+    revalidatePath(paths.admin());
+    revalidatePath(paths.adminOrderShow());
+    revalidatePath(paths.userOrderShowAll());
+    revalidatePath(paths.orderSuccess(updatedOrder.success_token));
+
+    return {
+      error: "",
+    };
+  } catch (error: unknown) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+      };
+    } else {
+      return {
+        error: "Something went wrong",
       };
     }
   }

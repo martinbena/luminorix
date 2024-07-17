@@ -184,7 +184,7 @@ export async function removeVariantFromProduct(
     const variant = product.variants.find((v: VariantType) => v.sku === sku);
     await removeImageFromCloudinary(variant.image);
 
-    revalidatePath("/", "layout");
+    revalidatePath(paths.home(), "layout");
     return {
       success: true,
     };
