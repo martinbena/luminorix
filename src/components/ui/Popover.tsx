@@ -101,7 +101,7 @@ function Row<C extends ElementType>({
 
   return (
     <MenuItem
-      className="block w-full px-4 py-2 text-sm text-zinc-800 focus:outline-none focus:bg-amber-200 hover:bg-amber-200 transition-colors duration-200 ease-out"
+      className="block w-full px-4 py-2 text-sm text-zinc-800 tracking-wider focus:outline-none focus:bg-amber-200 hover:bg-amber-200 transition-colors duration-200 ease-out"
       role="menuitem"
       onClick={props.type === "submit" ? undefined : handleClick}
       {...props}

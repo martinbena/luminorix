@@ -4,7 +4,13 @@ import paths from "@/lib/paths";
 import Link from "next/link";
 import UserMenuImage from "./UserMenuImage";
 import { useSession } from "next-auth/react";
-import { PiBellFill, PiCrownSimpleFill, PiPowerBold } from "react-icons/pi";
+import {
+  PiBellFill,
+  PiCrownSimpleFill,
+  PiPackageDuotone,
+  PiPackageFill,
+  PiPowerBold,
+} from "react-icons/pi";
 import Image from "next/image";
 import { HiUser } from "react-icons/hi";
 import Popover from "../ui/Popover";
@@ -59,10 +65,10 @@ export default function UserMenu() {
 
           <Popover.Row
             as={Link}
-            href={paths.userSettings()}
-            icon={<HiMiniCog6Tooth />}
+            href={paths.userOrderShowAll()}
+            icon={<PiPackageFill />}
           >
-            Settings
+            Orders
           </Popover.Row>
 
           <form action={actions.signOut}>

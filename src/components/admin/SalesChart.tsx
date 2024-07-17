@@ -2,13 +2,12 @@
 
 import { CategoryCount } from "@/db/queries/orders";
 import { formatLargeCurrency } from "@/lib/helpers";
-import { PiChartPieSliceLight } from "react-icons/pi";
+import { PiChartBarLight } from "react-icons/pi";
 import {
   Bar,
   BarChart,
   CartesianGrid,
   ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
@@ -22,7 +21,7 @@ export default function SalesChart({ data }: SalesChartProps) {
   if (!data.length)
     return (
       <EmptyItemList
-        icon={<PiChartPieSliceLight />}
+        icon={<PiChartBarLight />}
         message="No data can be shown right now"
       />
     );
@@ -31,7 +30,7 @@ export default function SalesChart({ data }: SalesChartProps) {
 
   return (
     <div className="overflow-x-auto pb-2">
-      <div style={{ minWidth: data.length * 100 }}>
+      <div style={{ minWidth: data.length * 150 }}>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData}>
             <XAxis dataKey="category" tick={<CustomAxisTick />} />

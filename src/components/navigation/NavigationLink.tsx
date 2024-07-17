@@ -3,17 +3,20 @@
 import { useMergedSearchParams } from "@/lib/helpers";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
+import { ReactElement } from "react";
 
 interface NavigationLinkProps {
   href: string;
   description: string;
   activeClasses?: string;
+  icon?: ReactElement;
 }
 
 export default function NavigationLink({
   href,
   description,
   activeClasses = "bg-amber-200",
+  icon,
 }: NavigationLinkProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams().toString();
@@ -32,9 +35,13 @@ export default function NavigationLink({
         href.split("?").some((param) => searchParams.includes(param))));
 
   return (
-    <li className="child:flex child:flex-1 child:py-2.5 child:pl-12">
+    <li>
       <Link
-        className={`${isActive ? `${activeClasses}` : ""}`}
+        className={`${isActive ? `${activeClasses}` : ""} flex flex-1 py-2.5 ${
+          icon
+            ? "gap-4 pl-8 items-center [&>*:nth-child(1)]:h-6 [&>*:nth-child(1)]:w-6 [&>*:nth-child(1)]:text-zinc-800"
+            : "pl-12"
+        } `}
         href={
           href.split("?").some((param) => searchParams.includes(param)) ||
           (!href.includes("?") && !searchParams.includes("category"))
@@ -42,6 +49,7 @@ export default function NavigationLink({
             : href
         }
       >
+        {icon && icon}
         {description}
       </Link>
     </li>
