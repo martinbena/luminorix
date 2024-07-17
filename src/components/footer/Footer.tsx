@@ -34,7 +34,8 @@ export default function Footer() {
 
       <Media />
 
-      <div className="flex justify-between text-zinc-800 font-sans gap-8 mob-lg:flex-col">
+      {/* <div className="flex justify-between text-zinc-800 font-sans gap-8 mob-lg:flex-col"> */}
+      <div className="grid grid-cols-[2fr_1fr] text-zinc-800 font-sans gap-8 mob-lg:grid-cols-1">
         <AboutUs />
         <Newsletter />
       </div>

@@ -1,21 +1,19 @@
 "use client";
 
+import * as actions from "@/actions";
 import paths from "@/lib/paths";
-import Link from "next/link";
-import UserMenuImage from "./UserMenuImage";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
+import Link from "next/link";
+import { HiUser } from "react-icons/hi";
 import {
   PiBellFill,
   PiCrownSimpleFill,
-  PiPackageDuotone,
   PiPackageFill,
   PiPowerBold,
 } from "react-icons/pi";
-import Image from "next/image";
-import { HiUser } from "react-icons/hi";
 import Popover from "../ui/Popover";
-import { HiMiniCog6Tooth } from "react-icons/hi2";
-import * as actions from "@/actions";
+import UserMenuImage from "./UserMenuImage";
 
 export default function UserMenu() {
   const session = useSession();
@@ -60,7 +58,7 @@ export default function UserMenu() {
           )}
 
           <Popover.Row as={Link} href={paths.userProfile()} icon={<HiUser />}>
-            Your Profile
+            Profile
           </Popover.Row>
 
           <Popover.Row

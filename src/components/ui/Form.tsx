@@ -123,7 +123,7 @@ interface InputGroupProps {
   inputType: string;
   placeholder?: string;
   error: string[] | undefined;
-  children: ReactNode;
+  children?: ReactNode;
   value?: string | number;
   inputRef?: React.RefObject<HTMLInputElement>;
   textareaRef?: React.RefObject<HTMLTextAreaElement>;
@@ -170,20 +170,22 @@ function InputGroup({
           : "flex-col gap-4"
       } flex `}
     >
-      <label
-        className={`${!optionalField ? "flex" : ""} ${
-          error ? "text-red-600" : ""
-        }`}
-        htmlFor={name}
-      >
-        <span>{children}</span>{" "}
-        {!optionalField ? (
-          <span>
-            {" "}
-            <FaStarOfLife className="ml-1 h-1.5 w-1.5 text-red-500" />{" "}
-          </span>
-        ) : null}
-      </label>{" "}
+      {children && (
+        <label
+          className={`${!optionalField ? "flex" : ""} ${
+            error ? "text-red-600" : ""
+          }`}
+          htmlFor={name}
+        >
+          <span>{children}</span>{" "}
+          {!optionalField ? (
+            <span>
+              {" "}
+              <FaStarOfLife className="ml-1 h-1.5 w-1.5 text-red-500" />{" "}
+            </span>
+          ) : null}
+        </label>
+      )}{" "}
       {inputType === "textarea" ? (
         <textarea {...commonProps} rows={4} ref={textareaRef} />
       ) : inputType === "select" ? (

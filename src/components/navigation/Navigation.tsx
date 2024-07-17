@@ -25,7 +25,7 @@ export default function Navigation({ mode }: NavigationProps) {
   return (
     <nav
       className={`text-zinc-800 uppercase transition-all duration-1000 ease-out bg-white child:py-6 child:flex child:flex-col child:gap-2 ${
-        mode === "shop" ? "tracking-[0.2em]" : "font-medium tracking-[0.15em]"
+        mode === "shop" ? "tracking-[0.2em]" : "tracking-[0.15em]"
       }`}
     >
       <Suspense>

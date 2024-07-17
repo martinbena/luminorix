@@ -21,3 +21,4 @@ export { editOrder } from "./order";
 export { processOrder } from "./order";
 export { editAccount } from "./user";
 export { changePassword } from "./user";
+export { newsletterSubscribe } from "./newsletter";
