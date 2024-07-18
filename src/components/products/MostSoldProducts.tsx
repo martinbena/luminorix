@@ -48,6 +48,7 @@ export default async function MostSoldProducts({
                     fill
                     alt={title}
                     className="object-fit"
+                    sizes="50vw"
                   />
                 </div>
               </div>

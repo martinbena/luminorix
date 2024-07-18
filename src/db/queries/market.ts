@@ -18,6 +18,7 @@ export async function getMarketItems({
   searchParams: { page: string };
   limit: boolean;
 }): Promise<MarketItemsResult> {
+  await new Promise((resolve) => setTimeout(resolve, 10000));
   const currentPage = +(searchParams?.page ?? 1);
   const skip = (currentPage - 1) * PAGE_LIMIT;
 

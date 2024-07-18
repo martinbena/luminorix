@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   title: "Products",
 };
 
-interface AdminAllProductsPageProps {
+export interface AdminAllProductsPageProps {
   searchParams: ReadonlyURLSearchParams & { page: string };
 }
 
