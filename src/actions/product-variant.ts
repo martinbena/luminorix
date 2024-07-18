@@ -88,6 +88,8 @@ export async function addVariantToProduct(
     };
   }
 
+  let imageUrl
+
   try {
     await ConnectDB();
 
@@ -99,7 +101,7 @@ export async function addVariantToProduct(
       throw new Error("duplicate key - SKU");
     }
 
-    const imageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
+    imageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
 
     const variantResult = await Product.findByIdAndUpdate(result.data.product, {
       $push: {
@@ -127,6 +129,13 @@ export async function addVariantToProduct(
       success: true,
     };
   } catch (error: unknown) {
+    if (imageUrl) {
+      try {
+        await removeImageFromCloudinary(imageUrl);
+      } catch (removeError) {
+        console.error("Error removing image from Cloudinary:", removeError);
+      }
+    }
     if (error instanceof Error) {
       if (error.message.includes("duplicate key")) {
         return {

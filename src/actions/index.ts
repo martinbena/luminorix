@@ -22,3 +22,4 @@ export { processOrder } from "./order";
 export { editAccount } from "./user";
 export { changePassword } from "./user";
 export { newsletterSubscribe } from "./newsletter";
+export { addMarketItem } from "./market";

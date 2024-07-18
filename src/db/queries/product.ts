@@ -2,6 +2,7 @@ import Product, { ProductWithVariant, Variant } from "@/models/Product";
 import ConnectDB from "../connectDB";
 import { productWithVariantFormat } from "./queryOptions";
 import { alphanumericSort } from "@/lib/helpers";
+import mongoose from "mongoose";
 
 export async function getFirstVariantSkuBySlug(slug: string): Promise<string> {
   try {
@@ -346,5 +347,31 @@ export async function hasFreeShipping(skus: string[]): Promise<boolean> {
   } catch (error) {
     console.error("Error checking for freeShipping:", error);
     throw new Error("Error checking for freeShipping");
+  }
+}
+
+export async function calculateAveragePrice(
+  productId: string
+): Promise<number> {
+  try {
+    const result = await Product.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(productId) },
+      },
+      {
+        $unwind: "$variants",
+      },
+      {
+        $group: {
+          _id: "$_id",
+          averagePrice: { $avg: "$variants.price" },
+        },
+      },
+    ]);
+
+    return result[0].averagePrice;
+  } catch (error) {
+    console.error("Error calculating half average price:", error);
+    throw error;
   }
 }

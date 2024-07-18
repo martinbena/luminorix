@@ -133,6 +133,8 @@ export async function createProduct(
     };
   }
 
+  let imageUrl;
+
   try {
     await ConnectDB();
 
@@ -146,7 +148,7 @@ export async function createProduct(
       throw new Error("duplicate key");
     }
 
-    const imageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
+    imageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
 
     const newProduct = new Product({
       category: result.data.category,
@@ -170,10 +172,6 @@ export async function createProduct(
       ],
     });
 
-    if (!newProduct && imageUrl) {
-      await removeImageFromCloudinary(imageUrl);
-    }
-
     await newProduct.save();
 
     revalidatePath(paths.home(), "layout");
@@ -182,6 +180,13 @@ export async function createProduct(
       success: true,
     };
   } catch (error: unknown) {
+    if (imageUrl) {
+      try {
+        await removeImageFromCloudinary(imageUrl);
+      } catch (removeError) {
+        console.error("Error removing image from Cloudinary:", removeError);
+      }
+    }
     if (error instanceof Error) {
       if (error.message.includes("duplicate key")) {
         return {
@@ -258,6 +263,8 @@ export async function editProductWithVariant(
     };
   }
 
+  let newImageUrl;
+
   try {
     await ConnectDB();
 
@@ -288,8 +295,6 @@ export async function editProductWithVariant(
       };
     }
     const oldImageUrl = product.variants[0].image;
-
-    let newImageUrl;
 
     if (result.data.image && result.data.image.size > 0) {
       newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
@@ -338,6 +343,13 @@ export async function editProductWithVariant(
       success: true,
     };
   } catch (error: unknown) {
+    if (newImageUrl) {
+      try {
+        await removeImageFromCloudinary(newImageUrl);
+      } catch (removeError) {
+        console.error("Error removing image from Cloudinary:", removeError);
+      }
+    }
     if (error instanceof Error) {
       if (error.message.includes("duplicate key")) {
         return {

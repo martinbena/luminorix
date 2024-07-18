@@ -12,3 +12,10 @@ export const ORDER_STATUSES = [
   "Cancelled",
 ] as const;
 export const ORDER_STATUS_FILTER_OPTIONS = ["All", ...ORDER_STATUSES];
+export const PRODUCT_CONDITION_OPTIONS = [
+  "New",
+  "Like New",
+  "Good",
+  "Fair",
+  "Poor",
+];

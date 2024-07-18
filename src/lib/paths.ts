@@ -15,7 +15,7 @@ const paths = {
     return `/market/${itemSlug}`;
   },
   marketItemCreate() {
-    return `/market/add-item`;
+    return `/profile/market-items/add-item`;
   },
   discountShowAll() {
     return `/discounts`;

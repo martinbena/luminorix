@@ -96,6 +96,8 @@ export async function editAccount(
     };
   }
 
+  let newImageUrl;
+
   try {
     await ConnectDB();
 
@@ -124,8 +126,6 @@ export async function editAccount(
     }
 
     const oldImageUrl = user.image ?? "";
-
-    let newImageUrl;
 
     if (image && image.size > 0) {
       newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
@@ -158,6 +158,13 @@ export async function editAccount(
       },
     };
   } catch (error: unknown) {
+    if (newImageUrl) {
+      try {
+        await removeImageFromCloudinary(newImageUrl);
+      } catch (removeError) {
+        console.error("Error removing image from Cloudinary:", removeError);
+      }
+    }
     if (error instanceof Error) {
       if (error.message.includes("duplicate key")) {
         return {
@@ -206,7 +213,7 @@ export async function changePassword(
     return {
       errors: result.error.flatten().fieldErrors,
     };
-  }  
+  }
 
   try {
     await ConnectDB();
