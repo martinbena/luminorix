@@ -1,27 +1,27 @@
+import * as actions from "@/actions";
+import { auth } from "@/auth";
 import AdminActions from "@/components/admin/AdminActions";
 import {
+  ItemTitle,
   Table,
   TableBody,
   TableContainer,
+  TableFooter,
   TableHeader,
   TableRow,
-  ItemTitle,
-  TableFooter,
 } from "@/components/data-tables/Table";
 import Button from "@/components/ui/Button";
 import HeadingSecondary from "@/components/ui/HeadingSecondary";
-import { getProductsWithAllVariants } from "@/db/queries/products";
-import paths from "@/lib/paths";
-import { ProductWithVariant } from "@/models/Product";
-import * as actions from "@/actions";
-import AddEditProductForm from "@/components/admin/AddEditProductForm";
-import { getAllCategories } from "@/db/queries/categories";
-import { formatCurrency, getProductVariantTitle } from "@/lib/helpers";
-import Image from "next/image";
-import { Metadata } from "next";
-import SortBy from "@/components/ui/SortBy";
-import { productSortOptions } from "@/db/queries/queryOptions";
 import Pagination from "@/components/ui/Pagination";
+import AddEditMarketItemForm from "@/components/user/AddEditMarketItemForm";
+import { getMarketItems } from "@/db/queries/market";
+import { getAllProducts } from "@/db/queries/products";
+import { formatCurrency } from "@/lib/helpers";
+import paths from "@/lib/paths";
+import { MarketItem } from "@/models/MarketItem";
+import { Product } from "@/models/Product";
+import { Metadata } from "next";
+import Image from "next/image";
 import { ReadonlyURLSearchParams } from "next/navigation";
 
 export const metadata: Metadata = {
@@ -35,10 +35,14 @@ interface AdminAllProductsPageProps {
 export default async function UserMarketItemsPage({
   searchParams,
 }: AdminAllProductsPageProps) {
+  const session = await auth();
   const currentPage = +searchParams?.page || 1;
-  const categories = await getAllCategories();
 
-  const { products, totalCount } = await getProductsWithAllVariants({
+  const products = await getAllProducts();
+
+  const { marketItems, totalCount } = await getMarketItems({
+    marketItemId: undefined,
+    userId: session?.user._id.toString(),
     searchParams,
     limit: true,
   });
@@ -49,72 +53,49 @@ export default async function UserMarketItemsPage({
     <section className="max-w-5xl mx-auto">
       <HeadingSecondary>Your market items</HeadingSecondary>
       <div className="mt-12 py-8 mob:mt-8 [&>*:nth-child(2)]:mt-12 mob:[&>*:nth-child(2)]:mt-4">
-        <div className="flex justify-between mob:flex-col mob:gap-8 items-center mob:items-start">
-          <div>
-            <Button type="secondary" href={paths.marketItemCreate()}>
-              Add new items
-            </Button>
-          </div>
-          <div>
-            <SortBy options={productSortOptions} />
-          </div>
-        </div>
+        <Button type="secondary" href={paths.marketItemCreate()}>
+          Add new items
+        </Button>
 
-        {/* <TableContainer>
+        <TableContainer>
           <Table maxWidth="max-w-5xl">
             <TableHeader numColumns={tableColumns}>
               <span className="mob-sm:hidden">&nbsp;</span>
               <span className="mob-sm:col-span-3">Product</span>
-              <span className="mob:hidden">Brand</span>
+              <span className="mob:hidden">Condition</span>
+              <span className="mob-lg:hidden">Age</span>
               <span className="mob-sm:hidden">Price</span>
-              <span className="mob-lg:hidden">Discount</span>
               <span className="mob-sm:hidden">&nbsp;</span>
             </TableHeader>
             <TableBody
-              data={products}
-              render={(product: ProductWithVariant) => (
-                <TableRow numColumns={tableColumns} key={product._id}>
+              data={marketItems}
+              render={(item: MarketItem) => (
+                <TableRow numColumns={tableColumns} key={item._id}>
                   <div className="w-16 relative aspect-square overflow-hidden">
                     <Image
-                      src={product.image}
-                      alt={`Image of ${product.title}`}
+                      src={item.image}
+                      alt={`Image of ${(item.product as Product).title}`}
                       className="object-cover"
                       fill
                       sizes="50vw"
                     />
                   </div>
-                  <ItemTitle>
-                    {getProductVariantTitle(
-                      product.title,
-                      product.color,
-                      product.size
-                    )}
-                  </ItemTitle>
-                  <div className="mob:hidden">{product.brand}</div>
+                  <ItemTitle>{(item.product as Product).title}</ItemTitle>
+                  <div className="mob:hidden font-medium">{item.condition}</div>
+                  <div className="mob-lg:hidden font-medium">
+                    {item.age} years
+                  </div>
                   <div className="font-semibold mob-sm:hidden">
-                    {formatCurrency(product.price)}
+                    {formatCurrency(item.price)}
                   </div>
-                  <div className="font-semibold mob-lg:hidden">
-                    {product.price < product.previousPrice ? (
-                      <span className="text-green-600">
-                        {formatCurrency(product.previousPrice - product.price)}
-                      </span>
-                    ) : (
-                      <span>&mdash;</span>
-                    )}
-                  </div>
-                  <AdminActions
-                    item={product}
-                    onDelete={actions.removeVariantFromProduct.bind(
-                      null,
-                      product._id,
-                      product.sku
-                    )}
+                  <AdminActions<MarketItem>
+                    item={item}
+                    onDelete={actions.deleteMarketItem.bind(null, item._id)}
                     editForm={
-                      <AddEditProductForm
+                      <AddEditMarketItemForm
                         isEditSession={true}
-                        product={product}
-                        categories={categories}
+                        item={item}
+                        products={products}
                       />
                     }
                   />
@@ -125,7 +106,7 @@ export default async function UserMarketItemsPage({
               <Pagination currentPage={currentPage} totalCount={totalCount} />
             </TableFooter>
           </Table>
-        </TableContainer> */}
+        </TableContainer>
       </div>
     </section>
   );

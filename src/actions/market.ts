@@ -1,7 +1,6 @@
 "use server";
 
 import { auth } from "@/auth";
-import Product from "@/components/products/Product";
 import ConnectDB from "@/db/connectDB";
 import { calculateAveragePrice } from "@/db/queries/product";
 import {
@@ -11,8 +10,10 @@ import {
 import { formatCurrency } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import MarketItem from "@/models/MarketItem";
+import mongoose, { ObjectId } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { DeleteItemState } from "./category";
 
 const marketItemSchema = z.object({
   product: z.string().min(1, { message: "Please select a product" }),
@@ -23,6 +24,10 @@ const marketItemSchema = z.object({
     message: "Location must be in the format 'City, Country'",
   }),
   issues: z.string().optional(),
+});
+
+const addMarketItemSchema = z.object({
+  ...marketItemSchema.shape,
   image: z
     .instanceof(File)
     .refine((file) => file.size > 1, "Please pick an image")
@@ -32,6 +37,22 @@ const marketItemSchema = z.object({
     )
     .refine(
       (file) => ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
+      { message: "Invalid image format. Accepted formats: jpg, jpeg, png" }
+    ),
+});
+const editMarketItemSchema = z.object({
+  ...marketItemSchema.shape,
+  image: z
+    .instanceof(File)
+    .optional()
+    .refine((file) => !file || file.size < 5 * 1024 * 1024, {
+      message: "Image size must be less than 5MB",
+    })
+    .refine(
+      (file) =>
+        !file ||
+        (file.size === 0 && file.type === "application/octet-stream") ||
+        ["image/jpeg", "image/png", "image/jpg"].includes(file.type),
       { message: "Invalid image format. Accepted formats: jpg, jpeg, png" }
     ),
 });
@@ -54,7 +75,7 @@ export async function addMarketItem(
   formState: MarketItemFormState,
   formData: FormData
 ): Promise<MarketItemFormState> {
-  const result = marketItemSchema.safeParse({
+  const result = addMarketItemSchema.safeParse({
     product: formData.get("product"),
     price: formData.get("price"),
     age: formData.get("age"),
@@ -102,12 +123,12 @@ export async function addMarketItem(
           ],
         },
       };
-    }    
+    }
 
     imageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
 
     const marketItem = new MarketItem({
-      product,     
+      product,
       postedBy: session.user._id,
       price: +price,
       age: +age,
@@ -146,5 +167,165 @@ export async function addMarketItem(
         },
       };
     }
+  }
+}
+
+export async function editMarketItem(
+  id: ObjectId,
+  formState: MarketItemFormState,
+  formData: FormData
+): Promise<MarketItemFormState> {
+  const result = editMarketItemSchema.safeParse({
+    product: formData.get("product"),
+    price: formData.get("price"),
+    age: formData.get("age"),
+    condition: formData.get("condition"),
+    location: formData.get("location"),
+    issues: formData.get("issues"),
+    image: formData.get("image"),
+  });
+
+  if (!result.success) {
+    return {
+      errors: result.error.flatten().fieldErrors,
+    };
+  }
+
+  const session = await auth();
+  if (!session || !session.user) {
+    return {
+      errors: {
+        _form: ["You are not authorized to do this"],
+      },
+    };
+  }
+
+  let newImageUrl: string | undefined;
+
+  try {
+    await ConnectDB();
+
+    // LOCATION CHECK
+    /////////////////
+
+    const editedItem = await MarketItem.findById(id);
+
+    if (!editedItem) {
+      return {
+        errors: {
+          _form: ["Item not found"],
+        },
+      };
+    }
+
+    if (
+      session.user._id.toString() !== editedItem.postedBy.toString() &&
+      session.user.role !== "admin"
+    ) {
+      return {
+        errors: {
+          _form: ["You are not authorized to do this"],
+        },
+      };
+    }
+
+    const { product, price, image } = result.data;
+
+    const highestAllowedPrice = Math.floor(
+      (await calculateAveragePrice(product)) * 0.35
+    );
+
+    if (+price > highestAllowedPrice) {
+      return {
+        errors: {
+          price: [
+            `Highest allowed price is ${formatCurrency(highestAllowedPrice)}`,
+          ],
+        },
+      };
+    }
+
+    const oldImageUrl = editedItem.image;
+
+    if (image && image.size > 0) {
+      newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
+    }
+
+    const updateData = {
+      ...result.data,
+      image: image && image.size > 0 ? newImageUrl : oldImageUrl,
+    };
+
+    const editResult = await MarketItem.findByIdAndUpdate(id, updateData);
+
+    if (image && image.size > 0 && editResult.modifiedCount !== 0) {
+      await removeImageFromCloudinary(oldImageUrl);
+    }
+
+    revalidatePath(paths.marketItemShowAll());
+    revalidatePath(paths.userMarketItemShow());
+    return {
+      errors: {},
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (newImageUrl) {
+      try {
+        await removeImageFromCloudinary(newImageUrl);
+      } catch (removeError) {
+        console.error("Error removing image from Cloudinary:", removeError);
+      }
+    }
+    if (error instanceof Error) {
+      return {
+        errors: {
+          _form: [error.message],
+        },
+      };
+    } else {
+      return {
+        errors: {
+          _form: ["Something went wrong"],
+        },
+      };
+    }
+  }
+}
+
+export async function deleteMarketItem(
+  id: mongoose.Types.ObjectId
+): Promise<DeleteItemState> {
+  try {
+    await ConnectDB();
+
+    const item = await MarketItem.findById(id);
+
+    if (!item) {
+      return {
+        error: "Market item not found",
+      };
+    }
+    const imageUrl = item.image;
+
+    await MarketItem.findByIdAndDelete(id);
+
+    if (imageUrl) {
+      await removeImageFromCloudinary(imageUrl);
+    }
+
+    revalidatePath(paths.marketItemShowAll(), "layout");
+    revalidatePath(paths.userMarketItemShow());
+    return {
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+      };
+    }
+    return {
+      error: "Market item could not be deleted. Please try again later",
+    };
   }
 }

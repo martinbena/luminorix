@@ -1,5 +1,5 @@
 import Button from "@/components/ui/Button";
-import AddMarketItemForm from "@/components/user/AddMarketItemForm";
+import AddMarketItemForm from "@/components/user/AddEditMarketItemForm";
 import { getAllProducts } from "@/db/queries/products";
 import paths from "@/lib/paths";
 import { Metadata } from "next";

@@ -200,14 +200,13 @@ export default function AddEditProductForm({
           {isEditSession && product ? (
             <div className="flex flex-col gap-2">
               <p>Current image</p>
-              <div className="h-40 w-40 overflow-hidden">
+              <div className="h-40 w-40 overflow-hidden relative">
                 <Image
                   src={product?.image}
                   alt="Image of the product"
-                  height={0}
-                  width={0}
-                  sizes="100vw"
-                  className="w-full h-auto"
+                  fill
+                  sizes="50vw"
+                  className="object-cover"
                 />
               </div>
             </div>

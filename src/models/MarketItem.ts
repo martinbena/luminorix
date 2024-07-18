@@ -4,7 +4,7 @@ import { User } from "./User";
 import { Product } from "./Product";
 
 export interface MarketItem extends Document {
-  product: Types.ObjectId | Product;
+  product: Product;
   postedBy: Types.ObjectId | User;
   price: number;
   age: number;
@@ -13,6 +13,7 @@ export interface MarketItem extends Document {
   issues: string;
   image: string;
   responded: number;
+  createdAt: Date;
 }
 
 const marketItemSchema = new mongoose.Schema<MarketItem>(
@@ -56,7 +57,6 @@ const marketItemSchema = new mongoose.Schema<MarketItem>(
     issues: {
       type: String,
       trim: true,
-      required: true,
       maxlength: 2000,
       text: true,
     },
