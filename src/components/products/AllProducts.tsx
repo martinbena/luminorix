@@ -7,7 +7,7 @@ import { GiCardboardBox } from "react-icons/gi";
 export default async function AllProducts({
   searchParams,
 }: AllProductsPageProps) {
-  const { products, currentCategory } = await getProductsWithAllVariants({
+  const { products } = await getProductsWithAllVariants({
     searchParams,
   });
   return (

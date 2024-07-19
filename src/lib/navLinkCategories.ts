@@ -33,11 +33,11 @@ export const tagLinks = [
     description: "Discounts",
   },
   {
-    href: paths.marketItemShowAll(),
-    description: "Market",
-  },
-  {
     href: paths.freeShippingShowAll(),
     description: "Free Shipping",
+  },
+  {
+    href: paths.marketItemShowAll(),
+    description: "Market",
   },
 ];

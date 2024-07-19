@@ -5,7 +5,7 @@ import { Product } from "./Product";
 
 export interface MarketItem extends Document {
   product: Product;
-  postedBy: Types.ObjectId | User;
+  postedBy: User;
   price: number;
   age: number;
   condition: string;

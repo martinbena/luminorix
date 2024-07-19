@@ -11,8 +11,8 @@ const paths = {
   marketItemShowAll() {
     return "/market";
   },
-  marketItemShow(itemSlug: string) {
-    return `/market/${itemSlug}`;
+  marketItemShow(id: string) {
+    return `/market/${id}`;
   },
   marketItemCreate() {
     return `/profile/market-items/add-item`;

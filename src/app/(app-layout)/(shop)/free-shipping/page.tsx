@@ -1,6 +1,11 @@
 import Product from "@/components/products/Product";
 import ProductRow from "@/components/products/ProductRow";
 import { getProductsWithFreeShipping } from "@/db/queries/products";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Free Shipping",
+};
 
 export default async function FreeShippingPage() {
   const allFreeShipping = await getProductsWithFreeShipping();
