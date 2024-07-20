@@ -70,6 +70,7 @@ export async function getMarketItems({
           location: 1,
           issues: 1,
           image: 1,
+          responded: 1,
           createdAt: 1,
           updatedAt: 1,
         },

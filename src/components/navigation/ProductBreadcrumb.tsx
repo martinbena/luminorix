@@ -6,13 +6,15 @@ import { FaHouseChimney } from "react-icons/fa6";
 
 interface ProductBreadcrumbProps {
   productTitle: string;
-  productCategory: Category;
+  productCategory: Category | string;
 }
 
 export default function ProductBreadcrumb({
   productTitle,
   productCategory,
 }: ProductBreadcrumbProps) {
+  const isCategory = (category: any): category is Category =>
+    category.title !== undefined;
   return (
     <nav className="flex font-sans py-4 items-center">
       <Link href={paths.home()}>
@@ -21,9 +23,13 @@ export default function ProductBreadcrumb({
       <Divider />
       <Link
         className="hover:underline"
-        href={`${paths.productShowAll()}?category=${productCategory.slug}`}
+        href={
+          isCategory(productCategory)
+            ? `${paths.productShowAll()}?category=${productCategory.slug}`
+            : `${paths.marketItemShowAll()}`
+        }
       >
-        {productCategory.title}
+        {isCategory(productCategory) ? productCategory.title : productCategory}
       </Link>
       <Divider />
       <span className="font-semibold">{productTitle}</span>

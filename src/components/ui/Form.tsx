@@ -98,7 +98,7 @@ interface ContainerProps {
 function Container({ children }: ContainerProps) {
   return (
     <div className="flex justify-center">
-      <div className="px-6 py-8 rounded-md shadow-form max-w-2xl w-full">
+      <div className="px-6 py-8 rounded-md shadow-form max-w-2xl w-full bg-white">
         {children}
       </div>
     </div>

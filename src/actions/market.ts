@@ -20,9 +20,6 @@ const marketItemSchema = z.object({
   price: z.string().min(1, { message: "Please enter price" }),
   age: z.string().min(1, { message: "Please enter a positive value or zero" }),
   condition: z.string().min(1, { message: "Please select product condition" }),
-  location: z.string().regex(/^[A-Za-z\s]+,\s?[A-Za-z\s]+$/, {
-    message: "Location must be in the format 'City, Country'",
-  }),
   issues: z.string().optional(),
 });
 
@@ -63,7 +60,6 @@ interface MarketItemFormState {
     price?: string[];
     age?: string[];
     condition?: string[];
-    location?: string[];
     issues?: string[];
     image?: string[];
     _form?: string[];
@@ -80,7 +76,6 @@ export async function addMarketItem(
     price: formData.get("price"),
     age: formData.get("age"),
     condition: formData.get("condition"),
-    location: formData.get("location"),
     issues: formData.get("issues"),
     image: formData.get("image"),
   });
@@ -105,11 +100,7 @@ export async function addMarketItem(
   try {
     await ConnectDB();
 
-    const { product, price, age, condition, location, issues, image } =
-      result.data;
-
-    // LOCATION CHECK
-    /////////////////
+    const { product, price, age, condition, issues, image } = result.data;
 
     const highestAllowedPrice = Math.floor(
       (await calculateAveragePrice(product)) * 0.35
@@ -133,7 +124,6 @@ export async function addMarketItem(
       price: +price,
       age: +age,
       condition,
-      location,
       issues,
       image: imageUrl,
     });
@@ -180,7 +170,6 @@ export async function editMarketItem(
     price: formData.get("price"),
     age: formData.get("age"),
     condition: formData.get("condition"),
-    location: formData.get("location"),
     issues: formData.get("issues"),
     image: formData.get("image"),
   });
@@ -204,9 +193,6 @@ export async function editMarketItem(
 
   try {
     await ConnectDB();
-
-    // LOCATION CHECK
-    /////////////////
 
     const editedItem = await MarketItem.findById(id);
 

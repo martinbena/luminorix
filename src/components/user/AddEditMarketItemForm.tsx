@@ -103,16 +103,6 @@ export default function AddEditMarketItemForm({
           >
             Condition
           </Form.InputGroup>
-
-          <Form.InputGroup
-            inputType="text"
-            name="location"
-            placeholder="Portland, USA"
-            error={formState.errors.location}
-            value={item?.location}
-          >
-            Location (city, country)
-          </Form.InputGroup>
         </div>
         <Form.InputGroup
           inputType="textarea"

@@ -12,7 +12,7 @@ export interface MarketItem extends Document {
   location: string;
   issues: string;
   image: string;
-  responded: number;
+  responders: User[];
   createdAt: Date;
 }
 
@@ -47,13 +47,6 @@ const marketItemSchema = new mongoose.Schema<MarketItem>(
       maxlength: 10,
       text: true,
     },
-    location: {
-      type: String,
-      trim: true,
-      required: true,
-      maxlength: 2000,
-      text: true,
-    },
     issues: {
       type: String,
       trim: true,
@@ -64,10 +57,12 @@ const marketItemSchema = new mongoose.Schema<MarketItem>(
       type: String,
       required: true,
     },
-    responded: {
-      type: Number,
-      default: 0,
-    },
+    responders: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
   },
   { timestamps: true }
 );
