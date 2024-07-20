@@ -2,20 +2,24 @@ import { auth } from "@/auth";
 import ProductBreadcrumb from "@/components/navigation/ProductBreadcrumb";
 import ProductImage from "@/components/products/ProductImage";
 import MessageForm from "@/components/user/MessageForm";
-import { getMarketItems } from "@/db/queries/market";
+import { getAllMarketItemIds, getMarketItems } from "@/db/queries/market";
 import { formatCurrency } from "@/lib/helpers";
 import { User } from "@/models/User";
 import { Metadata } from "next";
 import Image from "next/image";
 import probe from "probe-image-size";
 import { PropsWithChildren, ReactNode } from "react";
-import { PiEnvelope } from "react-icons/pi";
 
 export const metadata: Metadata = {
   title: "Market",
   description:
     "Explore and browse user listings on our market page. Buy and sell items exclusively from our store current product catalog. Join the community and find great deals on your favorite products.",
 };
+
+export async function generateStaticParams() {
+  const marketItemIds = await getAllMarketItemIds();
+  return marketItemIds;
+}
 
 export default async function MarketItemPage({
   params,

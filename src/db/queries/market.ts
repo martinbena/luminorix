@@ -3,6 +3,26 @@ import MarketItem, { MarketItem as MarketItemType } from "@/models/MarketItem";
 import mongoose from "mongoose";
 import ConnectDB from "../connectDB";
 
+interface MarketItemId {
+  marketItemId: string;
+}
+
+export async function getAllMarketItemIds(): Promise<MarketItemId[]> {
+  try {
+    await ConnectDB();
+    const marketItemIds = await MarketItem.find().select("_id").exec();
+
+    const idArray = marketItemIds.map((doc) => ({
+      marketItemId: doc._id.toString(),
+    }));
+
+    return idArray;
+  } catch (error) {
+    console.error("Error fetching success tokens:", error);
+    return [];
+  }
+}
+
 interface MarketItemsResult {
   marketItems: MarketItemType[];
   totalCount: number;

@@ -2,7 +2,6 @@ import Order, { CartItemSchema, Order as OrderType } from "@/models/Order";
 import ConnectDB from "../connectDB";
 import mongoose from "mongoose";
 import { ORDER_STATUS_FILTER_OPTIONS, PAGE_LIMIT } from "@/lib/constants";
-import { CartItem } from "@/app/contexts/CartContext";
 
 interface SuccessToken {
   successToken: string;
