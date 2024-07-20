@@ -25,3 +25,4 @@ export { newsletterSubscribe } from "./newsletter";
 export { addMarketItem } from "./market";
 export { editMarketItem } from "./market";
 export { deleteMarketItem } from "./market";
+export { sendMessage } from "./message";

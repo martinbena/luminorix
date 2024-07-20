@@ -1,23 +1,25 @@
 "use client";
 
 import * as actions from "@/actions";
+import { ObjectId } from "mongoose";
 import { useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import toast from "react-hot-toast";
 import Form from "../ui/Form";
-import { ObjectId } from "mongoose";
 
 interface MessageFormProps {
-  senderId: ObjectId | undefined;
+  isExistingSession: boolean;
   recipientId: ObjectId;
+  marketItemId: ObjectId;
 }
 
 export default function MessageForm({
-  senderId,
+  isExistingSession,
   recipientId,
+  marketItemId,
 }: MessageFormProps) {
   const [formState, action] = useFormState(
-    actions.changePassword.bind(null, senderId?.toString()),
+    actions.sendMessage.bind(null, recipientId, marketItemId),
     {
       errors: {},
       success: false,
@@ -40,27 +42,26 @@ export default function MessageForm({
     <Form.Container>
       <Form formAction={action} formRef={formRef}>
         <Form.Title>Contact seller</Form.Title>
-        {/* <p>
-          {numResponded > 0 ? (
-            <>
-              {" "}
-              <span className="font-semibold">{numResponded}</span>{" "}
-              {`${numResponded === 1 ? "person" : " people"}`} responded to this
-              sale
-            </>
-          ) : (
-            <span className="font-medium">
-              No one has responded to this sale yet. You can be the first
-            </span>
-          )}
-        </p> */}
-        {senderId ? (
+        {isExistingSession && !formState.success ? (
           <>
-            {" "}
+            <p className="text-xs flex items-center">
+              <span className="text-amber-500 text-4xl leading-none">*</span>
+              Your name and e-mail address will be provided to the seller from
+              your account information
+            </p>{" "}
+            <Form.InputGroup
+              name="contact-phone"
+              inputType="tel"
+              error={formState.errors.telephone}
+              optionalField
+              placeholder="+15554443333"
+            >
+              Telephone
+            </Form.InputGroup>
             <Form.InputGroup
               name="message"
               inputType="textarea"
-              error={formState.errors.oldPassword}
+              error={formState.errors.message}
             >
               Message
             </Form.InputGroup>
@@ -71,6 +72,10 @@ export default function MessageForm({
               <Form.Button width="w-1/2 mob:w-full">Send message</Form.Button>
             </div>{" "}
           </>
+        ) : formState.success ? (
+          <p className="text-base text-center text-green-500">
+            Your message has been sent successfully
+          </p>
         ) : (
           <p className="text-base text-center">
             You must be logged in to send a message

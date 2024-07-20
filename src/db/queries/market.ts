@@ -60,6 +60,14 @@ export async function getMarketItems({
       },
       { $unwind: "$product" },
       {
+        $lookup: {
+          from: "users",
+          localField: "responders",
+          foreignField: "_id",
+          as: "responders",
+        },
+      },
+      {
         $project: {
           _id: 1,
           product: { _id: 1, title: 1 },
@@ -70,7 +78,7 @@ export async function getMarketItems({
           location: 1,
           issues: 1,
           image: 1,
-          responded: 1,
+          responders: { _id: 1, name: 1, image: 1 },
           createdAt: 1,
           updatedAt: 1,
         },

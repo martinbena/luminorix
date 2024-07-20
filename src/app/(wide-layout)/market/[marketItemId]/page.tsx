@@ -25,6 +25,7 @@ export default async function MarketItemPage({
   const { marketItemId } = params;
   const { marketItems } = await getMarketItems({ marketItemId });
   const {
+    _id: id,
     postedBy,
     price,
     age,
@@ -36,7 +37,7 @@ export default async function MarketItemPage({
   } = marketItems[0];
   const { width, height } = await probe(image);
   const session = await auth();
-  const numResponses = responders?.length || 0;
+
   return (
     <>
       <ProductBreadcrumb
@@ -63,26 +64,15 @@ export default async function MarketItemPage({
             {issues.length ? issues : "None"}
           </ItemInformation>
           <Divider />
-          <AdditionalInformation>
-            <PiEnvelope />
-            <span>Responses:</span>{" "}
-            {numResponses > 0 ? (
-              <>
-                {" "}
-                <span className="font-semibold">{numResponses}</span>{" "}
-                {`${numResponses === 1 ? "person" : " people"}`} responded to
-                this sale
-              </>
-            ) : (
-              <span className="font-medium">
-                No one has responded to this sale yet
-              </span>
-            )}
-          </AdditionalInformation>
+          <ResponderInformation responders={responders} />
         </div>
       </div>
-      <div className="py-8 bg-zinc-100 mt-4">
-        <MessageForm senderId={session?.user._id} recipientId={postedBy._id} />
+      <div className="py-8 bg-zinc-100 mob-lg:bg-white mob-lg:mt-0 mt-4">
+        <MessageForm
+          isExistingSession={session?.user ? true : false}
+          recipientId={postedBy._id}
+          marketItemId={id}
+        />
       </div>
     </>
   );
@@ -114,7 +104,7 @@ function ListedBy({ listedBy }: ListedByProps) {
       <p className="font-semibold mb-3">Listed by</p>
       <div className="flex items-center gap-2">
         {listedBy.image && (
-          <div className="relative h-8 w-8 aspect-square">
+          <div className="relative h-12 w-12 aspect-square">
             <Image
               src={listedBy.image}
               alt={`Image of ${listedBy.name}`}
@@ -143,10 +133,47 @@ function ItemInformation({ children, title }: ItemInformationProps) {
   );
 }
 
-function AdditionalInformation({ children }: PropsWithChildren) {
+interface ResponderInformationProps {
+  responders: User[];
+}
+
+function ResponderInformation({ responders }: ResponderInformationProps) {
   return (
-    <p className="flex items-center gap-1 [&>*:nth-child(1)]:w-5 [&>*:nth-child(1)]:h-5 [&>*:nth-child(2)]:font-semibold">
-      {children}
-    </p>
+    <div className="flex mob-sm:flex-col gap-2 items-center mob-sm:items-start">
+      {responders.length > 0 && (
+        <div className="flex [&>*:not(:first-child)]:-ml-4">
+          {responders
+            .filter(
+              (responder) =>
+                typeof responder.image === "string" && responder.image !== ""
+            )
+            .slice(0, 5)
+            .map((responder) => (
+              <Image
+                key={responder._id}
+                src={responder.image as string}
+                width={48}
+                height={48}
+                alt={`Photo of ${responder.name}`}
+                className="rounded-full border-[3px] border-white"
+              />
+            ))}
+        </div>
+      )}
+      <p>
+        {responders.length > 0 ? (
+          <>
+            {" "}
+            <span className="font-semibold">{responders.length}</span>{" "}
+            {`${responders.length === 1 ? "person" : " people"}`} responded to
+            this sale
+          </>
+        ) : (
+          <span className="font-medium">
+            No one has responded to this sale yet
+          </span>
+        )}
+      </p>
+    </div>
   );
 }
