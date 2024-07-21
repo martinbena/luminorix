@@ -1,6 +1,20 @@
 import mongoose, { model, models, Schema } from "mongoose";
+import { MarketItem } from "./MarketItem";
+import { User } from "./User";
 
-const MessageSchema = new mongoose.Schema(
+export interface Message extends Document {
+  _id: mongoose.Types.ObjectId;
+  sender: User;
+  recipient: mongoose.Types.ObjectId;
+  marketItem: MarketItem;
+  phone?: string;
+  text: string;
+  read: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const MessageSchema = new mongoose.Schema<Message>(
   {
     sender: {
       type: Schema.Types.ObjectId,
@@ -20,7 +34,7 @@ const MessageSchema = new mongoose.Schema(
     phone: {
       type: String,
     },
-    body: {
+    text: {
       type: String,
       required: true,
     },
@@ -32,6 +46,6 @@ const MessageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Message = models?.Message || model("Message", MessageSchema);
+const Message = models?.Message || model<Message>("Message", MessageSchema);
 
 export default Message;

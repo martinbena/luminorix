@@ -28,7 +28,10 @@ export default async function Reviews() {
         <ul className="flex flex-col gap-6">
           {reviews.map((item) => {
             return (
-              <li key={item.title} className="flex border border-amber-500">
+              <li
+                key={item.title}
+                className="flex border border-amber-500 rounded-md overflow-hidden"
+              >
                 <div className="px-6 py-3 flex-grow">
                   <h3 className="font-semibold text-2xl mb-2">
                     <Link

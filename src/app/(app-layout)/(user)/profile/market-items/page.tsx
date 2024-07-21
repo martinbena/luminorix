@@ -15,7 +15,7 @@ export default function UserMarketItemsPage({
   searchParams,
 }: AdminAllProductsPageProps) {
   return (
-    <section className="max-w-5xl mx-auto">
+    <section className="max-w-5xl mx-auto [&>*:nth-child(1)]:-mb-6">
       <HeadingSecondary>Your market items</HeadingSecondary>
       <div className="mt-12 py-8 mob:mt-8 [&>*:nth-child(2)]:mt-12">
         <Button type="secondary" href={paths.marketItemCreate()}>

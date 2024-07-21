@@ -4,10 +4,13 @@ import { auth } from "@/auth";
 import ConnectDB from "@/db/connectDB";
 import paths from "@/lib/paths";
 import MarketItem from "@/models/MarketItem";
-import Message from "@/models/Messages";
-import { ObjectId } from "mongoose";
+import Message from "@/models/Message";
+import mongoose, { ObjectId } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { DeleteItemState } from "./category";
+import { getMessages } from "@/db/queries/messages";
+import User from "@/models/User";
 
 const sendMessageSchema = z.object({
   telephone: z
@@ -94,7 +97,7 @@ export async function sendMessage(
       recipient: recipientId,
       marketItem: marketItemId,
       telephone,
-      body: message,
+      text: message,
     });
 
     await newMessage.save();
@@ -122,5 +125,53 @@ export async function sendMessage(
         },
       };
     }
+  }
+}
+
+export async function toggleMessageReadStatus(id: mongoose.Types.ObjectId) {
+  const session = await auth();
+  if (!session || !session.user) {
+    throw new Error("Only logged in users can manage their messages");
+  }
+
+  try {
+    const message = await Message.findById(id);
+    if (!message) throw new Error("Message not found");
+
+    if (session.user._id.toString() !== message.recipient.toString())
+      throw new Error("You are not authorized to do this");
+
+    message.read = !message.read;
+
+    await message.save();
+  } catch (error) {
+    console.log(error);
+    return {
+      error: "Something went wrong",
+    };
+  } finally {
+    revalidatePath(paths.userMessages());
+  }
+}
+
+export async function deleteMessage(
+  id: mongoose.Types.ObjectId
+): Promise<DeleteItemState> {
+  try {
+    await ConnectDB();
+    await Message.findByIdAndDelete(id);
+    revalidatePath(paths.userMessages());
+    return {
+      success: true,
+    };
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return {
+        error: error.message,
+      };
+    }
+    return {
+      error: "Message could not be deleted. Please try again later",
+    };
   }
 }

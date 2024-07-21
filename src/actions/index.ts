@@ -26,3 +26,5 @@ export { addMarketItem } from "./market";
 export { editMarketItem } from "./market";
 export { deleteMarketItem } from "./market";
 export { sendMessage } from "./message";
+export { toggleMessageReadStatus } from "./message";
+export { deleteMessage } from "./message";

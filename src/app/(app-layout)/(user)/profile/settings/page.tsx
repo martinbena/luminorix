@@ -17,7 +17,7 @@ export default async function UserSettingsPage() {
   return (
     <>
       <div className="max-w-2xl mx-auto">
-        <HeadingSecondary>Your account settings</HeadingSecondary>
+        <HeadingSecondary>Account settings</HeadingSecondary>
 
         <div className="mt-8 flex flex-col gap-6">
           {isGoogleUser ? (
