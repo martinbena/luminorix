@@ -14,14 +14,16 @@ interface FormProps {
   formAction: (payload: FormData) => void;
   children: ReactNode;
   formRef?: React.Ref<HTMLFormElement>;
+  onClick?: () => void;
 }
 
-function Form({ children, formAction, formRef }: FormProps) {
+function Form({ children, formAction, formRef, onClick }: FormProps) {
   return (
     <form
       ref={formRef}
       action={formAction}
       className="flex flex-col gap-8 font-sans"
+      onClick={onClick ?? undefined}
     >
       {children}
     </form>

@@ -14,16 +14,40 @@ import {
 } from "react-icons/pi";
 import Popover from "../ui/Popover";
 import UserMenuImage from "./UserMenuImage";
+import { useEffect } from "react";
+import { useMessagesContext } from "@/app/contexts/MessagesContext";
 
 export default function UserMenu() {
   const session = useSession();
+  const { unreadMessagesCount, setUnreadMessagesCount } = useMessagesContext();
+
+  useEffect(() => {
+    if (!session) return;
+
+    async function fetchUnreadMessages() {
+      try {
+        const res = await fetch("/api/messages");
+
+        if (res.status === 200) {
+          const data = await res.json();
+          setUnreadMessagesCount(data);
+        }
+      } catch (error) {
+        console.log(error);
+        setUnreadMessagesCount(0);
+      }
+    }
+
+    fetchUnreadMessages();
+  }, [session, setUnreadMessagesCount]);
+
   return (
     <>
       <Link href={paths.userMessages()} className="relative" tabIndex={-1}>
-        <UserMenuImage screenReaderText="View notifications">
+        <UserMenuImage screenReaderText="View messages">
           <PiBellFill className="w-9 h-9 mob:w-7 mob:h-7 text-zinc-600" />
-          <span className="absolute font-medium -top-1 -right-1 bg-amber-200 text-zinc-800 tracking-normal min-h-5 min-w-5 text-center rounded-full leading-none flex items-center justify-center pointer-events-none py-[2px] px-1 font-sans mob:left-5 mob:-top-1">
-            0
+          <span className="absolute font-medium -top-1 -right-1 bg-amber-200 text-zinc-800 tracking-normal min-h-5 min-w-5 text-center rounded-full leading-none flex items-center justify-center pointer-events-none py-0.5 px-1 font-sans mob:left-5 mob:-top-1">
+            {unreadMessagesCount}
           </span>
         </UserMenuImage>
       </Link>

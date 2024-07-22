@@ -1,30 +1,67 @@
-import { auth } from "@/auth";
-import { getMessages } from "@/db/queries/messages";
+"use client";
+
+import * as actions from "@/actions";
 import { formatCurrency } from "@/lib/helpers";
+import { Message } from "@/models/Message";
 import { format } from "date-fns";
 import Image from "next/image";
-import { ReactNode } from "react";
-import MessageActions from "./MessageActions";
-import EmptyItemList from "../admin/EmptyItemList";
-import { PiBell } from "react-icons/pi";
+import { ReactNode, useEffect, useOptimistic } from "react";
+import mongoose from "mongoose";
+import { useMessagesContext } from "@/app/contexts/MessagesContext";
+import ToggleMessageReadStatus from "./ToggleMessageReadStatus";
+import DeleteMessage from "./DeleteMessage";
 
-export default async function Messages() {
-  const session = await auth();
-  const messages = await getMessages(session!.user._id.toString());
+interface MessagesProps {
+  messages: Message[];
+  dbUnreadCount: number;
+}
 
-  if (!messages.length)
-    return (
-      <div className="mt-12">
-        <EmptyItemList
-          icon={<PiBell />}
-          message="You do not have any messages right now"
-        />
-      </div>
-    );
+export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
+  const [optimisticMessages, updateOptimisticMessages] = useOptimistic(
+    messages,
+    (
+      prevMessages: Message[],
+      updatedMessageId: mongoose.Types.ObjectId
+    ): Message[] => {
+      const updatedMessageIndex = prevMessages.findIndex(
+        (message) => message._id === updatedMessageId
+      );
+
+      if (updatedMessageIndex === -1) {
+        return prevMessages;
+      }
+
+      const updatedMessage = { ...prevMessages[updatedMessageIndex] };
+      updatedMessage.read = !updatedMessage.read;
+      const newMessages = [...prevMessages];
+      newMessages[updatedMessageIndex] = updatedMessage;
+
+      return newMessages;
+    }
+  );
+
+  const { unreadMessagesCount, setUnreadMessagesCount } = useMessagesContext();
+
+  useEffect(() => {
+    if (dbUnreadCount !== unreadMessagesCount) {
+      const timeoutId = setTimeout(() => {
+        if (dbUnreadCount !== unreadMessagesCount) {
+          setUnreadMessagesCount(dbUnreadCount);
+        }
+      }, 1500);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [dbUnreadCount, unreadMessagesCount, setUnreadMessagesCount]);
+
+  async function handleToggleReadStatus(id: mongoose.Types.ObjectId) {
+    updateOptimisticMessages(id);
+    await actions.toggleMessageReadStatus(id);
+  }
 
   return (
-    <div className="mt-12 flex flex-col gap-4">
-      {messages.map((message) => {
+    <>
+      {optimisticMessages.map((message) => {
         const {
           _id: id,
           marketItem,
@@ -35,7 +72,7 @@ export default async function Messages() {
           read: isRead,
         } = message;
         return (
-          <div
+          <li
             key={id.toString()}
             className="relative bg-white p-4 mob-lg:py-5 rounded-md border border-zinc-200 font-sans"
           >
@@ -92,11 +129,18 @@ export default async function Messages() {
                 {format(new Date(createdAt), "MMM d, yyyy, h:mm a")}
               </MessageInfo>
             </ul>
-            <MessageActions message={message} />
-          </div>
+            <div className="flex gap-3 mt-4">
+              <ToggleMessageReadStatus
+                id={id}
+                onToggle={handleToggleReadStatus}
+                isRead={isRead}
+              />
+              <DeleteMessage message={message} />
+            </div>
+          </li>
         );
       })}
-    </div>
+    </>
   );
 }
 

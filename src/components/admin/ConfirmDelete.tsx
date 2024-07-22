@@ -12,12 +12,14 @@ interface ConfirmDeleteProps {
   resourceName: string;
   onCloseModal?: () => void;
   onConfirm: () => Promise<DeleteItemState>;
+  onClick?: () => void;
 }
 
 export default function ConfirmDelete({
   resourceName,
   onCloseModal,
   onConfirm,
+  onClick,
 }: ConfirmDeleteProps) {
   const [storedName, setStoredName] = useState<string>("");
   const [formState, action] = useFormState(onConfirm, {
@@ -62,7 +64,7 @@ export default function ConfirmDelete({
         <Button type="tertiary" onClick={onCloseModal}>
           Cancel
         </Button>
-        <Form formAction={action}>
+        <Form onClick={onClick ?? undefined} formAction={action}>
           <Form.Button width="w-full" type="secondary">
             Delete
           </Form.Button>
