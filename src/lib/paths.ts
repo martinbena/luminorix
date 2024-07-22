@@ -77,8 +77,8 @@ const paths = {
   login() {
     return "/login";
   },
-  loginForgotPassword() {
-    return "/login/forgot-password";
+  loginForgottenPassword() {
+    return "/login/forgotten-password";
   },
 };
 

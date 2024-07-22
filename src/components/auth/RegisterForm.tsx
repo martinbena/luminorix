@@ -7,7 +7,6 @@ import { useEffect, useRef } from "react";
 import { useFormState } from "react-dom";
 import toast from "react-hot-toast";
 import Form from "../ui/Form";
-import GoogleLoginButton from "./GoogleLoginButton";
 import Link from "next/link";
 
 export default function RegisterForm() {
@@ -34,49 +33,45 @@ export default function RegisterForm() {
     };
   }, [formState.success, router]);
   return (
-    <div className="flex flex-col gap-8 divide-y-2">
-      <Form formAction={action} formRef={formRef}>
-        <Form.Title textAlign="left">Register to manage your orders</Form.Title>
-        <Form.InputGroup
-          name="fullName"
-          inputType="text"
-          error={formState.errors.name}
-        >
-          Full name
-        </Form.InputGroup>
-        <Form.InputGroup
-          name="email"
-          inputType="email"
-          error={formState.errors.email}
-        >
-          E-mail
-        </Form.InputGroup>
-        <Form.InputGroup
-          name="password"
-          inputType="password"
-          error={formState.errors.password}
-        >
-          Password
-        </Form.InputGroup>
-        <Form.InputGroup
-          name="passwordConfirm"
-          inputType="password"
-          error={formState.errors.passwordConfirm}
-        >
-          Confirm password
-        </Form.InputGroup>
-        {formState.errors._form ? (
-          <Form.Error>{formState.errors._form?.join(" | ")}</Form.Error>
-        ) : null}
-        <Form.Button>Register</Form.Button>
-        <p>
-          <Link className="underline" href={paths.login()}>
-            Already have an account? Login here
-          </Link>
-        </p>
-      </Form>
-
-      <GoogleLoginButton />
-    </div>
+    <Form formAction={action} formRef={formRef}>
+      <Form.Title textAlign="left">Register to manage your orders</Form.Title>
+      <Form.InputGroup
+        name="fullName"
+        inputType="text"
+        error={formState.errors.name}
+      >
+        Full name
+      </Form.InputGroup>
+      <Form.InputGroup
+        name="email"
+        inputType="email"
+        error={formState.errors.email}
+      >
+        E-mail
+      </Form.InputGroup>
+      <Form.InputGroup
+        name="password"
+        inputType="password"
+        error={formState.errors.password}
+      >
+        Password
+      </Form.InputGroup>
+      <Form.InputGroup
+        name="passwordConfirm"
+        inputType="password"
+        error={formState.errors.passwordConfirm}
+      >
+        Confirm password
+      </Form.InputGroup>
+      {formState.errors._form ? (
+        <Form.Error>{formState.errors._form?.join(" | ")}</Form.Error>
+      ) : null}
+      <Form.Button>Register</Form.Button>
+      <p>
+        <Link className="underline" href={paths.login()}>
+          Already have an account? Login here
+        </Link>
+      </p>
+    </Form>
   );
 }

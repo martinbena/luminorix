@@ -1,3 +1,4 @@
+import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 import "../globals.css";
 import Button from "@/components/ui/Button";
 import paths from "@/lib/paths";
@@ -24,7 +25,10 @@ export default function AuthLayout({
           </Button>
         </div>
         <div className="bg-white px-24 py-12 mob-lg:p-12 mob-sm:p-6">
-          {children}
+          <div className="flex flex-col gap-8 divide-y-2 child:min-w-96 child:mob:min-w-0">
+            {children}
+            <GoogleLoginButton />
+          </div>
         </div>
       </section>
     </main>

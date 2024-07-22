@@ -28,3 +28,6 @@ export { deleteMarketItem } from "./market";
 export { sendMessage } from "./message";
 export { toggleMessageReadStatus } from "./message";
 export { deleteMessage } from "./message";
+export { generateResetCode } from "./forgotten-password";
+export { enterResetCode } from "./forgotten-password";
+export { createNewPassword } from "./forgotten-password";
