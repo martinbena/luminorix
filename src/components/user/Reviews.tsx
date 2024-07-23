@@ -35,7 +35,7 @@ export default async function Reviews() {
                 <div className="px-6 py-3 flex-grow">
                   <h3 className="font-semibold text-2xl mb-2">
                     <Link
-                      className="hover:underline"
+                      className="hover:underline focus:outline-none focus:underline"
                       href={`/${item.slug}/${slugSkuPairs[item.slug]}`}
                     >
                       {item.title}

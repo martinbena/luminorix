@@ -17,12 +17,12 @@ export default function ProductBreadcrumb({
     category.title !== undefined;
   return (
     <nav className="flex font-sans py-4 items-center">
-      <Link href={paths.home()}>
-        <FaHouseChimney className="h-5 w-5 text-amber-500 hover:text-amber-600" />
+      <Link className="focus:outline-none group" href={paths.home()}>
+        <FaHouseChimney className="h-5 w-5 text-amber-500 hover:text-amber-600 group-focus:text-amber-600" />
       </Link>
       <Divider />
       <Link
-        className="hover:underline"
+        className="hover:underline focus:outline-none focus:underline"
         href={
           isCategory(productCategory)
             ? `${paths.productShowAll()}?category=${productCategory.slug}`

@@ -38,9 +38,9 @@ export default function OrderFilters({
         return (
           <button
             key={option.status}
-            className={`rounded-md font-medium py-1 px-2 transition-all duration-300 ${
+            className={`rounded-md font-medium py-1 px-2 transition-all duration-300 focus:outline-none ${
               !disabled
-                ? "hover:bg-amber-600 hover:text-amber-50"
+                ? "hover:bg-amber-600 hover:text-amber-50 focus:bg-amber-600 focus:text-amber-50"
                 : "cursor-not-allowed opacity-50"
             }  ${isActive ? "bg-amber-600 text-amber-50" : ""}`}
             disabled={disabled}

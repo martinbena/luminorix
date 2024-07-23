@@ -46,7 +46,7 @@ export default function RecentOrders({ recentOrderItems }: RecentOrdersProps) {
             </div>
             <div className="flex flex-col justify-between">
               <Link
-                className="font-semibold hover:underline mb-1"
+                className="font-semibold hover:underline mb-1 focus:outline-none focus:underline"
                 href={paths.productShow(slug, sku)}
               >
                 {composedTitle}

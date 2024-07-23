@@ -33,7 +33,7 @@ export default function AdminActions<T extends Document>({
     <>
       <Modal>
         <Popover>
-          <Popover.Button>
+          <Popover.Button isTabbable>
             <PiDotsThreeVerticalLight className="w-8 h-8" />
           </Popover.Button>
           <Popover.Content>

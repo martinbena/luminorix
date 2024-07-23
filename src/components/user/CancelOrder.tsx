@@ -13,7 +13,7 @@ export default function CancelOrder({ id, onCancel }: CancelOrderProps) {
   return (
     <Modal>
       <Modal.Open opens="cancel-order">
-        <button className="text-red-800 font-medium bg-red-100 px-4 py-1 hover:bg-red-200 rounded-md">
+        <button className="text-red-800 font-medium focus:outline-none focus:bg-red-200 bg-red-100 px-4 py-1 hover:bg-red-200 rounded-md">
           Cancel and Refund
         </button>
       </Modal.Open>

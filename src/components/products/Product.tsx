@@ -82,7 +82,7 @@ export default function Product({
         <div>
           <h3 className="text-xl capitalize mb-1.5 font-medium mob-sm:text-lg">
             <Link
-              className="hover:underline"
+              className="hover:underline focus:outline-none focus:underline"
               href={
                 isProductWithVariant(product)
                   ? paths.productShow(slug, sku)

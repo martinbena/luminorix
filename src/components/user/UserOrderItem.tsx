@@ -27,7 +27,7 @@ export default function UserOrderItem({ orderItem }: UserOrderItemProps) {
       <div className="flex flex-col gap-1.5">
         <ItemTitle>
           <Link
-            className="text-amber-700 hover:underline"
+            className="text-amber-700 hover:underline focus:outline-none focus:underline"
             href={paths.productShow(slug, sku)}
           >
             {" "}

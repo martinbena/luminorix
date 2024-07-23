@@ -61,7 +61,7 @@ function SubmitButton({
   if (type === "small")
     return (
       <button
-        className="py-1 px-2 min-h-7 min-w-20 bg-sky-700 w-full hover:bg-sky-600 text-white rounded-md uppercase font-semibold disabled:opacity-75"
+        className="py-1 px-2 min-h-7 min-w-20 focus:outline-none focus:bg-sky-600 bg-sky-700 w-full hover:bg-sky-600 text-white rounded-md uppercase font-semibold disabled:opacity-75"
         disabled={pending || isDisabled}
       >
         {!pending ? (

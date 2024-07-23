@@ -48,6 +48,7 @@ const config: Config = {
     function ({ addVariant }: any) {
       addVariant("child", "& > *");
       addVariant("child-hover", "& > *:hover");
+      addVariant("child-focus", "& > *:focus");
       addVariant("hover-child", "&:hover > *");
       addVariant("focus-child", "&:focus > *");
     },

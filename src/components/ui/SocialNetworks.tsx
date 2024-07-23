@@ -30,7 +30,7 @@ export default function SocialNetworks({
   return (
     <div className="flex flex-col gap-6">
       <p className="font-semibold">Share</p>
-      <div className="flex gap-3">
+      <div className="flex gap-3 child-focus:outline-none child:rounded-full child-focus:ring child-focus:ring-amber-600 child-focus:ring-offset-2">
         <FacebookShareButton
           url={shareUrl}
           title={composedTitle}

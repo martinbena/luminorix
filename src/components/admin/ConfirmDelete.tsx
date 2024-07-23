@@ -3,7 +3,7 @@
 import { useFormState } from "react-dom";
 import Button from "../ui/Button";
 import Form from "../ui/Form";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { DeleteItemState } from "@/actions/category";
 import HeadingSecondary from "../ui/HeadingSecondary";
@@ -26,6 +26,7 @@ export default function ConfirmDelete({
     error: "",
     success: false,
   });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function storeName() {
@@ -37,6 +38,19 @@ export default function ConfirmDelete({
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
+    const focusFirstElement = () => {
+      if (containerRef.current) {
+        const focusableSelectors =
+          'a, button, input, textarea, select, details, [tabindex]:not([tabindex="-1"])';
+        const firstFocusableElement =
+          containerRef.current.querySelector(focusableSelectors);
+        if (firstFocusableElement) {
+          (firstFocusableElement as HTMLElement).focus();
+        }
+      }
+    };
+    focusFirstElement();
+
     if (formState.success) {
       toast.success(`${storedName} successfully deleted`);
       onCloseModal?.();
@@ -52,7 +66,10 @@ export default function ConfirmDelete({
   }, [formState, onCloseModal, storedName]);
 
   return (
-    <div className="flex flex-col gap-5 min-w-96 pb-8 px-12 pt-10 mob:px-6 mob:min-w-0 shadow-form">
+    <div
+      ref={containerRef}
+      className="flex flex-col gap-5 min-w-96 pb-8 px-12 pt-10 mob:px-6 mob:min-w-0 shadow-form"
+    >
       <HeadingSecondary>Delete {resourceName}</HeadingSecondary>
 
       <p className="text-base font-sans">

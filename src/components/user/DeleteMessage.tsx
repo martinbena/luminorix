@@ -16,7 +16,7 @@ export default function DeleteMessage({ message }: DeleteMessageProps) {
   return (
     <Modal>
       <Modal.Open opens="delete">
-        <button className=" bg-amber-400 hover:bg-amber-500 font-semibold  py-1.5 px-3 rounded-md">
+        <button className=" bg-amber-400 hover:bg-amber-500 font-semibold focus:outline-none focus:bg-amber-500 py-1.5 px-3 rounded-md">
           Delete
         </button>
       </Modal.Open>

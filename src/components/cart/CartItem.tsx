@@ -48,7 +48,10 @@ export default function CartItem({ item, type = "cart" }: CartItemProps) {
           <>
             <div>
               <h3 className="hover:underline text-xl font-semibold mob:text-lg mob-sm:text-base">
-                <Link href={paths.productShow(item.slug, item.sku)}>
+                <Link
+                  className="focus:outline-none focus:underline"
+                  href={paths.productShow(item.slug, item.sku)}
+                >
                   {composedTitle}
                 </Link>
               </h3>

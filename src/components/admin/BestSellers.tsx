@@ -64,7 +64,12 @@ interface SelectorProps {
 
 function Selector({ isActive, onClick, children }: SelectorProps) {
   return (
-    <button className={`${isActive ? "underline" : ""}`} onClick={onClick}>
+    <button
+      className={`${
+        isActive ? "underline" : ""
+      } focus:outline-none focus:underline`}
+      onClick={onClick}
+    >
       {children}
     </button>
   );

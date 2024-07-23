@@ -51,14 +51,17 @@ export default function WishlistButton({
         await actions.toggleWishlistProduct(slug, sku);
       }}
     >
-      <button type="submit" className="flex items-center gap-1 group">
+      <button
+        type="submit"
+        className="flex focus:outline-none items-center gap-1 group"
+      >
         {optimisticWishlistItem ? (
           <PiHeartFill className="w-4 h-4 text-amber-500" />
         ) : (
           <PiHeart className="w-4 h-4" />
         )}
         <span
-          className={`group-hover:underline ${
+          className={`group-hover:underline group-focus:underline ${
             optimisticWishlistItem ? "text-amber-600" : ""
           }`}
         >

@@ -58,6 +58,7 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
             <Link
               className="relative aspect-square overflow-hidden mob:h-[150px] mob:w-[150px] mob:mx-auto"
               href={paths.productShow(item.slug, item.sku)}
+              tabIndex={-1}
             >
               <Image
                 src={item.image}
@@ -71,7 +72,7 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
               <div>
                 <h3 className="text-2xl font-serif font-semibold mob-lg:text-xl">
                   <Link
-                    className="hover:underline"
+                    className="hover:underline focus:outline-none focus:underline"
                     href={paths.productShow(item.slug, item.sku)}
                   >
                     {composedTitle}

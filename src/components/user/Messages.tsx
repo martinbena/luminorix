@@ -109,7 +109,7 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
                 {" "}
                 <a
                   href={`mailto:${sender.email}`}
-                  className="text-blue-500 hover:underline"
+                  className="text-blue-500 hover:underline focus:outline-none focus:underline"
                 >
                   {sender.email}
                 </a>{" "}
@@ -119,7 +119,7 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
                   {" "}
                   <a
                     href={`tel:${phone}`}
-                    className="text-blue-500 hover:underline"
+                    className="text-blue-500 hover:underline focus:outline-none focus:underline"
                   >
                     {phone}
                   </a>

@@ -108,16 +108,22 @@ function SummaryLinks({
         isSoleRow ? "mob:flex hidden px-6 py-1 bg-amber-50" : "flex mob:hidden"
       }`}
     >
-      <Link className="hover:underline" href={paths.orderSuccess(successToken)}>
+      <Link
+        className="hover:underline focus:outline-none focus:underline"
+        href={paths.orderSuccess(successToken)}
+      >
         Summary
       </Link>
       <Link
         target="blank"
         referrerPolicy="no-referrer"
-        className="group pl-2 border-l border-zinc-400"
+        className="group pl-2 border-l focus:outline-none border-zinc-400"
         href={receiptUrl}
       >
-        💳 <span className="group-hover:underline">Receipt</span>
+        💳{" "}
+        <span className="group-hover:underline group-focus:underline">
+          Receipt
+        </span>
       </Link>
     </div>
   );

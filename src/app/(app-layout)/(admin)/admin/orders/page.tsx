@@ -75,7 +75,7 @@ export default async function AdminOrdersPage({
                         <p className="font-semibold">{shipping.name}</p>
                         <p className="text-xs font-medium">
                           <a
-                            className="hover:underline"
+                            className="hover:underline focus:outline-none focus:underline"
                             href={`mailto:${email}`}
                           >
                             {email}

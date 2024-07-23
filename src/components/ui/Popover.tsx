@@ -36,13 +36,21 @@ function Popover({ children }: PopoverProps) {
 interface ButtonProps {
   children: ReactNode;
   screenReaderTitle?: string;
+  isTabbable?: boolean;
 }
 
-function Button({ children, screenReaderTitle }: ButtonProps) {
+function Button({
+  children,
+  screenReaderTitle,
+  isTabbable = false,
+}: ButtonProps) {
   const { isOpen, setIsOpen } = useContext(PopoverContext);
 
   return (
-    <button onClick={() => setIsOpen((isOpen) => !isOpen)} tabIndex={-1}>
+    <button
+      onClick={() => setIsOpen((isOpen) => !isOpen)}
+      tabIndex={isTabbable ? 0 : -1}
+    >
       <span className="sr-only">{`${
         isOpen ? "Close" : "Open"
       } ${screenReaderTitle}`}</span>
@@ -60,7 +68,7 @@ function Content({ children }: ContentProps) {
   const popoverContentRef = useRef<HTMLDivElement>(null);
 
   useCloseOnClickOutside(isOpen, () => setIsOpen(false), popoverContentRef);
-  useKeyboardInteractions(isOpen, setIsOpen, popoverContentRef);
+  useKeyboardInteractions(isOpen, () => setIsOpen(false), popoverContentRef);
 
   if (!isOpen) return null;
 

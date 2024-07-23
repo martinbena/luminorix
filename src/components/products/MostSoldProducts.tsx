@@ -53,7 +53,7 @@ export default async function MostSoldProducts({
                 </div>
               </div>
               <Link
-                className="hover:underline text-lg mob-sm:text-base"
+                className="hover:underline text-lg mob-sm:text-base focus:outline-none focus:underline"
                 href={paths.productShow(product.slug, product.sku)}
               >
                 {title}
