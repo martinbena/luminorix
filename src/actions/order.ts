@@ -23,6 +23,18 @@ import {
 } from "@/db/queries/products";
 import mongoose from "mongoose";
 import { ORDER_STATUSES } from "@/lib/constants";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: process.env.GMAIL_AUTH_USER,
+    pass: process.env.GMAIL_AUTH_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false,
+  },
+});
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -476,6 +488,98 @@ export async function editOrder(
           "decrement"
         );
       }
+    }
+
+    if (newDeliveryStatus === "Dispatched") {
+      const emailSubject = `Dispatching order no. ${updatedOrder._id
+        .toString()
+        .slice(-5)}`;
+      const hasFreeShipping = updatedOrder.cartItems.some(
+        (item: CartItem) => item.freeShipping
+      );
+
+      const mailOptions = {
+        to: updatedOrder.delivery_email,
+        from: process.env.GMAIL_AUTH_USER,
+        subject: emailSubject,
+        html: `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2 style="color: #D97706;"><strong>${
+        updatedOrder.shipping.name
+      }</strong>, your order has been dispatched!</h2>
+      <p>We have forwarded your order to the carrier and it is on its way to you.</p>
+      <h3 style="color: #D97706;">Order Recap</h3>
+      <div style="border-top: 1px solid #D97706; margin-top: 10px; padding-top: 10px;">
+        <h4 style="margin: 0;">Shipping Address</h4>
+        <p style="margin: 5px 0;">
+          <strong>${updatedOrder.shipping.name}</strong><br/>
+          ${updatedOrder.shipping.address.line1}<br/>
+          ${
+            updatedOrder.shipping.address.line2
+              ? `${updatedOrder.shipping.address.line2}<br/>`
+              : ""
+          }
+          ${updatedOrder.shipping.address.city},${
+          updatedOrder.shipping.address.state
+            ? ` ${updatedOrder.shipping.address.state}`
+            : ""
+        } ${updatedOrder.shipping.address.postal_code}<br/>
+          ${updatedOrder.shipping.address.country}
+        </p>
+      </div>
+      <div style="border-top: 1px solid #D97706; margin-top: 10px; padding-top: 10px;">
+        <h4 style="margin: 0;">Ordered Products</h4>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+          <thead>
+            <tr>
+              <th style="text-align: left; padding: 5px; border-bottom: 1px solid #D97706;">Product</th>
+              <th style="text-align: left; padding: 5px; border-bottom: 1px solid #D97706;">Details</th>
+              <th style="text-align: left; padding: 5px; border-bottom: 1px solid #D97706;">Quantity</th>
+              <th style="text-align: left; padding: 5px; border-bottom: 1px solid #D97706;">Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${updatedOrder.cartItems
+              .map(
+                (item: CartItem) => `
+              <tr>
+                <td style="padding: 5px; border-bottom: 1px solid #eaeaea;"><strong>${
+                  item.title
+                }</strong></td>
+                <td style="padding: 5px; border-bottom: 1px solid #eaeaea;">
+                  ${item.color ? `<div>Color: ${item.color}</div>` : ""}
+                  ${item.size ? `<div>Size: ${item.size}</div>` : ""}
+                </td>
+                <td style="padding: 5px; border-bottom: 1px solid #eaeaea;">${
+                  item.quantity
+                }</td>
+                <td style="padding: 5px; border-bottom: 1px solid #eaeaea;">$${item.price.toFixed(
+                  2
+                )}</td>
+              </tr>
+            `
+              )
+              .join("")}
+          </tbody>
+        </table>
+        </div>
+        <div style="border-top: 1px solid #D97706; margin-top: 20px; padding-top: 10px;">
+        <h4 style="margin: 0;">Shipping Cost: <strong>${
+          hasFreeShipping ? "Free" : "$5.00"
+        }</strong></h4>
+          <h3>Cash on Delivery: <strong>$${
+            updatedOrder.status === "succeeded"
+              ? 0
+              : (updatedOrder.amount_captured / 100).toFixed(2)
+          }</strong></h3>
+          <p>If you have any questions or concerns, please contact our support team.</p>
+          <p>Thank you for shopping with us!</p>
+        </div>    
+      </div>
+    `,
+      };
+
+      await transporter.sendMail(mailOptions);
     }
 
     revalidatePath(paths.admin());
