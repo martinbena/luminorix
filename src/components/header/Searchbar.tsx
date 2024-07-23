@@ -1,11 +1,13 @@
 "use client";
 
+import * as actions from "@/actions";
 import { useEffect, useRef } from "react";
 import { PiMagnifyingGlassThin, PiXThin } from "react-icons/pi";
 import ButtonIcon from "../ui/ButtonIcon";
 import useKeyboardInteractions from "@/hooks/useKeyboardInteractions";
 import useCloseOnClickOutside from "@/hooks/useCloseOnClickOutside";
 import Modal from "../ui/Modal";
+import { usePathname, useSearchParams } from "next/navigation";
 
 interface SearchbarProps {
   isVisible: boolean;
@@ -18,8 +20,11 @@ export default function Searchbar({
   onToggleVisibility,
   onSetVisibility,
 }: SearchbarProps) {
+  const searchParams = useSearchParams();
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const searchBarContainerRef = useRef<HTMLDivElement | null>(null);
+  const searchFormRef = useRef<HTMLFormElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (isVisible) {
@@ -28,6 +33,12 @@ export default function Searchbar({
       }, 100);
     }
   }, [isVisible]);
+
+  useEffect(() => {
+    if (pathname !== "/search" && !searchParams.get("term")) {
+      searchFormRef.current?.reset();
+    }
+  }, [pathname, searchParams]);
 
   useCloseOnClickOutside(
     isVisible,
@@ -53,12 +64,23 @@ export default function Searchbar({
     >
       <div className="flex items-center text-zinc-800 gap-6">
         <PiMagnifyingGlassThin className="h-8 w-8" />
-        <input
-          ref={searchInputRef}
-          type="text"
-          className="border-zinc-500 border-opacity-50 focus:outline-none focus:border-opacity-100 border-2 w-full bg-amber-50 text-zinc-800 placeholder-zinc-800 text-base tracking-[0.2em] px-4 py-2"
-          placeholder="Search..."
-        />
+        <form
+          ref={searchFormRef}
+          className="w-full"
+          action={(formData) => {
+            actions.search(formData);
+            onSetVisibility(false);
+          }}
+        >
+          <input
+            ref={searchInputRef}
+            name="term"
+            type="text"
+            className="border-zinc-500 border-opacity-50 focus:outline-none focus:border-opacity-100 border-2 w-full bg-amber-50 text-zinc-800 font-medium placeholder-zinc-800 text-base tracking-[0.2em] px-4 py-2"
+            placeholder="Search..."
+            defaultValue={searchParams.get("term") || ""}
+          />
+        </form>
 
         <ButtonIcon variant="small" onClick={() => onToggleVisibility()}>
           <PiXThin />

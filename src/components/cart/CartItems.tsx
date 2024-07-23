@@ -10,6 +10,7 @@ interface CartItemsProps {
 
 export default function CartItems({ type = "cart" }: CartItemsProps) {
   const { cartItems } = useCartContext();
+  console.log(cartItems);
 
   return (
     <ul className="flex flex-col gap-4">

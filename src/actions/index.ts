@@ -31,3 +31,4 @@ export { deleteMessage } from "./message";
 export { generateResetCode } from "./forgotten-password";
 export { enterResetCode } from "./forgotten-password";
 export { createNewPassword } from "./forgotten-password";
+export { search } from "./search";

@@ -141,6 +141,7 @@ export async function getOrders(
     const orders: OrderType[] = await Order.find(query)
       .skip(userId ? 0 : skip)
       .limit(userId ? 0 : PAGE_LIMIT)
+      .sort({ createdAt: -1 })
       .exec();
 
     return {

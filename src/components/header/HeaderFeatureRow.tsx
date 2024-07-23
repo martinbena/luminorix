@@ -7,7 +7,7 @@ import {
 } from "react-icons/pi";
 import HeaderFeature from "./HeaderFeature";
 import paths from "@/lib/paths";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import Searchbar from "./Searchbar";
 import { useSession } from "next-auth/react";
@@ -81,11 +81,13 @@ export default function HeaderFeatureRow() {
           </HeaderFeature>
         )}
 
-        <Searchbar
-          isVisible={isSearchVisible}
-          onToggleVisibility={toggleSearchVisibility}
-          onSetVisibility={setIsSearchVisible}
-        />
+        <Suspense>
+          <Searchbar
+            isVisible={isSearchVisible}
+            onToggleVisibility={toggleSearchVisibility}
+            onSetVisibility={setIsSearchVisible}
+          />
+        </Suspense>
       </div>
     </>
   );
