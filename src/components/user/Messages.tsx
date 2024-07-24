@@ -58,7 +58,12 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
     return () => {
       debouncedUpdateCount.cancel();
     };
-  }, [dbUnreadCount, unreadMessagesCount, setUnreadMessagesCount, debouncedUpdateCount]);
+  }, [
+    dbUnreadCount,
+    unreadMessagesCount,
+    setUnreadMessagesCount,
+    debouncedUpdateCount,
+  ]);
 
   async function handleToggleReadStatus(id: mongoose.Types.ObjectId) {
     updateOptimisticMessages(id);
@@ -68,7 +73,14 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
   return (
     <>
       {optimisticMessages
-        .sort((a, b) => (a.read === b.read ? 0 : a.read ? 1 : -1))
+        .sort((a, b) => {
+          if (a.read !== b.read) {
+            return a.read ? 1 : -1;
+          }
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        })
         .map((message) => {
           const {
             _id: id,
