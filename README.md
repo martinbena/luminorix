@@ -4,7 +4,7 @@
 
 Luminorix is a fully-featured e-commerce website built for showcasing my web development skills. This project demonstrates an online shopping platform with comprehensive functionality, including user authentication, product management, and order processing. The application is fully responsive and designed with a user-friendly interface.
 
-**Live Demo:** [Luminorix](https://luminorix-martinbena.vercel.app/)
+**Live Demo:** [Luminorix](https://luminorix-martinbena.vercel.app/) _(Please note that the demo is hosted on Vercel's free plan, which may result in slower performance for Mongoose queries and other operations.)_
 
 This app was created and styled entirely by Martin Beňa.
 

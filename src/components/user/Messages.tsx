@@ -48,7 +48,7 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
         if (dbUnreadCount !== unreadMessagesCount) {
           setUnreadMessagesCount(dbUnreadCount);
         }
-      }, 1500);
+      }, 2500);
 
       return () => clearTimeout(timeoutId);
     }

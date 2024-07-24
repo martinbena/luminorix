@@ -32,7 +32,7 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
         if (count !== wishlistCount) {
           setWishlistCount(count);
         }
-      }, 1500);
+      }, 2500);
 
       return () => clearTimeout(timeoutId);
     }
