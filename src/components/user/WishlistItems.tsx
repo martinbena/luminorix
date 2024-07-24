@@ -30,7 +30,7 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
 
   const debouncedUpdateCount = debounce((dbWishlistCount, setWishlistCount) => {
     setWishlistCount(dbWishlistCount);
-  }, 2500);
+  }, 10000);
 
   useEffect(() => {
     if (count !== wishlistCount) {

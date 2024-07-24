@@ -30,7 +30,7 @@ export default function WishlistButton({
 
   const debouncedUpdateCount = debounce((dbWishlistCount, setWishlistCount) => {
     setWishlistCount(dbWishlistCount);
-  }, 2500);
+  }, 10000);
 
   useEffect(() => {
     if (stateCount !== wishlistCount) {
