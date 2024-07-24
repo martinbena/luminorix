@@ -152,7 +152,7 @@ export async function getOrders(
       categoryCounts: categoryCountsResult,
     };
   } catch (error) {
-    console.error("Error fetching orders for user:", error);
+    // console.error("Error fetching orders for user:", error);
     throw error;
   }
 }

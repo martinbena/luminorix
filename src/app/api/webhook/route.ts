@@ -41,7 +41,6 @@ export async function POST(req: NextRequest) {
 
   const _raw = await req.text();
   const signature = req.headers.get("stripe-signature");
-  console.log("1");
 
   try {
     const event = stripe.webhooks.constructEvent(
@@ -49,7 +48,6 @@ export async function POST(req: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-    console.log("2");
 
     switch (event.type) {
       case "charge.succeeded":
@@ -58,8 +56,6 @@ export async function POST(req: NextRequest) {
         const { userId, sessionId, telephone } = chargeSucceeded.metadata;
 
         const cartSession = await CartSession.findOne({ sessionId });
-
-        console.log("3");
 
         if (!cartSession) {
           throw new Error("Cart session not found");
@@ -112,8 +108,6 @@ export async function POST(req: NextRequest) {
           cartItems: cartItemsWithProductDetails,
           success_token: sessionId,
         };
-
-        console.log("4");
 
         const order = await Order.create(orderData);
 
