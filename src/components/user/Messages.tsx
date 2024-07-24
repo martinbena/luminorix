@@ -11,6 +11,8 @@ import { useMessagesContext } from "@/app/contexts/MessagesContext";
 import ToggleMessageReadStatus from "./ToggleMessageReadStatus";
 import DeleteMessage from "./DeleteMessage";
 import { debounce } from "lodash";
+import EmptyItemList from "../admin/EmptyItemList";
+import { PiBell } from "react-icons/pi";
 
 interface MessagesProps {
   messages: Message[];
@@ -70,8 +72,18 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
     await actions.toggleMessageReadStatus(id);
   }
 
+  if (!optimisticMessages.length)
+    return (
+      <div className="mt-12">
+        <EmptyItemList
+          icon={<PiBell />}
+          message="You do not have any messages right now"
+        />
+      </div>
+    );
+
   return (
-    <>
+    <ul className="mt-12 flex flex-col gap-4">
       {optimisticMessages
         .sort((a, b) => {
           if (a.read !== b.read) {
@@ -161,7 +173,7 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
             </li>
           );
         })}
-    </>
+    </ul>
   );
 }
 

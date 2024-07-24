@@ -11,6 +11,7 @@ import { useEffect, useOptimistic } from "react";
 import { useWishlistContext } from "@/app/contexts/WishlistContext";
 import CartActions from "../cart/CartActions";
 import { debounce } from "lodash";
+import EmptyItemList from "../admin/EmptyItemList";
 
 interface WishlistProps {
   wishlist: WishlistItem[];
@@ -45,8 +46,16 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
     optimisticRemoval(sku);
     await actions.toggleWishlistProduct(slug, sku);
   }
+
+  if (!optimisticWishlist.length)
+    return (
+      <div className="mt-20">
+        <EmptyItemList message="Your wishlist is empty" />
+      </div>
+    );
+
   return (
-    <>
+    <ul className="border border-zinc-300 rounded-md">
       {optimisticWishlist.map((item) => {
         const composedTitle = getProductVariantTitle(
           item.title,
@@ -103,6 +112,6 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
           </li>
         );
       })}
-    </>
+    </ul>
   );
 }
