@@ -12,13 +12,13 @@ This app was created and styled entirely by Martin Beňa.
 
 - **User Registration and Authorization**: Secure user registration and login, including forgotten password recovery.
 - **Protected Routes**: Ensuring secure access to certain parts of the application.
-- **Admin CRUD Operations**: Comprehensive admin panel for managing products, product categories, and user orders, including sorting and filtering options.
+- **Admin sections with CRUD Operations**: Comprehensive admin panel for managing products, product categories, and user orders, including sorting and filtering options. Includes dashboard with charts, statistics and quick order management.
 - **Product Browsing, Sorting, and Filtering**: Easy navigation through products with advanced sorting and filtering capabilities.
 - **Shopping Cart Functionality**: Full shopping cart features, including adding, removing, and updating items.
 - **Payment Integration**: Secure payment processing.
 - **Discount Coupons**: Application of discount codes during checkout.
 - **Order Processing with Email Notifications**: Complete order processing system with automated email notifications.
-- **User CRUD Operations**: User management features including account settings, wishlist, reviews, order cancellations and refunds, own market items, and messages, with sorting and filtering for some operations.
+- **User section with CRUD Operations**: User management features including account settings, wishlist, reviews, order cancellations and refunds, own market items, and messages, with sorting and filtering for some operations. Also includes dashboard with charts and statistics.
 - **Search Functionality**: Efficient search across products.
 - **Newsletter**: Subscription to receive updates and promotions.
 
