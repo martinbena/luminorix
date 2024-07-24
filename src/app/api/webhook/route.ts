@@ -5,6 +5,8 @@ import {
   updateProductAndVariantSold,
   updateVariantStockBySku,
 } from "@/db/queries/products";
+import { SHIPPING_RATE } from "@/lib/constants";
+import { formatCurrency } from "@/lib/helpers";
 import { Category } from "@/models/Category";
 import Order, { CartSession, LineItem } from "@/models/Order";
 import User, { WishlistItem } from "@/models/User";
@@ -39,6 +41,7 @@ export async function POST(req: NextRequest) {
 
   const _raw = await req.text();
   const signature = req.headers.get("stripe-signature");
+  console.log("1");
 
   try {
     const event = stripe.webhooks.constructEvent(
@@ -46,6 +49,7 @@ export async function POST(req: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     );
+    console.log("2");
 
     switch (event.type) {
       case "charge.succeeded":
@@ -54,6 +58,8 @@ export async function POST(req: NextRequest) {
         const { userId, sessionId, telephone } = chargeSucceeded.metadata;
 
         const cartSession = await CartSession.findOne({ sessionId });
+
+        console.log("3");
 
         if (!cartSession) {
           throw new Error("Cart session not found");
@@ -106,6 +112,8 @@ export async function POST(req: NextRequest) {
           cartItems: cartItemsWithProductDetails,
           success_token: sessionId,
         };
+
+        console.log("4");
 
         const order = await Order.create(orderData);
 
@@ -184,8 +192,8 @@ export async function POST(req: NextRequest) {
                 <td style="padding: 5px; border-bottom: 1px solid #eaeaea;">${
                   item.quantity
                 }</td>
-                <td style="padding: 5px; border-bottom: 1px solid #eaeaea;">$${item.price.toFixed(
-                  2
+                <td style="padding: 5px; border-bottom: 1px solid #eaeaea;">${formatCurrency(
+                  item.price
                 )}</td>
               </tr>
             `
@@ -196,10 +204,10 @@ export async function POST(req: NextRequest) {
         </div>
         <div style="border-top: 1px solid #D97706; margin-top: 20px; padding-top: 10px;">
         <h4 style="margin: 0;">Shipping Cost: <strong>${
-          hasFreeShipping ? "Free" : "$5.00"
+          hasFreeShipping ? "Free" : `${formatCurrency(SHIPPING_RATE)}`
         }</strong></h4>
-          <h3>Total Price: <strong>$${(orderData.amount_captured / 100).toFixed(
-            2
+          <h3>Total Price: <strong>${formatCurrency(
+            orderData.amount_captured / 100
           )}</strong></h3>
           <p>If you have any questions or concerns, please contact our support team.</p>
           <p>Thank you for shopping with us!</p>

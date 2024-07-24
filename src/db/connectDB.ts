@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import CategoryModel from "@/models/Category";
 
 interface ProcessEnv {
   MONGODB_USERNAME: string;

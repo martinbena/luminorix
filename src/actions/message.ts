@@ -9,8 +9,6 @@ import mongoose, { ObjectId } from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { DeleteItemState } from "./category";
-import { getMessages } from "@/db/queries/messages";
-import User from "@/models/User";
 
 const sendMessageSchema = z.object({
   telephone: z

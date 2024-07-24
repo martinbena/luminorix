@@ -1,17 +1,17 @@
 "use client";
 
+import { DeleteItemState } from "@/actions/category";
+import { Product } from "@/models/Product";
+import { Document } from "mongoose";
+import { ReactElement } from "react";
 import {
   PiDotsThreeVerticalLight,
   PiPencilSimpleLineThin,
   PiTrashThin,
 } from "react-icons/pi";
-import Popover from "../ui/Popover";
 import Modal from "../ui/Modal";
+import Popover from "../ui/Popover";
 import ConfirmDelete from "./ConfirmDelete";
-import { Document, ObjectId } from "mongoose";
-import { DeleteItemState } from "@/actions/category";
-import { ReactElement } from "react";
-import { Product } from "@/models/Product";
 
 interface AdminActionsProps<T extends Document> {
   item: T & {

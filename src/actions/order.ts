@@ -7,7 +7,11 @@ import {
   getProductVariantsBySkus,
   hasFreeShipping,
 } from "@/db/queries/product";
-import { areAddressesDifferent, getProductVariantTitle } from "@/lib/helpers";
+import {
+  areAddressesDifferent,
+  formatCurrency,
+  getProductVariantTitle,
+} from "@/lib/helpers";
 import paths from "@/lib/paths";
 import { Category } from "@/models/Category";
 import { isRedirectError } from "next/dist/client/components/redirect";
@@ -22,7 +26,7 @@ import {
   updateVariantStockBySku,
 } from "@/db/queries/products";
 import mongoose from "mongoose";
-import { ORDER_STATUSES } from "@/lib/constants";
+import { ORDER_STATUSES, SHIPPING_RATE } from "@/lib/constants";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
@@ -496,7 +500,7 @@ export async function editOrder(
         .slice(-5)}`;
       const hasFreeShipping = updatedOrder.cartItems.some(
         (item: CartItem) => item.freeShipping
-      );
+      );     
 
       const mailOptions = {
         to: updatedOrder.delivery_email,
@@ -565,12 +569,12 @@ export async function editOrder(
         </div>
         <div style="border-top: 1px solid #D97706; margin-top: 20px; padding-top: 10px;">
         <h4 style="margin: 0;">Shipping Cost: <strong>${
-          hasFreeShipping ? "Free" : "$5.00"
+          hasFreeShipping ? "Free" : `${formatCurrency(SHIPPING_RATE)}`
         }</strong></h4>
-          <h3>Cash on Delivery: <strong>$${
+          <h3>Cash on Delivery: <strong>${
             updatedOrder.status === "succeeded"
-              ? 0
-              : (updatedOrder.amount_captured / 100).toFixed(2)
+              ? formatCurrency(0)
+              : formatCurrency(updatedOrder.amount_captured / 100)
           }</strong></h3>
           <p>If you have any questions or concerns, please contact our support team.</p>
           <p>Thank you for shopping with us!</p>

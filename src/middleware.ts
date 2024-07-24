@@ -1,4 +1,3 @@
-// import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import paths from "./lib/paths";
 import NextAuth from "next-auth";
