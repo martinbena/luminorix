@@ -10,6 +10,7 @@ import mongoose from "mongoose";
 import { useMessagesContext } from "@/app/contexts/MessagesContext";
 import ToggleMessageReadStatus from "./ToggleMessageReadStatus";
 import DeleteMessage from "./DeleteMessage";
+import { debounce } from "lodash";
 
 interface MessagesProps {
   messages: Message[];
@@ -42,17 +43,22 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
 
   const { unreadMessagesCount, setUnreadMessagesCount } = useMessagesContext();
 
+  const debouncedUpdateCount = debounce(
+    (dbUnreadCount, setUnreadMessagesCount) => {
+      setUnreadMessagesCount(dbUnreadCount);
+    },
+    2500
+  );
+
   useEffect(() => {
     if (dbUnreadCount !== unreadMessagesCount) {
-      const timeoutId = setTimeout(() => {
-        if (dbUnreadCount !== unreadMessagesCount) {
-          setUnreadMessagesCount(dbUnreadCount);
-        }
-      }, 2500);
-
-      return () => clearTimeout(timeoutId);
+      debouncedUpdateCount(dbUnreadCount, setUnreadMessagesCount);
     }
-  }, [dbUnreadCount, unreadMessagesCount, setUnreadMessagesCount]);
+
+    return () => {
+      debouncedUpdateCount.cancel();
+    };
+  }, [dbUnreadCount, unreadMessagesCount, setUnreadMessagesCount, debouncedUpdateCount]);
 
   async function handleToggleReadStatus(id: mongoose.Types.ObjectId) {
     updateOptimisticMessages(id);

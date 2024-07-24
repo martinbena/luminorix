@@ -10,6 +10,7 @@ import RemoveFromWishlist from "./RemoveFromWishlist";
 import { useEffect, useOptimistic } from "react";
 import { useWishlistContext } from "@/app/contexts/WishlistContext";
 import CartActions from "../cart/CartActions";
+import { debounce } from "lodash";
 
 interface WishlistProps {
   wishlist: WishlistItem[];
@@ -26,17 +27,19 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
 
   const { wishlistCount, setWishlistCount } = useWishlistContext();
 
+  const debouncedUpdateCount = debounce((dbWishlistCount, setWishlistCount) => {
+    setWishlistCount(dbWishlistCount);
+  }, 2500);
+
   useEffect(() => {
     if (count !== wishlistCount) {
-      const timeoutId = setTimeout(() => {
-        if (count !== wishlistCount) {
-          setWishlistCount(count);
-        }
-      }, 2500);
-
-      return () => clearTimeout(timeoutId);
+      debouncedUpdateCount(count, setWishlistCount);
     }
-  }, [count, wishlistCount, setWishlistCount]);
+
+    return () => {
+      debouncedUpdateCount.cancel();
+    };
+  }, [count, wishlistCount, setWishlistCount, debouncedUpdateCount]);
 
   async function handleRemoveItem(slug: string, sku: string) {
     optimisticRemoval(sku);

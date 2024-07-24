@@ -4,6 +4,7 @@ import * as actions from "@/actions";
 import { useWishlistContext } from "@/app/contexts/WishlistContext";
 import { useEffect, useOptimistic } from "react";
 import { PiHeart, PiHeartFill } from "react-icons/pi";
+import { debounce } from "lodash";
 
 interface WishlistButtonProps {
   slug: string;
@@ -27,17 +28,19 @@ export default function WishlistButton({
     }
   );
 
+  const debouncedUpdateCount = debounce((dbWishlistCount, setWishlistCount) => {
+    setWishlistCount(dbWishlistCount);
+  }, 2500);
+
   useEffect(() => {
     if (stateCount !== wishlistCount) {
-      const timeoutId = setTimeout(() => {
-        if (stateCount !== wishlistCount) {
-          setWishlistCount(wishlistCount);
-        }
-      }, 1500);
-
-      return () => clearTimeout(timeoutId);
+      debouncedUpdateCount(wishlistCount, setWishlistCount);
     }
-  }, [stateCount, wishlistCount, setWishlistCount]);
+
+    return () => {
+      debouncedUpdateCount.cancel();
+    };
+  }, [stateCount, wishlistCount, setWishlistCount, debouncedUpdateCount]);
 
   return (
     <form
