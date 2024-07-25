@@ -76,6 +76,7 @@ export default function WishlistItems({ wishlist, count }: WishlistProps) {
                 src={item.image}
                 alt={composedTitle}
                 fill
+                sizes="50vw"
                 className="object-cover"
               />
             </Link>

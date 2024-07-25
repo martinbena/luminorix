@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose";
 import ConnectDB from "../connectDB";
-import User, { WishlistItem } from "@/models/User";
+import User, { User as UserType, WishlistItem } from "@/models/User";
 import mongoose from "mongoose";
 
 export async function isProductInWishlist(
@@ -69,5 +69,47 @@ export async function getAllWishlistedItems(
   } catch (error) {
     console.error(error);
     throw new Error("Could not get user's wishlist");
+  }
+}
+
+export async function getUserWishlistInfo(userId: string) {
+  try {
+    const user: UserType | null = await User.findById(userId)
+      .select("wishlist")
+      .lean();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const wishlistCount = user.wishlist.length;
+    const allWishlistSkus = user.wishlist.map((item) => item.sku);
+
+    return {
+      wishlistCount,
+      allWishlistSkus,
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error fetching user wishlist information");
+  }
+}
+
+export async function getAllWishlistItems() {
+  try {
+    const result = await User.aggregate([
+      {
+        $project: {
+          _id: 0,
+          user: "$_id",
+          wishlistItems: "$wishlist.sku",
+        },
+      },
+    ]);
+
+    return result;
+  } catch (error) {
+    console.error("Error fetching wishlist items:", error);
+    throw error;
   }
 }

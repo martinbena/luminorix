@@ -1,23 +1,19 @@
 import { getColorAndSizeVariantsBySku } from "@/db/queries/product";
-import colorNameList from "color-name-list";
+import { getAllWishlistItems } from "@/db/queries/wishlist";
 import {
   formatCurrency,
   getDeliveryDateRange,
   getProductVariantTitle,
 } from "@/lib/helpers";
 import { ProductWithVariant } from "@/models/Product";
-import { auth } from "@/auth";
-import {
-  getAllWishlistedItems,
-  isProductInWishlist,
-} from "@/db/queries/wishlist";
-import { PiCalendarBlank, PiTruck } from "react-icons/pi";
-import SocialNetworks from "../ui/SocialNetworks";
-import VariantSelector from "./VariantSelector";
-import VariantLink from "./VariantLink";
+import colorNameList from "color-name-list";
 import { ReactNode } from "react";
-import WishlistButton from "./WishlistButton";
+import { PiCalendarBlank, PiTruck } from "react-icons/pi";
 import CartActions from "../cart/CartActions";
+import SocialNetworks from "../ui/SocialNetworks";
+import VariantLink from "./VariantLink";
+import VariantSelector from "./VariantSelector";
+import WishlistButton from "./WishlistButton";
 
 interface ProductDetailsProps {
   product: ProductWithVariant;
@@ -45,14 +41,7 @@ export default async function ProductDetails({
     sku
   );
 
-  const session = await auth();
-  const isInWishlist = session?.user
-    ? await isProductInWishlist(session?.user._id, sku)
-    : false;
-
-  const count = session?.user
-    ? (await getAllWishlistedItems(session?.user._id)).count
-    : 0;
+  const wishlistItems = await getAllWishlistItems();
 
   return (
     <div className="font-sans mb-8">
@@ -107,14 +96,11 @@ export default async function ProductDetails({
       <div className="flex gap-10 font-semibold my-8">
         <p>{stock} in stock</p>
 
-        {session?.user ? (
-          <WishlistButton
-            slug={slug}
-            sku={sku}
-            isInWishlist={isInWishlist}
-            wishlistCount={count}
-          />
-        ) : null}
+        <WishlistButton
+          slug={slug}
+          sku={sku}
+          wishlistItems={JSON.parse(JSON.stringify(wishlistItems))}
+        />
       </div>
 
       {stock > 0 ? (

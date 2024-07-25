@@ -6,6 +6,7 @@ import ProductImage from "@/components/products/ProductImage";
 import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
 import RatingDistribution from "@/components/products/RatingDistribution";
 import Ratings from "@/components/products/Ratings";
+import RatingSection from "@/components/products/RatingSection";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import {
   getAllSlugSkuCombinations,
@@ -57,19 +58,14 @@ export default async function SingleProductPage({
 
   const { title, image, ratings, averageRating, category } = product;
   const { width, height } = await probe(image);
-  const session = await auth();
-  const hasUserRated = session?.user
-    ? ratings.some(
-        (rating) => rating.postedBy._id.toString() === session.user._id
-      )
-    : false;
+
   return (
     <>
       <ProductBreadcrumb
         productTitle={title}
         productCategory={category as Category}
       />
-      <div className="grid grid-cols-2 gap-16 max-w-8xl mx-auto tab:grid-cols-1 tab:gap-8 text-zinc-800">
+      <section className="grid grid-cols-2 gap-16 max-w-8xl mx-auto tab:grid-cols-1 tab:gap-8 text-zinc-800">
         <div className="flex flex-col gap-1.5">
           <ProductImage title={title} image={image} size={{ width, height }} />
           <div className="text-base">
@@ -79,32 +75,15 @@ export default async function SingleProductPage({
           </div>
         </div>
         <ProductDetails product={product} slug={slug} sku={sku} />
-      </div>
+      </section>
       <Suspense fallback={<ProductRowSkeleton numItems={4} hasTitle />}>
         <RelatedProducts sku={sku} />
       </Suspense>
-      <div className="grid grid-cols-2 mt-16 mb-4 gap-16 tab-xl:gap-4 tab:grid-cols-1 tab:gap-16">
-        <div className="flex flex-col gap-8">
-          <RatingDistribution ratings={ratings} averageRating={averageRating} />
-          {session?.user ? (
-            !hasUserRated ? (
-              <AddEditRatingForm productSlug={slug} />
-            ) : (
-              <p className="text-base text-center">
-                You have already rated this product. Visit your{" "}
-                <Link
-                  className="underline text-amber-600"
-                  href={paths.userReviews()}
-                >
-                  profile
-                </Link>{" "}
-                for edit.
-              </p>
-            )
-          ) : null}
-        </div>
-        <Ratings ratings={JSON.parse(JSON.stringify(ratings))} />
-      </div>
+      <RatingSection
+        ratings={JSON.parse(JSON.stringify(ratings))}
+        averageRating={averageRating}
+        productSlug={slug}
+      />
     </>
   );
 }

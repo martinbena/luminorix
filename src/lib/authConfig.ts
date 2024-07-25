@@ -90,6 +90,7 @@ export const authConfig: NextAuthConfig = {
       return session;
     },
   },
+  trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
   pages: { signIn: paths.login() },
 };
