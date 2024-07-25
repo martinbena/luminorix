@@ -80,7 +80,7 @@ export default function WishlistButton({
     };
   }, [stateCount, wishlistCount, setWishlistCount, debouncedUpdateCount]);
 
-  if (!session || !session.data?.user)
+  if (session.status === "loading")
     return (
       <div className="flex items-center gap-1">
         <SkeletonBlock
@@ -100,35 +100,39 @@ export default function WishlistButton({
       </div>
     );
 
-  return (
-    <form
-      onClick={() => {
-        setWishlistCount((prevCount) =>
-          optimisticWishlistItem ? prevCount - 1 : prevCount + 1
-        );
-      }}
-      action={async () => {
-        updateOptimisticWishlistItem(isInWishlist);
-        await actions.toggleWishlistProduct(slug, sku);
-      }}
-    >
-      <button
-        type="submit"
-        className="flex focus:outline-none items-center gap-1 group"
+  if (session.data?.user) {
+    return (
+      <form
+        onClick={() => {
+          setWishlistCount((prevCount) =>
+            optimisticWishlistItem ? prevCount - 1 : prevCount + 1
+          );
+        }}
+        action={async () => {
+          updateOptimisticWishlistItem(isInWishlist);
+          await actions.toggleWishlistProduct(slug, sku);
+        }}
       >
-        {optimisticWishlistItem ? (
-          <PiHeartFill className="w-4 h-4 text-amber-500" />
-        ) : (
-          <PiHeart className="w-4 h-4" />
-        )}
-        <span
-          className={`group-hover:underline group-focus:underline ${
-            optimisticWishlistItem ? "text-amber-600" : ""
-          }`}
+        <button
+          type="submit"
+          className="flex focus:outline-none items-center gap-1 group"
         >
-          Wishlist{optimisticWishlistItem ? "ed" : ""}
-        </span>
-      </button>
-    </form>
-  );
+          {optimisticWishlistItem ? (
+            <PiHeartFill className="w-4 h-4 text-amber-500" />
+          ) : (
+            <PiHeart className="w-4 h-4" />
+          )}
+          <span
+            className={`group-hover:underline group-focus:underline ${
+              optimisticWishlistItem ? "text-amber-600" : ""
+            }`}
+          >
+            Wishlist{optimisticWishlistItem ? "ed" : ""}
+          </span>
+        </button>
+      </form>
+    );
+  } else {
+    return null;
+  }
 }

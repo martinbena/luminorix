@@ -23,7 +23,7 @@ export default function RatingSection({
   const session = useSession();
   const user = session.data?.user;
   const hasUserRated = user
-    ? ratings.some((rating) => rating.postedBy._id.toString() !== user._id)
+    ? ratings.some((rating) => rating.postedBy._id.toString() === user._id)
     : false;
 
   return (
