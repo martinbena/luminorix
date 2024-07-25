@@ -1,4 +1,3 @@
-import { auth } from "@/auth";
 import ProductBreadcrumb from "@/components/navigation/ProductBreadcrumb";
 import ProductImage from "@/components/products/ProductImage";
 import MessageForm from "@/components/user/MessageForm";
@@ -39,8 +38,7 @@ export default async function MarketItemPage({
     responders,
     product,
   } = marketItems[0];
-  const { width, height } = await probe(image);
-  const session = await auth();
+  const { width, height } = await probe(image); 
 
   return (
     <>
@@ -71,13 +69,8 @@ export default async function MarketItemPage({
           <ResponderInformation responders={responders} />
         </div>
       </div>
-      <div className="py-8 bg-zinc-100 mob-lg:bg-white mob-lg:mt-0 mt-4">
-        <MessageForm
-          isExistingSession={session?.user ? true : false}
-          recipientId={postedBy._id}
-          marketItemId={id}
-        />
-      </div>
+
+      <MessageForm recipientId={postedBy._id} marketItemId={id} />
     </>
   );
 }

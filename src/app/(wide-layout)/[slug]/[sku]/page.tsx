@@ -1,11 +1,7 @@
-import { auth } from "@/auth";
 import ProductBreadcrumb from "@/components/navigation/ProductBreadcrumb";
-import AddEditRatingForm from "@/components/products/AddEditRatingForm";
 import ProductDetails from "@/components/products/ProductDetails";
 import ProductImage from "@/components/products/ProductImage";
 import ProductRowSkeleton from "@/components/products/ProductRowSkeleton";
-import RatingDistribution from "@/components/products/RatingDistribution";
-import Ratings from "@/components/products/Ratings";
 import RatingSection from "@/components/products/RatingSection";
 import RelatedProducts from "@/components/products/RelatedProducts";
 import {
@@ -13,9 +9,7 @@ import {
   getProductVariantsBySkus,
 } from "@/db/queries/product";
 import { getProductVariantTitle } from "@/lib/helpers";
-import paths from "@/lib/paths";
 import { Category } from "@/models/Category";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import probe from "probe-image-size";
 import { Suspense } from "react";
