@@ -182,7 +182,12 @@ export async function getColorAndSizeVariantsBySku(
             { $sort: { color: 1 } },
           ],
           sizesByColor: [
-            { $match: { "variants.color": colorOfSku } },
+            {
+              $match: {
+                "variants.color": colorOfSku,
+                "variants.size": { $ne: "" },
+              },
+            },
             {
               $group: {
                 _id: "$variants.size",

@@ -42,6 +42,7 @@ export default async function ProductDetails({
   );
 
   const wishlistItems = await getAllWishlistItems();
+  console.log(sizesByColor);
 
   return (
     <div className="font-sans mb-8">
@@ -77,30 +78,32 @@ export default async function ProductDetails({
             );
           })}
         </VariantSelector>
-        <VariantSelector criterion="Size for this color">
-          {sizesByColor.map((item) => {
-            return (
-              <VariantLink
-                key={item.size}
-                slug={slug}
-                sku={item.sku}
-                selectedCriterion={size}
-                criterionOption={item.size}
-                hasDescription={false}
-              />
-            );
-          })}
-        </VariantSelector>
+        {sizesByColor.length ? (
+          <VariantSelector criterion="Size for this color">
+            {sizesByColor.map((item) => {
+              return (
+                <VariantLink
+                  key={item.size}
+                  slug={slug}
+                  sku={item.sku}
+                  selectedCriterion={size}
+                  criterionOption={item.size}
+                  hasDescription={false}
+                />
+              );
+            })}
+          </VariantSelector>
+        ) : null}
       </div>
 
       <div className="flex gap-10 font-semibold my-8">
-        <p>{stock} in stock</p>
-
         <WishlistButton
           slug={slug}
           sku={sku}
           wishlistItems={JSON.parse(JSON.stringify(wishlistItems))}
         />
+
+        <p>{stock > 0 ? `${stock} in stock` : "Not available"}</p>
       </div>
 
       {stock > 0 ? (

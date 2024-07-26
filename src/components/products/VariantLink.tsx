@@ -24,7 +24,7 @@ export default function VariantLink({
   hexColor,
 }: VariantLinkProps) {
   return (
-    <div className="flex flex-col justify-center gap-2.5">
+    <div className="flex flex-col justify-center items-center gap-2.5">
       <Link
         style={{ backgroundColor: hexColor ? hexColor?.hex : "#fff" }}
         aria-disabled={selectedCriterion === criterionOption}

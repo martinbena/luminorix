@@ -80,7 +80,7 @@ export default function DashboardStats(props: DashboardStatsProps) {
             color="bg-yellow-100"
             iconColor="child:text-yellow-700"
             icon={<PiChartBar />}
-            value={`${props.inventoryRate}%`}
+            value={`${props.inventoryRate.toFixed(1)}%`}
           />
         </>
       )}
