@@ -32,7 +32,9 @@ interface AdminOrdersPageProps {
 export default async function AdminOrdersPage({
   searchParams,
 }: AdminOrdersPageProps) {
-  const { orders, statusCounts } = await getOrders(searchParams);
+  const { orders, statusCounts, totalOrdersCount } = await getOrders(
+    searchParams
+  );
   const currentPage = +searchParams?.page || 1;
 
   const tableColumns =
@@ -104,7 +106,7 @@ export default async function AdminOrdersPage({
               <TableFooter>
                 <Pagination
                   currentPage={currentPage}
-                  totalCount={orders.length}
+                  totalCount={totalOrdersCount}
                 />
               </TableFooter>
             </Table>
