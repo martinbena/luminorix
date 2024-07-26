@@ -2,11 +2,11 @@
 
 ## Description
 
-Luminorix is a fully-featured e-commerce website built for showcasing my web development skills. This project demonstrates an online shopping platform with comprehensive functionality, including user authentication, product management, and order processing. The application is fully responsive and designed with a user-friendly interface.
+Luminorix is a fully-featured e-commerce website built for showcasing my web development skills. This project demonstrates an online shopping platform with comprehensive functionality, including user authentication, product management, and order processing. The application is fully responsive and designed with a user-friendly interface and works perfectly across all devices.
 
 **Live Demo:** [Luminorix](https://luminorix-martinbena.vercel.app/) _(Please note that the demo is hosted on Vercel's free plan, which may result in slower performance for Mongoose queries and other operations.)_
 
-This app was created and styled entirely by Martin Beňa.
+This app was designed, created and styled entirely by Martin Beňa.
 
 ## Features
 
@@ -24,7 +24,7 @@ This app was created and styled entirely by Martin Beňa.
 
 ## Technologies Used
 
-- **Next.js**: React framework for server-rendered applications.
+- **Next.js v14**: React framework for server-rendered applications using the App router. Combines server-side rendering and static site generation. Data mutations are being done via server actions, where cached data is revalidated on demand.
 - **React**: JavaScript library for building user interfaces.
 - **TypeScript**: Typed superset of JavaScript.
 - **Tailwind CSS**: Utility-first CSS framework.

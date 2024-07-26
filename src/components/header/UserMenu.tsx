@@ -22,9 +22,8 @@ export default function UserMenu() {
   const { unreadMessagesCount, setUnreadMessagesCount } = useMessagesContext();
 
   useEffect(() => {
-    if (!session) return;
-
     async function fetchUnreadMessages() {
+      if (!session.data?.user) return;
       try {
         const res = await fetch("/api/messages");
 

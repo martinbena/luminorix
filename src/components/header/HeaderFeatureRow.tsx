@@ -11,7 +11,6 @@ import { Suspense, useEffect, useState } from "react";
 
 import Searchbar from "./Searchbar";
 import { useSession } from "next-auth/react";
-import { ObjectId } from "mongoose";
 import { useWishlistContext } from "@/app/contexts/WishlistContext";
 import { useCartContext } from "@/app/contexts/CartContext";
 import { formatCurrency } from "@/lib/helpers";
@@ -34,23 +33,20 @@ export default function HeaderFeatureRow() {
   }
 
   useEffect(() => {
-    async function fetchWishlistCount(userId: ObjectId) {
-      if (userId) {
-        try {
-          const res = await fetch(`/api/wishlist/${userId}`);
-          const data = await res.json();
-          setWishlistCount(data.count);
-        } catch (error) {
-          setWishlistCount(0);
-          console.error("Failed to fetch wishlist count:", error);
-        }
+    async function fetchWishlistCount() {
+      if (!session.data?.user) return;
+      try {
+        const res = await fetch("/api/wishlist");
+        const data = await res.json();
+        setWishlistCount(data.count);
+      } catch (error) {
+        setWishlistCount(0);
+        console.error("Failed to fetch wishlist count:", error);
       }
     }
 
-    if (session.data?.user?._id) {
-      fetchWishlistCount(session.data.user._id);
-    }
-  }, [session.data?.user?._id, setWishlistCount]);
+    fetchWishlistCount();
+  }, [session, setWishlistCount]);
 
   return (
     <>

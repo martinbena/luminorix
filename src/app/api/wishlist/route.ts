@@ -1,18 +1,21 @@
+import { auth } from "@/auth";
 import ConnectDB from "@/db/connectDB";
 import User from "@/models/User";
-import { ObjectId } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-interface GetRequestParams {
-  params: { userId: ObjectId };
-}
-
-export async function GET(req: NextRequest, urlParams: GetRequestParams) {
+export async function GET(req: NextRequest) {
   try {
     await ConnectDB();
 
-    const userId = urlParams.params.userId;
-    const user = await User.findById(userId).select("wishlist");
+    const session = await auth();
+    if (!session || !session.user) {
+      return NextResponse.json({
+        error: "You must be logged in to see your messages",
+        status: 401,
+      });
+    }
+
+    const user = await User.findById(session.user._id).select("wishlist");
     if (!user) {
       return NextResponse.json({ error: "User not found", status: 404 });
     }

@@ -49,7 +49,7 @@ export default function Messages({ messages, dbUnreadCount }: MessagesProps) {
     (dbUnreadCount, setUnreadMessagesCount) => {
       setUnreadMessagesCount(dbUnreadCount);
     },
-    10000
+    5000
   );
 
   useEffect(() => {
