@@ -99,7 +99,6 @@ const productSchema = new mongoose.Schema<Product>(
       unique: true,
       minlength: 3,
       maxlength: 160,
-      text: true,
     },
     slug: {
       type: String,
@@ -112,7 +111,6 @@ const productSchema = new mongoose.Schema<Product>(
       required: true,
       minlength: 50,
       maxlength: 2000,
-      text: true,
     },
     brand: String,
     freeShipping: {
