@@ -5,9 +5,14 @@ import { getAllSuccessTokens } from "@/db/queries/orders";
 import { formatCurrency } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import Order, { Order as OrderType } from "@/models/Order";
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FaHouseChimney } from "react-icons/fa6";
+
+export const metadata: Metadata = {
+  title: "Order Summary",
+};
 
 export async function generateStaticParams() {
   const successTokens = await getAllSuccessTokens();
