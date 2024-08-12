@@ -13,6 +13,8 @@ import User, { WishlistItem } from "@/models/User";
 import { NextResponse, NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 
+export const maxDuration = 60;
+
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
