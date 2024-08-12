@@ -26,7 +26,7 @@ export default async function AllProductsPage({
   return (
     <>
       <Suspense fallback={<MostSoldProductsSkeleton />}>
-        <MostSoldProducts category={category} />
+        <MostSoldProducts categorySlug={category} />
       </Suspense>
       <Suspense
         fallback={

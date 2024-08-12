@@ -42,7 +42,6 @@ export default async function ProductDetails({
   );
 
   const wishlistItems = await getAllWishlistItems();
-  console.log(sizesByColor);
 
   return (
     <div className="font-sans mb-8">

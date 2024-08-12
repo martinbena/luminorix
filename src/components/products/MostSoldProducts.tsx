@@ -5,18 +5,20 @@ import Image from "next/image";
 import Link from "next/link";
 import paths from "@/lib/paths";
 import HeadingTertiary from "../ui/HeadingTertiary";
+import { getCategoryBySlug } from "@/db/queries/categories";
 
 interface MostSoldProductsProps {
-  category: string | undefined;
+  categorySlug: string | undefined;
 }
 
 export default async function MostSoldProducts({
-  category,
+  categorySlug,
 }: MostSoldProductsProps) {
-  const topProducts = await getTopSellingProductVariants(category);
+  const topProducts = await getTopSellingProductVariants(categorySlug);
+  const category = await getCategoryBySlug(categorySlug);
   return (
     <section className="px-8 mob:px-5">
-      <HeadingSecondary>{category ?? "All sortiment"}</HeadingSecondary>
+      <HeadingSecondary>{category?.title ?? "All sortiment"}</HeadingSecondary>
       <div className="flex flex-col gap-6 max-w-max mx-auto mt-8 mb-2">
         <div className="mb-2 text-center mob:text-left">
           <HeadingTertiary>Best sellers</HeadingTertiary>

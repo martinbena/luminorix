@@ -88,7 +88,7 @@ export async function addVariantToProduct(
     };
   }
 
-  let imageUrl
+  let imageUrl;
 
   try {
     await ConnectDB();
