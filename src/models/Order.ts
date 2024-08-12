@@ -57,7 +57,7 @@ export interface Order extends Document {
   amount_captured: number;
   currency: string;
   shipping: Shipping;
-  userId: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId | string;
   delivery_telephone: string;
   delivery_email: string;
   cartItems: CartItemSchema[];
@@ -94,7 +94,7 @@ const orderSchema = new mongoose.Schema<Order>(
       name: String,
     },
     userId: {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.Types.Mixed,
       ref: "User",
     },
     delivery_telephone: String,
