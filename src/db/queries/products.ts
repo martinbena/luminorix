@@ -80,7 +80,7 @@ export async function getProductsWithAllVariants({
       if (searchParams.sizes) {
         const sizesArray = searchParams.sizes.split(",");
         matchStage["variants.size"] = {
-          $in: sizesArray.map((size) => new RegExp(size, "i")),
+          $in: sizesArray,
         };
       }
       if (searchParams.brands) {
