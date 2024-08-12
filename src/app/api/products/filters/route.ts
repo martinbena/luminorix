@@ -169,7 +169,7 @@ export async function GET(req: NextRequest) {
                   case: {
                     $and: [
                       { $gte: ["$averageRating", 3.7] },
-                      { $lt: ["$averageRating", 4.7] },
+                      { $lt: ["$averageRating", 4.65] },
                     ],
                   },
                   then: 4,
@@ -177,7 +177,7 @@ export async function GET(req: NextRequest) {
                 {
                   case: {
                     $and: [
-                      { $gte: ["$averageRating", 4.7] },
+                      { $gte: ["$averageRating", 4.65] },
                       { $lte: ["$averageRating", 5] },
                     ],
                   },

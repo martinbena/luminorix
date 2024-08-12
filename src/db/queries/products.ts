@@ -92,8 +92,8 @@ export async function getProductsWithAllVariants({
       if (searchParams.ratings) {
         const ratingsArray = searchParams.ratings.split(",").map(Number);
         matchStage.averageRating = {
-          $gte: Math.min(...ratingsArray) - 0.3,
-          $lte: Math.max(...ratingsArray) + 0.7,
+          $gte: Math.min(...ratingsArray) - 0.35,
+          $lte: Math.max(...ratingsArray) + 0.65,
         };
       }
     }
