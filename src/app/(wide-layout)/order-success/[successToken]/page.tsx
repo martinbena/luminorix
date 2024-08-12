@@ -13,17 +13,29 @@ export const metadata: Metadata = {
   title: "Order Summary",
 };
 
+// Ensure that the data will be fetched correctly during the order creation on Vercel's free plan / slow querries
+async function fetchOrder(successToken: string) {
+  const order = await Order.findOne({ success_token: successToken });
+
+  if (!order) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    return await Order.findOne({ success_token: successToken });
+  }
+
+  return order;
+}
+
 export default async function OrderSuccessPage({
   params,
 }: {
   params: { successToken: string };
 }) {
   const { successToken } = params;
-  const order: OrderType | null = await Order.findOne({
-    success_token: successToken,
-  });
+  const order = await fetchOrder(successToken);
 
-  if (!order) notFound();
+  if (!order) {
+    notFound();
+  }
 
   const { _id: id, amount_captured: totalPrice, cartItems } = order;
 
