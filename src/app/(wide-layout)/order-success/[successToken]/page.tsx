@@ -1,7 +1,6 @@
 import ClearCart from "@/components/cart/ClearCart";
 import OrderDetails from "@/components/orders/OrderDetails";
 import OrderSummary from "@/components/orders/OrderSummary";
-import { getAllSuccessTokens } from "@/db/queries/orders";
 import { formatCurrency } from "@/lib/helpers";
 import paths from "@/lib/paths";
 import Order, { Order as OrderType } from "@/models/Order";
@@ -13,11 +12,6 @@ import { FaHouseChimney } from "react-icons/fa6";
 export const metadata: Metadata = {
   title: "Order Summary",
 };
-
-export async function generateStaticParams() {
-  const successTokens = await getAllSuccessTokens();
-  return successTokens;
-}
 
 export default async function OrderSuccessPage({
   params,
