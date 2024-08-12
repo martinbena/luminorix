@@ -39,7 +39,11 @@ export default function VariantLink({
         {hasDescription ? (
           <span>&nbsp;</span>
         ) : (
-          <span className="font-medium">{criterionOption}</span>
+          <span className="font-medium">
+            {criterionOption.includes("mm")
+              ? criterionOption.slice(0, 2)
+              : criterionOption}
+          </span>
         )}
       </Link>
       {hasDescription ? (
