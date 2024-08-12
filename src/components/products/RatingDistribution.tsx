@@ -68,7 +68,7 @@ export default function RatingDistribution({
               {starIcons}
               {emptyStarIcons}
             </div>
-            <span className="text-base">{percentage}%</span>
+            <span className="text-base">{Math.round(percentage)}%</span>
           </div>
         </div>
       );
