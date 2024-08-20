@@ -148,7 +148,7 @@ export default function AddEditProductForm({
           <Form.InputGroup
             inputType="number"
             step={0.01}
-            name="previous-price"
+            name="previousPrice"
             placeholder="199.99"
             error={formState.errors.previousPrice}
             value={product?.previousPrice}

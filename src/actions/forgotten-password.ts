@@ -1,22 +1,12 @@
 "use server";
 
 import { hashPassword } from "@/lib/brcypt";
-import ConnectDB from "@/db/connectDB";
+import { handleDataMutation } from "@/lib/handleDataMutation";
+import { transporter } from "@/lib/nodemailerTransporter";
+import { validateFormData } from "@/lib/validateFormData";
 import User from "@/models/User";
-import { z } from "zod";
 import randomInteger from "random-int";
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  service: "Gmail",
-  auth: {
-    user: process.env.GMAIL_AUTH_USER,
-    pass: process.env.GMAIL_AUTH_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+import { z } from "zod";
 
 const generateResetCodeSchema = z
   .object({
@@ -59,14 +49,14 @@ export async function generateResetCode(
   formState: GenerateResetCodeFormState,
   formData: FormData
 ): Promise<GenerateResetCodeFormState> {
-  const result = generateResetCodeSchema.safeParse({
-    email: formData.get("email"),
-    emailConfirm: formData.get("email-confirm"),
-  });
+  const { result, errors } = validateFormData(
+    generateResetCodeSchema,
+    formData
+  );
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
@@ -78,18 +68,10 @@ export async function generateResetCode(
     };
   }
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const user = await User.findOne({ email: result.data.email });
 
-    if (!user) {
-      return {
-        errors: {
-          _form: ["There is no user with this e-mail address"],
-        },
-      };
-    }
+    if (!user) throw new Error("There is no user with this e-mail address");
 
     const resetCode = randomInteger(100000, 999999);
 
@@ -121,27 +103,13 @@ export async function generateResetCode(
     };
 
     await transporter.sendMail(mailOptions);
+  });
 
-    return {
-      errors: {},
-      success: true,
-      email: result.data.email,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+    email: result.data.email,
+  };
 }
 
 interface EnterResetCodeFormState {
@@ -172,42 +140,20 @@ export async function enterResetCode(
     };
   }
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const user = await User.findOne({
       email,
       "resetCode.data": resetCode,
       "resetCode.expiresAt": { $gt: new Date() },
     });
 
-    if (!user) {
-      return {
-        errors: {
-          _form: ["Invalid or expired reset code"],
-        },
-      };
-    }
+    if (!user) throw new Error("Invalid or expired reset code");
+  });
 
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 interface createNewPasswordFormState {
@@ -225,14 +171,14 @@ export async function createNewPassword(
   formState: createNewPasswordFormState,
   formData: FormData
 ): Promise<createNewPasswordFormState> {
-  const result = createNewPasswordSchema.safeParse({
-    password: formData.get("password"),
-    passwordConfirm: formData.get("password-confirm"),
-  });
+  const { result, errors } = validateFormData(
+    createNewPasswordSchema,
+    formData
+  );
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
@@ -252,45 +198,23 @@ export async function createNewPassword(
     };
   }
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const user = await User.findOne({
       email,
       "resetCode.data": resetCode,
       "resetCode.expiresAt": { $gt: new Date() },
     });
 
-    if (!user) {
-      return {
-        errors: {
-          _form: ["Invalid or expired reset code"],
-        },
-      };
-    }
+    if (!user) throw new Error("Invalid or expired reset code");
 
     user.password = await hashPassword(result.data.password);
     user.resetCode = null;
 
     await user.save();
+  });
 
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }

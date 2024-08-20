@@ -41,7 +41,7 @@ export default function ChangePasswordForm({
       <Form formAction={action} formRef={formRef}>
         <Form.Title>Change password</Form.Title>
         <Form.InputGroup
-          name="old-password"
+          name="oldPassword"
           inputType="password"
           error={formState.errors.oldPassword}
           isReadOnly={isGoogleUser}
@@ -49,7 +49,7 @@ export default function ChangePasswordForm({
           Current password
         </Form.InputGroup>
         <Form.InputGroup
-          name="new-password"
+          name="newPassword"
           inputType="password"
           error={formState.errors.newPassword}
           isReadOnly={isGoogleUser}
@@ -57,7 +57,7 @@ export default function ChangePasswordForm({
           New Password
         </Form.InputGroup>
         <Form.InputGroup
-          name="new-password-confirm"
+          name="newPasswordConfirm"
           inputType="password"
           error={formState.errors.newPasswordConfirm}
           isReadOnly={isGoogleUser}

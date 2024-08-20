@@ -38,7 +38,7 @@ export default function RegisterForm() {
       <Form.InputGroup
         name="fullName"
         inputType="text"
-        error={formState.errors.name}
+        error={formState.errors.fullName}
       >
         Full name
       </Form.InputGroup>

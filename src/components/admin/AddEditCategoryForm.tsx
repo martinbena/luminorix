@@ -55,9 +55,11 @@ export default function AddEditCategoryForm({
         </Form.Title>
         <Form.InputGroup
           inputType="text"
-          name={isEditSession ? "edit-title" : "title"}
+          name={isEditSession ? "editTitle" : "title"}
           placeholder="Women's fashion"
-          error={formState.errors.title}
+          error={
+            isEditSession ? formState.errors.editTitle : formState.errors.title
+          }
           value={category?.title}
           inputRef={firstInputRef}
         >

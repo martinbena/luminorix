@@ -1,18 +1,19 @@
 "use server";
 
-import { auth } from "@/auth";
-import ConnectDB from "@/db/connectDB";
-import paths from "@/lib/paths";
-import Product from "@/models/Product";
-import { revalidatePath } from "next/cache";
-import slugify from "slugify";
-import { z } from "zod";
-import { DeleteItemState } from "./category";
-import mongoose from "mongoose";
+import { validateUserSession } from "@/auth";
 import {
   removeImageFromCloudinary,
   uploadIamgeToCloudinaryAndGetUrl,
 } from "@/lib/async-helpers";
+import { handleDataMutation } from "@/lib/handleDataMutation";
+import paths from "@/lib/paths";
+import { validateFormData } from "@/lib/validateFormData";
+import Product from "@/models/Product";
+import mongoose from "mongoose";
+import { revalidatePath } from "next/cache";
+import slugify from "slugify";
+import { z } from "zod";
+import { DeleteItemState } from "./category";
 
 const productVariantEditSchema = z.object({
   color: z.string().optional(),
@@ -103,111 +104,73 @@ export async function createProduct(
   formState: CreateProductFormState,
   formData: FormData
 ): Promise<CreateProductFormState> {
-  const result = createProductSchema.safeParse({
-    category: formData.get("category"),
-    title: formData.get("title"),
-    description: formData.get("description"),
-    brand: formData.get("brand"),
-    freeShipping: formData.get("shipping"),
-    color: formData.get("color"),
-    size: formData.get("size"),
-    price: formData.get("price"),
-    previousPrice: formData.get("previous-price"),
-    image: formData.get("image"),
-    stock: formData.get("stock"),
-    sku: formData.get("sku"),
-  });
+  const { result, errors } = validateFormData(createProductSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (!session || !session.user || session.user.role !== "admin") {
+  const { authorized, authError } = await validateUserSession();
+
+  if (!authorized) {
     return {
       errors: {
-        _form: ["You are not authorized to do this"],
+        _form: [authError],
       },
     };
   }
 
   let imageUrl;
 
-  try {
-    await ConnectDB();
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const skuCount = await Product.countDocuments({
+        "variants.sku": result.data.sku,
+      });
+      const titleCount = await Product.countDocuments({
+        title: result.data.title,
+      });
+      if (skuCount !== 0 || titleCount !== 0) throw new Error("duplicate key");
 
-    const skuCount = await Product.countDocuments({
-      "variants.sku": result.data.sku,
-    });
-    const titleCount = await Product.countDocuments({
-      title: result.data.title,
-    });
-    if (skuCount !== 0 || titleCount !== 0) {
-      throw new Error("duplicate key");
-    }
+      imageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
 
-    imageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
-
-    const newProduct = new Product({
-      category: result.data.category,
-      title: result.data.title,
-      slug: slugify(result.data.title.replace(/'/g, "")),
-      description: result.data.description,
-      brand: result.data.brand,
-      freeShipping: result.data.freeShipping,
-      variants: [
-        {
-          sku: result.data.sku,
-          price: +result.data.price,
-          previousPrice:
-            result.data.previousPrice !== undefined &&
-            +result.data.previousPrice,
-          color: result.data.color,
-          size: result.data.size,
-          stock: result.data.stock,
-          image: imageUrl,
-        },
-      ],
-    });
-
-    await newProduct.save();
-
-    revalidatePath(paths.home(), "layout");
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (imageUrl) {
-      try {
-        await removeImageFromCloudinary(imageUrl);
-      } catch (removeError) {
-        console.error("Error removing image from Cloudinary:", removeError);
-      }
-    }
-    if (error instanceof Error) {
-      if (error.message.includes("duplicate key")) {
-        return {
-          errors: {
-            _form: ["The product with this title or SKU already exists"],
+      const newProduct = new Product({
+        category: result.data.category,
+        title: result.data.title,
+        slug: slugify(result.data.title.replace(/'/g, "")),
+        description: result.data.description,
+        brand: result.data.brand,
+        freeShipping: result.data.freeShipping,
+        variants: [
+          {
+            sku: result.data.sku,
+            price: +result.data.price,
+            previousPrice:
+              result.data.previousPrice !== undefined &&
+              +result.data.previousPrice,
+            color: result.data.color,
+            size: result.data.size,
+            stock: result.data.stock,
+            image: imageUrl,
           },
-        };
-      }
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+        ],
+      });
+
+      await newProduct.save();
+
+      revalidatePath(paths.home(), "layout");
+    },
+    "An error has occurred while creating product",
+    true,
+    imageUrl
+  );
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 interface EditProductWithVariantFormState {
@@ -233,164 +196,128 @@ export async function editProductWithVariant(
   formState: EditProductWithVariantFormState,
   formData: FormData
 ): Promise<EditProductWithVariantFormState> {
-  const result = editProductWithVariantSchema.safeParse({
-    category: formData.get("category"),
-    title: formData.get("title"),
-    description: formData.get("description"),
-    brand: formData.get("brand"),
-    freeShipping: formData.get("shipping"),
-    color: formData.get("color"),
-    size: formData.get("size"),
-    price: formData.get("price"),
-    previousPrice: formData.get("previous-price"),
-    image: formData.get("image"),
-    stock: formData.get("stock"),
-    sku: formData.get("sku"),
-  });
+  const { result, errors } = validateFormData(
+    editProductWithVariantSchema,
+    formData
+  );
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (!session || !session.user || session.user.role !== "admin") {
+  const { authorized, authError } = await validateUserSession();
+
+  if (!authorized) {
     return {
       errors: {
-        _form: ["You are not authorized to do this"],
+        _form: [authError],
       },
     };
   }
 
-  let newImageUrl;
+  let newImageUrl: string | undefined;
 
-  try {
-    await ConnectDB();
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const titleCount = await Product.countDocuments({
+        title: result.data.title,
+        _id: { $ne: id },
+      });
+      if (titleCount !== 0) throw new Error("duplicate key");
 
-    const titleCount = await Product.countDocuments({
-      title: result.data.title,
-      _id: { $ne: id },
-    });
-    if (titleCount !== 0) {
-      throw new Error("duplicate key");
-    }
-
-    // The original image url
-    const product = await Product.findOne(
-      {
-        _id: id,
-        "variants.sku": sku,
-      },
-      {
-        "variants.$": 1,
-      }
-    ).exec();
-
-    if (!product || !product.variants.length) {
-      return {
-        errors: {
-          _form: ["Variant not found"],
+      const product = await Product.findOne(
+        {
+          _id: id,
+          "variants.sku": sku,
         },
-      };
-    }
-    const oldImageUrl = product.variants[0].image;
+        {
+          "variants.$": 1,
+        }
+      ).exec();
 
-    if (result.data.image && result.data.image.size > 0) {
-      newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
-    }
+      if (!product || !product.variants.length)
+        throw new Error("Variant not found");
 
-    const editResult = await Product.updateOne(
-      {
-        _id: id,
-        "variants.sku": sku,
-      },
-      {
-        $set: {
-          category: result.data.category,
-          title: result.data.title,
-          slug: slugify(result.data.title.replace(/'/g, "")),
-          description: result.data.description,
-          brand: result.data.brand,
-          freeShipping: result.data.freeShipping,
-          "variants.$.price": +result.data.price,
-          "variants.$.previousPrice":
-            result.data.previousPrice !== undefined
-              ? +result.data.previousPrice
-              : undefined,
-          "variants.$.color": result.data.color,
-          "variants.$.size": result.data.size,
-          "variants.$.stock": result.data.stock,
-          "variants.$.image":
-            result.data.image && result.data.image.size > 0
-              ? newImageUrl
-              : oldImageUrl,
+      const oldImageUrl = product.variants[0].image;
+
+      if (result.data.image && result.data.image.size > 0) {
+        newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(result.data.image);
+      }
+
+      const editResult = await Product.updateOne(
+        {
+          _id: id,
+          "variants.sku": sku,
         },
-      }
-    ).exec();
-
-    if (
-      result.data.image &&
-      result.data.image.size > 0 &&
-      editResult.modifiedCount !== 0
-    ) {
-      await removeImageFromCloudinary(oldImageUrl);
-    }
-
-    revalidatePath(paths.home(), "layout");
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (newImageUrl) {
-      try {
-        await removeImageFromCloudinary(newImageUrl);
-      } catch (removeError) {
-        console.error("Error removing image from Cloudinary:", removeError);
-      }
-    }
-    if (error instanceof Error) {
-      if (error.message.includes("duplicate key")) {
-        return {
-          errors: {
-            _form: ["This product already exists"],
+        {
+          $set: {
+            category: result.data.category,
+            title: result.data.title,
+            slug: slugify(result.data.title.replace(/'/g, "")),
+            description: result.data.description,
+            brand: result.data.brand,
+            freeShipping: result.data.freeShipping,
+            "variants.$.price": +result.data.price,
+            "variants.$.previousPrice":
+              result.data.previousPrice !== undefined
+                ? +result.data.previousPrice
+                : undefined,
+            "variants.$.color": result.data.color,
+            "variants.$.size": result.data.size,
+            "variants.$.stock": result.data.stock,
+            "variants.$.image":
+              result.data.image && result.data.image.size > 0
+                ? newImageUrl
+                : oldImageUrl,
           },
-        };
+        }
+      ).exec();
+
+      if (
+        result.data.image &&
+        result.data.image.size > 0 &&
+        editResult.modifiedCount !== 0
+      ) {
+        await removeImageFromCloudinary(oldImageUrl);
       }
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+
+      revalidatePath(paths.home(), "layout");
+    },
+    "Something went wrong",
+    true,
+    newImageUrl
+  );
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 export async function deleteProduct(
   id: mongoose.Types.ObjectId
 ): Promise<DeleteItemState> {
-  try {
-    await ConnectDB();
-    await Product.findByIdAndDelete(id);
-    revalidatePath("/", "layout");
+  const { authorized, authError } = await validateUserSession();
+
+  if (!authorized) {
     return {
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
-    }
-    return {
-      error: "Product could not be deleted. Please try again later",
+      error: authError,
     };
   }
+
+  const mutationResult = await handleDataMutation(
+    async () => {
+      await Product.findByIdAndDelete(id);
+      revalidatePath("/", "layout");
+    },
+    "Product could not be deleted. Please try again later",
+    false
+  );
+
+  return {
+    error: mutationResult.error || "",
+    success: mutationResult.success,
+  };
 }

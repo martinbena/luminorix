@@ -1,8 +1,9 @@
 "use server";
 
-import { auth } from "@/auth";
-import ConnectDB from "@/db/connectDB";
+import { validateUserSession } from "@/auth";
+import { handleDataMutation } from "@/lib/handleDataMutation";
 import paths from "@/lib/paths";
+import { validateFormData } from "@/lib/validateFormData";
 import MarketItem from "@/models/MarketItem";
 import Message from "@/models/Message";
 import mongoose, { ObjectId } from "mongoose";
@@ -41,27 +42,26 @@ export async function sendMessage(
   formState: SendMessageFormState,
   formData: FormData
 ): Promise<SendMessageFormState> {
-  const result = sendMessageSchema.safeParse({
-    telephone: formData.get("contact-phone"),
-    message: formData.get("message"),
-  });
+  const { result, errors } = validateFormData(sendMessageSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (!session || !session.user) {
+  const { authenticated, authError, user } = await validateUserSession();
+
+  if (!authenticated) {
     return {
       errors: {
-        _form: ["You are not authorized to do this"],
+        _form: [authError],
       },
     };
   }
-  const senderId = session.user._id;
-  if (senderId.toString() === recipientId.toString()) {
+  const senderId = user?._id;
+  if (senderId?.toString() === recipientId.toString()) {
+    console.log("haha");
     return {
       errors: {
         _form: ["You are not allowed to send messages to yourself"],
@@ -69,24 +69,11 @@ export async function sendMessage(
     };
   }
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const marketItem = await MarketItem.findById(marketItemId).exec();
-    if (!marketItem) {
-      return {
-        errors: {
-          _form: ["Market item not found"],
-        },
-      };
-    }
-    if (marketItem.responders.includes(senderId)) {
-      return {
-        errors: {
-          _form: ["You have already responded to this market item"],
-        },
-      };
-    }
+    if (!marketItem) throw new Error("Market item not found");
+    if (marketItem.responders.includes(senderId))
+      throw new Error("You have already responded to this market item");
 
     const { telephone, message } = result.data;
 
@@ -105,71 +92,56 @@ export async function sendMessage(
 
     revalidatePath(paths.userMessages());
     revalidatePath(paths.marketItemShow(marketItemId.toString()));
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  });
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 export async function toggleMessageReadStatus(id: mongoose.Types.ObjectId) {
-  const session = await auth();
-  if (!session || !session.user) {
-    throw new Error("Only logged in users can manage their messages");
-  }
+  await handleDataMutation(
+    async () => {
+      const message = await Message.findById(id);
+      if (!message) throw new Error("Message not found");
 
-  try {
-    const message = await Message.findById(id);
-    if (!message) throw new Error("Message not found");
+      const { authorized, authError } = await validateUserSession(
+        message.recipient.toString()
+      );
+      if (!authorized) throw new Error(authError);
 
-    if (session.user._id.toString() !== message.recipient.toString())
-      throw new Error("You are not authorized to do this");
+      message.read = !message.read;
 
-    message.read = !message.read;
+      await message.save();
+    },
+    "Something went wrong",
+    false
+  );
 
-    await message.save();
-  } catch (error) {
-    console.log(error);
-    return {
-      error: "Something went wrong",
-    };
-  } finally {
-    revalidatePath(paths.userMessages());
-  }
+  revalidatePath(paths.userReviews());
 }
 
 export async function deleteMessage(
   id: mongoose.Types.ObjectId
 ): Promise<DeleteItemState> {
-  try {
-    await ConnectDB();
-    await Message.findByIdAndDelete(id);
-    revalidatePath(paths.userMessages());
-    return {
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
-    }
-    return {
-      error: "Message could not be deleted. Please try again later",
-    };
-  }
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const message = await Message.findById(id);
+      const { authorized, authError } = await validateUserSession(
+        message.recipient.toString()
+      );
+      if (!authorized) throw new Error(authError);
+      await Message.findByIdAndDelete(id);
+    },
+    "Message could not be deleted. Please try again later",
+    false
+  );
+
+  revalidatePath(paths.userReviews());
+
+  return {
+    error: mutationResult.error || "",
+    success: mutationResult.success,
+  };
 }

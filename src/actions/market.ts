@@ -1,14 +1,15 @@
 "use server";
 
-import { auth } from "@/auth";
-import ConnectDB from "@/db/connectDB";
+import { validateUserSession } from "@/auth";
 import { calculateAveragePrice } from "@/db/queries/product";
 import {
   removeImageFromCloudinary,
   uploadIamgeToCloudinaryAndGetUrl,
 } from "@/lib/async-helpers";
+import { handleDataMutation } from "@/lib/handleDataMutation";
 import { formatCurrency } from "@/lib/helpers";
 import paths from "@/lib/paths";
+import { validateFormData } from "@/lib/validateFormData";
 import MarketItem from "@/models/MarketItem";
 import mongoose, { ObjectId } from "mongoose";
 import { revalidatePath } from "next/cache";
@@ -71,93 +72,65 @@ export async function addMarketItem(
   formState: MarketItemFormState,
   formData: FormData
 ): Promise<MarketItemFormState> {
-  const result = addMarketItemSchema.safeParse({
-    product: formData.get("product"),
-    price: formData.get("price"),
-    age: formData.get("age"),
-    condition: formData.get("condition"),
-    issues: formData.get("issues"),
-    image: formData.get("image"),
-  });
+  const { result, errors } = validateFormData(addMarketItemSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (!session || !session.user) {
+  const { authenticated, authError, user } = await validateUserSession();
+
+  if (!authenticated) {
     return {
       errors: {
-        _form: ["You are not authorized to do this"],
+        _form: [authError],
       },
     };
   }
 
   let imageUrl: string | undefined;
 
-  try {
-    await ConnectDB();
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const { product, price, age, condition, issues, image } = result.data;
 
-    const { product, price, age, condition, issues, image } = result.data;
+      const highestAllowedPrice = Math.floor(
+        (await calculateAveragePrice(product)) * 0.35
+      );
 
-    const highestAllowedPrice = Math.floor(
-      (await calculateAveragePrice(product)) * 0.35
-    );
+      if (+price > highestAllowedPrice)
+        throw new Error(
+          `Highest allowed price is ${formatCurrency(highestAllowedPrice)}`
+        );
 
-    if (+price > highestAllowedPrice) {
-      return {
-        errors: {
-          price: [
-            `Highest allowed price is ${formatCurrency(highestAllowedPrice)}`,
-          ],
-        },
-      };
-    }
+      imageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
 
-    imageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
+      const marketItem = new MarketItem({
+        product,
+        postedBy: user?._id,
+        price: +price,
+        age: +age,
+        condition,
+        issues,
+        image: imageUrl,
+      });
 
-    const marketItem = new MarketItem({
-      product,
-      postedBy: session.user._id,
-      price: +price,
-      age: +age,
-      condition,
-      issues,
-      image: imageUrl,
-    });
+      await marketItem.save();
 
-    await marketItem.save();
+      revalidatePath(paths.marketItemShowAll());
+      revalidatePath(paths.userMarketItemShow());
+    },
+    "Spmething went wrong",
+    true,
+    imageUrl
+  );
 
-    revalidatePath(paths.marketItemShowAll());
-    revalidatePath(paths.userMarketItemShow());
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (imageUrl) {
-      try {
-        await removeImageFromCloudinary(imageUrl);
-      } catch (removeError) {
-        console.error("Error removing image from Cloudinary:", removeError);
-      }
-    }
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 export async function editMarketItem(
@@ -165,153 +138,106 @@ export async function editMarketItem(
   formState: MarketItemFormState,
   formData: FormData
 ): Promise<MarketItemFormState> {
-  const result = editMarketItemSchema.safeParse({
-    product: formData.get("product"),
-    price: formData.get("price"),
-    age: formData.get("age"),
-    condition: formData.get("condition"),
-    issues: formData.get("issues"),
-    image: formData.get("image"),
-  });
+  const { result, errors } = validateFormData(editMarketItemSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
-    };
-  }
-
-  const session = await auth();
-  if (!session || !session.user) {
-    return {
-      errors: {
-        _form: ["You are not authorized to do this"],
-      },
+      errors,
     };
   }
 
   let newImageUrl: string | undefined;
 
-  try {
-    await ConnectDB();
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const editedItem = await MarketItem.findById(id);
 
-    const editedItem = await MarketItem.findById(id);
-
-    if (!editedItem) {
-      return {
-        errors: {
-          _form: ["Item not found"],
-        },
-      };
-    }
-
-    if (
-      session.user._id.toString() !== editedItem.postedBy.toString() &&
-      session.user.role !== "admin"
-    ) {
-      return {
-        errors: {
-          _form: ["You are not authorized to do this"],
-        },
-      };
-    }
-
-    const { product, price, image } = result.data;
-
-    const highestAllowedPrice = Math.floor(
-      (await calculateAveragePrice(product)) * 0.35
-    );
-
-    if (+price > highestAllowedPrice) {
-      return {
-        errors: {
-          price: [
-            `Highest allowed price is ${formatCurrency(highestAllowedPrice)}`,
-          ],
-        },
-      };
-    }
-
-    const oldImageUrl = editedItem.image;
-
-    if (image && image.size > 0) {
-      newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
-    }
-
-    const updateData = {
-      ...result.data,
-      image: image && image.size > 0 ? newImageUrl : oldImageUrl,
-    };
-
-    const editResult = await MarketItem.findByIdAndUpdate(id, updateData);
-
-    if (image && image.size > 0 && editResult.modifiedCount !== 0) {
-      await removeImageFromCloudinary(oldImageUrl);
-    }
-
-    revalidatePath(paths.marketItemShowAll());
-    revalidatePath(paths.userMarketItemShow());
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (newImageUrl) {
-      try {
-        await removeImageFromCloudinary(newImageUrl);
-      } catch (removeError) {
-        console.error("Error removing image from Cloudinary:", removeError);
+      if (!editedItem) {
+        return {
+          errors: {
+            _form: ["Item not found"],
+          },
+        };
       }
-    }
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
+
+      const { authorized, authError } = await validateUserSession(
+        editedItem.postedBy.toString()
+      );
+
+      if (!authorized) throw new Error(authError);
+
+      const { product, price, image } = result.data;
+
+      const highestAllowedPrice = Math.floor(
+        (await calculateAveragePrice(product)) * 0.35
+      );
+
+      if (+price > highestAllowedPrice)
+        throw new Error(
+          `Highest allowed price is ${formatCurrency(highestAllowedPrice)}`
+        );
+
+      const oldImageUrl = editedItem.image;
+
+      if (image && image.size > 0) {
+        newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
+      }
+
+      const updateData = {
+        ...result.data,
+        image: image && image.size > 0 ? newImageUrl : oldImageUrl,
       };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+
+      const editResult = await MarketItem.findByIdAndUpdate(id, updateData);
+
+      if (image && image.size > 0 && editResult.modifiedCount !== 0) {
+        await removeImageFromCloudinary(oldImageUrl);
+      }
+
+      revalidatePath(paths.marketItemShowAll());
+      revalidatePath(paths.userMarketItemShow());
+    },
+    "Market item could not be edited",
+    true,
+    newImageUrl
+  );
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 export async function deleteMarketItem(
   id: mongoose.Types.ObjectId
 ): Promise<DeleteItemState> {
-  try {
-    await ConnectDB();
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const item = await MarketItem.findById(id);
 
-    const item = await MarketItem.findById(id);
+      if (!item) throw new Error("Market item not found");
 
-    if (!item) {
-      return {
-        error: "Market item not found",
-      };
-    }
-    const imageUrl = item.image;
+      const { authorized, authError } = await validateUserSession(
+        item.postedBy.toString()
+      );
+      if (!authorized) throw new Error(authError);
 
-    await MarketItem.findByIdAndDelete(id);
+      const imageUrl = item.image;
 
-    if (imageUrl) {
-      await removeImageFromCloudinary(imageUrl);
-    }
+      await MarketItem.findByIdAndDelete(id);
 
-    revalidatePath(paths.marketItemShowAll(), "layout");
-    revalidatePath(paths.userMarketItemShow());
-    return {
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
-    }
-    return {
-      error: "Market item could not be deleted. Please try again later",
-    };
-  }
+      if (imageUrl) {
+        await removeImageFromCloudinary(imageUrl);
+      }
+
+      revalidatePath(paths.marketItemShowAll(), "layout");
+      revalidatePath(paths.userMarketItemShow());
+    },
+    "Market item could not be deleted. Please try again later",
+    false
+  );
+
+  return {
+    success: mutationResult.success,
+  };
 }

@@ -1,14 +1,15 @@
 "use server";
 
-import { auth } from "@/auth";
-import ConnectDB from "@/db/connectDB";
+import { validateUserSession } from "@/auth";
+import { handleDataMutation } from "@/lib/handleDataMutation";
+import paths from "@/lib/paths";
+import { validateFormData } from "@/lib/validateFormData";
+import Order from "@/models/Order";
 import Product, { Rating } from "@/models/Product";
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { DeleteItemState } from "./category";
-import paths from "@/lib/paths";
-import Order from "@/models/Order";
 
 const productRatingSchema = z.object({
   rating: z.preprocess(
@@ -44,130 +45,94 @@ export async function addRating(
   formState: AddRatingFormState,
   formData: FormData
 ): Promise<AddRatingFormState> {
-  const result = productRatingSchema.safeParse({
-    rating: formData.get("rating"),
-    comment: formData.get("comment"),
-    productSlug: formData.get("product-slug"),
-  });
+  const { result, errors } = validateFormData(productRatingSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (!session || !session.user) {
+  const { authenticated, authError, user } = await validateUserSession();
+
+  if (!authenticated) {
     return {
       errors: {
-        _form: [
-          "Only logged in users who purchased the product may leave a review",
-        ],
+        _form: [authError],
       },
     };
   }
+  const userId = user?._id;
 
-  const user = session.user._id;
-
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const product = await Product.findOne({ slug: result.data.productSlug })
       .populate("ratings")
       .exec();
 
     const existingRating = product.ratings.find(
-      (rating: Rating) => rating.postedBy.toString() === user.toString()
+      (rating: Rating) => rating.postedBy.toString() === userId?.toString()
     );
 
-    if (existingRating) {
-      return {
-        errors: {
-          _form: [
-            "You have already rated this product. You can visit you profile for edit",
-          ],
-        },
-      };
-    }
+    if (existingRating)
+      throw new Error(
+        "You have already rated this product. You can visit you profile for edit"
+      );
 
     const userPurchased = await Order.findOne({
-      userId: session.user._id,
+      userId: new mongoose.Types.ObjectId(userId?.toString()),
       "cartItems._id": product._id,
       delivery_status: "Delivered",
     });
 
-    if (!userPurchased) {
-      return {
-        errors: {
-          _form: [
-            "You can only leave rating for products you have purchased and got delivered",
-          ],
-        },
-      };
-    }
+    if (!userPurchased)
+      throw new Error(
+        "You can only leave rating for products you have purchased and got delivered"
+      );
 
     product.ratings.push({
       rating: result.data.rating,
       comment: result.data.comment,
-      postedBy: user,
+      postedBy: userId,
     });
     await product.save();
 
     revalidatePath(`/${result.data.productSlug}`, "layout");
     revalidatePath(paths.userProfile());
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  });
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 export async function editRating(
   formState: AddRatingFormState,
   formData: FormData
 ): Promise<AddRatingFormState> {
-  const result = productRatingSchema.safeParse({
-    rating: formData.get("rating"),
-    comment: formData.get("comment"),
-    productSlug: formData.get("product-slug"),
-  });
+  const { result, errors } = validateFormData(productRatingSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (!session || !session.user) {
+  const { authenticated, authError, user } = await validateUserSession();
+
+  if (!authenticated) {
     return {
       errors: {
-        _form: ["Only logged in users may edit a review"],
+        _form: [authError],
       },
     };
   }
 
-  const user = session.user._id;
+  const userId = user?._id;
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const editResult = await Product.updateOne(
-      { slug: result.data.productSlug, "ratings.postedBy": user },
+      { slug: result.data.productSlug, "ratings.postedBy": userId },
       {
         $set: {
           "ratings.$.rating": result.data.rating,
@@ -177,69 +142,44 @@ export async function editRating(
       }
     );
 
-    if (!editResult) {
-      return {
-        errors: {
-          _form: ["Could not edit rating"],
-        },
-      };
-    }
+    if (!editResult) throw new Error("Could not edit rating");
 
     revalidatePath(`/${result.data.productSlug}`, "layout");
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  } finally {
-    revalidatePath(paths.userReviews());
-  }
+  });
+
+  revalidatePath(paths.userReviews());
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 export async function deleteRating(
   productSlug: string,
   userId: string
 ): Promise<DeleteItemState> {
-  try {
-    await ConnectDB();
-    const result = await Product.updateOne(
-      { slug: productSlug },
-      { $pull: { ratings: { postedBy: new mongoose.Types.ObjectId(userId) } } }
-    );
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const result = await Product.updateOne(
+        { slug: productSlug },
+        {
+          $pull: { ratings: { postedBy: new mongoose.Types.ObjectId(userId) } },
+        }
+      );
 
-    if (!result) {
-      return {
-        error: "Could not remove rating",
-      };
-    }
+      if (!result) throw new Error("Could not remove rating");
 
-    revalidatePath(`/${productSlug}`, "layout");
-    return {
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
-    }
-    return {
-      error: "Rating could not be deleted. Please try again later",
-    };
-  } finally {
-    revalidatePath(paths.userReviews());
-  }
+      revalidatePath(`/${productSlug}`, "layout");
+    },
+    "Rating could not be deleted. Please try again later",
+    false
+  );
+
+  revalidatePath(paths.userReviews());
+
+  return {
+    error: mutationResult.error || "",
+    success: mutationResult.success,
+  };
 }

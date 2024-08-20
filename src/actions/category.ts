@@ -1,150 +1,110 @@
 "use server";
 
-import { auth } from "@/auth";
-import ConnectDB from "@/db/connectDB";
+import { validateUserSession } from "@/auth";
+import { handleDataMutation } from "@/lib/handleDataMutation";
 import paths from "@/lib/paths";
+import { validateFormData } from "@/lib/validateFormData";
 import Category from "@/models/Category";
 import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import slugify from "slugify";
 import { z } from "zod";
 
+const baseCategorySchema = z
+  .string()
+  .min(3, { message: "Category title must be at least 3 characters long" })
+  .max(30);
+
 const createCategorySchema = z.object({
-  title: z
-    .string()
-    .min(3, { message: "Category title must be at least 3 characters long" })
-    .max(30),
+  title: baseCategorySchema,
 });
 
-interface CreateCategoryFormState {
+const editCategorySchema = z.object({
+  editTitle: baseCategorySchema,
+});
+
+interface CreateEditCategoryFormState {
   errors: {
     title?: string[];
+    editTitle?: string[];
     _form?: string[];
   };
   success?: boolean;
 }
 
 export async function createCategory(
-  formState: CreateCategoryFormState,
+  formState: CreateEditCategoryFormState,
   formData: FormData
-): Promise<CreateCategoryFormState> {
-  const result = createCategorySchema.safeParse({
-    title: formData.get("title"),
-  });
+): Promise<CreateEditCategoryFormState> {
+  const { result, errors } = validateFormData(createCategorySchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (!session || !session.user || session.user.role !== "admin") {
+  const { authorized, authError } = await validateUserSession();
+
+  if (!authorized) {
     return {
       errors: {
-        _form: ["You are not authorized to do this"],
+        _form: [authError],
       },
     };
   }
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const newCategory = new Category({
       title: result.data.title,
       slug: slugify(result.data.title.replace(/'/g, "")),
     });
 
     await newCategory.save();
-
     revalidatePath(paths.home(), "layout");
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      if (error.message.includes("duplicate key")) {
-        return {
-          errors: {
-            _form: ["This category already exists"],
-          },
-        };
-      }
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  });
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 export async function editCategory(
   id: mongoose.Types.ObjectId,
-  formState: CreateCategoryFormState,
+  formState: CreateEditCategoryFormState,
   formData: FormData
-): Promise<CreateCategoryFormState> {
-  const result = createCategorySchema.safeParse({
-    title: formData.get("edit-title"),
-  });
+): Promise<CreateEditCategoryFormState> {
+  const { result, errors } = validateFormData(editCategorySchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (!session || !session.user || session.user.role !== "admin") {
+  const { authorized, authError } = await validateUserSession();
+
+  if (!authorized) {
     return {
       errors: {
-        _form: ["You are not authorized to do this"],
+        _form: [authError],
       },
     };
   }
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     await Category.findByIdAndUpdate(id, {
-      title: result.data.title,
-      slug: slugify(result.data.title.replace(/'/g, "")),
+      title: result.data.editTitle,
+      slug: slugify(result.data.editTitle.replace(/'/g, "")),
     });
-
     revalidatePath(paths.home(), "layout");
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      if (error.message.includes("duplicate key")) {
-        return {
-          errors: {
-            _form: ["This category already exists"],
-          },
-        };
-      }
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  });
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 export interface DeleteItemState {
@@ -155,21 +115,12 @@ export interface DeleteItemState {
 export async function deleteCategory(
   id: mongoose.Types.ObjectId
 ): Promise<DeleteItemState> {
-  try {
-    await ConnectDB();
+  const mutationResult = await handleDataMutation(async () => {
     await Category.findByIdAndDelete(id);
     revalidatePath("/", "layout");
-    return {
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
-    }
-    return {
-      error: "Category could not be deleted. Please try again later",
-    };
-  }
+  });
+
+  return {
+    success: mutationResult.success,
+  };
 }

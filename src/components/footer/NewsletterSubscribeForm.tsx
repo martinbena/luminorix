@@ -27,11 +27,14 @@ export default function NewsletterSubmitForm() {
   return (
     <Form formAction={action} formRef={formRef}>
       <Form.InputGroup
-        name="newsletter-email"
+        name="newsletterEmail"
         placeholder="Enter email address"
         inputType="email"
-        error={formState.errors.email}
+        error={formState.errors.newsletterEmail}
       />
+      {formState.errors._form ? (
+        <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
+      ) : null}
       <div className="-mt-4">
         <Form.Button width="w-full">Subscribe</Form.Button>
       </div>

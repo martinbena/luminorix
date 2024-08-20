@@ -7,24 +7,14 @@ import {
 } from "@/db/queries/products";
 import { SHIPPING_RATE } from "@/lib/constants";
 import { formatCurrency } from "@/lib/helpers";
+import { transporter } from "@/lib/nodemailerTransporter";
 import { Category } from "@/models/Category";
 import Order, { CartSession, LineItem } from "@/models/Order";
 import User, { WishlistItem } from "@/models/User";
+import mongoose from "mongoose";
 import { NextResponse, NextRequest } from "next/server";
-import nodemailer from "nodemailer";
 
 export const maxDuration = 60;
-
-const transporter = nodemailer.createTransport({
-  service: "Gmail",
-  auth: {
-    user: process.env.GMAIL_AUTH_USER,
-    pass: process.env.GMAIL_AUTH_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
 
 interface MetadataCartItem {
   sku: string;
@@ -101,10 +91,15 @@ export async function POST(req: NextRequest) {
           })
         );
 
+        const parsedId =
+          userId === "not-logged-in"
+            ? "not-logged-in"
+            : new mongoose.Types.ObjectId(userId.toString());
+
         const orderData = {
           ...rest,
           chargeId: id,
-          userId,
+          userId: parsedId,
           delivery_telephone: telephone,
           delivery_email: chargeSucceeded.receipt_email,
           cartItems: cartItemsWithProductDetails,

@@ -92,7 +92,7 @@ export default function EditOrderForm({
         </Form.InputGroup>
         <Form.InputGroup
           inputType="text"
-          name={"edit-delivery-telephone"}
+          name={"telephone"}
           error={formState.errors.telephone}
           value={delivery_telephone}
           placeholder="+15554443333"
@@ -103,7 +103,7 @@ export default function EditOrderForm({
         </Form.InputGroup>
         <Form.InputGroup
           inputType="text"
-          name={"edit-delivery-email"}
+          name={"email"}
           error={formState.errors.email}
           value={delivery_email}
           placeholder="john.doe@example.com"
@@ -116,7 +116,7 @@ export default function EditOrderForm({
           <div className="grid gap-4 grid-cols-3 mob:grid-cols-2 mob-sm:grid-cols-1">
             <Form.InputGroup
               inputType="text"
-              name={"edit-recipient-name"}
+              name={"name"}
               error={formState.errors.name}
               value={shipping.name}
               placeholder="John Doe"
@@ -131,7 +131,7 @@ export default function EditOrderForm({
                   ? [shipping.address.country]
                   : process.env.STRIPE_COUNTRY_CODES?.split(",")
               }
-              name={"edit-recipient-country"}
+              name={"country"}
               error={formState.errors.country}
               value={shipping.address.country}
               placeholder="US"
@@ -141,7 +141,7 @@ export default function EditOrderForm({
             </Form.InputGroup>
             <Form.InputGroup
               inputType="text"
-              name={"edit-recipient-city"}
+              name={"city"}
               error={formState.errors.city}
               value={shipping.address.city}
               placeholder="Portland"
@@ -151,7 +151,7 @@ export default function EditOrderForm({
             </Form.InputGroup>
             <Form.InputGroup
               inputType="text"
-              name={"edit-recipient-street"}
+              name={"street"}
               error={formState.errors.street}
               value={shipping.address.line1}
               placeholder="Maplewood Lane 1234"
@@ -161,7 +161,7 @@ export default function EditOrderForm({
             </Form.InputGroup>
             <Form.InputGroup
               inputType="text"
-              name={"edit-recipient-postal-code"}
+              name={"postalCode"}
               error={formState.errors.postalCode}
               value={shipping.address.postal_code}
               placeholder="97218"
@@ -173,7 +173,7 @@ export default function EditOrderForm({
         </div>
         <Form.InputGroup
           inputType="select"
-          name={"edit-delivery-status"}
+          name={"deliveryStatus"}
           error={formState.errors.deliveryStatus}
           options={
             statusReadOnly

@@ -5,7 +5,6 @@ import { useFormState } from "react-dom";
 import Form from "../ui/Form";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import Button from "../ui/Button";
 import { Product } from "@/models/Product";
 
 interface AddEditProductFormProps {
@@ -68,7 +67,7 @@ export default function AddVariantForm({ products }: AddEditProductFormProps) {
           <Form.InputGroup
             inputType="number"
             step={0.01}
-            name="previous-price"
+            name="previousPrice"
             placeholder="199.99"
             error={formState.errors.previousPrice}
             optionalField={true}

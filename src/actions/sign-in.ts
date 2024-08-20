@@ -1,10 +1,10 @@
 "use server";
 
 import * as auth from "@/auth";
+import { handleDataMutation } from "@/lib/handleDataMutation";
 import paths from "@/lib/paths";
+import { validateFormData } from "@/lib/validateFormData";
 import { z } from "zod";
-import { AuthError } from "@auth/core/errors";
-import { isRedirectError } from "next/dist/client/components/redirect";
 
 const signInUserSchema = z.object({
   email: z.string().regex(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, {
@@ -25,53 +25,24 @@ export async function signInWithCredentials(
   formState: SignInWithCredentialsFormState,
   formData: FormData
 ): Promise<SignInWithCredentialsFormState> {
-  const result = signInUserSchema.safeParse({
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
+  const { result, errors } = validateFormData(signInUserSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  try {
+  const mutationResult = await handleDataMutation(async () => {
     await auth.signIn("credentials", {
       email: result.data.email,
       password: result.data.password,
       redirectTo: paths.home(),
     });
-  } catch (error: unknown) {
-    if (isRedirectError(error)) {
-      throw error;
-    }
-
-    if (error instanceof Error) {
-      const { message } = error as AuthError;
-
-      if (
-        message === "CallbackRouteError" ||
-        message.toLowerCase().startsWith("a") ||
-        message.toLowerCase().startsWith("o")
-      ) {
-        return {
-          errors: {
-            _form: ["Invalid e-mail or password"],
-          },
-        };
-      }
-
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  });
 
   return {
-    errors: {},
+    errors: mutationResult.errors || {},
   };
 }
 

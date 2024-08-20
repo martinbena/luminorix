@@ -1,13 +1,14 @@
 "use server";
 
 import { hashPassword } from "@/lib/brcypt";
-import ConnectDB from "@/db/connectDB";
+import { handleDataMutation } from "@/lib/handleDataMutation";
+import { validateFormData } from "@/lib/validateFormData";
 import User from "@/models/User";
 import { z } from "zod";
 
 const registerUserSchema = z
   .object({
-    name: z
+    fullName: z
       .string()
       .max(50)
       // @ts-ignore
@@ -32,7 +33,7 @@ const registerUserSchema = z
 
 interface RegisterUserFormState {
   errors: {
-    name?: string[];
+    fullName?: string[];
     email?: string[];
     password?: string[];
     passwordConfirm?: string[];
@@ -45,16 +46,11 @@ export async function registerUser(
   formState: RegisterUserFormState,
   formData: FormData
 ): Promise<RegisterUserFormState> {
-  const result = registerUserSchema.safeParse({
-    name: formData.get("fullName"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-    passwordConfirm: formData.get("passwordConfirm"),
-  });
+  const { result, errors } = validateFormData(registerUserSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
@@ -66,46 +62,25 @@ export async function registerUser(
     };
   }
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const existingUser = await User.findOne({ email: result.data.email });
 
-    if (existingUser) {
-      return {
-        errors: {
-          _form: ["User with this e-mail address already exists"],
-        },
-      };
-    }
+    if (existingUser)
+      throw new Error("User with this e-mail address already exists");
 
     const hashedPassword = await hashPassword(result.data.password);
 
     const registeredUser = new User({
-      name: result.data.name,
+      name: result.data.fullName,
       email: result.data.email,
       password: hashedPassword,
     });
 
     await registeredUser.save();
+  });
 
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }

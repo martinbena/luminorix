@@ -68,7 +68,7 @@ export default function EditAccountForm({
     <Form.Container>
       <Form formAction={action} formRef={formRef}>
         <Form.InputGroup
-          name="edit-fullName"
+          name="name"
           inputType="text"
           error={formState.errors.name}
           isReadOnly={isGoogleUser}
@@ -77,7 +77,7 @@ export default function EditAccountForm({
           Full name
         </Form.InputGroup>
         <Form.InputGroup
-          name="edit-email"
+          name="email"
           inputType="email"
           error={formState.errors.email}
           isReadOnly={isGoogleUser}
@@ -104,7 +104,7 @@ export default function EditAccountForm({
           </div>
 
           <Form.ImagePicker
-            name="edit-image"
+            name="image"
             error={formState.errors.image}
             optionalField
             isReset={resetImage}

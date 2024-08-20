@@ -71,7 +71,7 @@ export default function AddEditRatingForm({
           >
             Optional review
           </Form.InputGroup>
-          <input type="hidden" value={productSlug} name="product-slug" />
+          <input type="hidden" value={productSlug} name="productSlug" />
           {formState.errors._form ? (
             <Form.Error>{formState.errors._form.join(" | ")}</Form.Error>
           ) : null}

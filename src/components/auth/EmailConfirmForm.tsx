@@ -39,7 +39,7 @@ export default function EmailConfirmForm() {
         E-mail
       </Form.InputGroup>
       <Form.InputGroup
-        name="email-confirm"
+        name="emailConfirm"
         inputType="email"
         error={formState.errors.emailConfirm}
       >

@@ -42,7 +42,7 @@ export default function SetNewPasswordForm() {
         New password
       </Form.InputGroup>
       <Form.InputGroup
-        name="password-confirm"
+        name="passwordConfirm"
         inputType="password"
         error={formState.errors.passwordConfirm}
       >

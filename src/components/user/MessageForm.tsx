@@ -57,7 +57,7 @@ export default function MessageForm({
                   from your account information
                 </p>{" "}
                 <Form.InputGroup
-                  name="contact-phone"
+                  name="telephone"
                   inputType="tel"
                   error={formState.errors.telephone}
                   optionalField

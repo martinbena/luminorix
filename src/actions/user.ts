@@ -1,13 +1,14 @@
 "use server";
 
-import { auth } from "@/auth";
-import ConnectDB from "@/db/connectDB";
+import { validateUserSession } from "@/auth";
 import {
   removeImageFromCloudinary,
   uploadIamgeToCloudinaryAndGetUrl,
 } from "@/lib/async-helpers";
 import { hashPassword, verifyPassword } from "@/lib/brcypt";
+import { handleDataMutation } from "@/lib/handleDataMutation";
 import paths from "@/lib/paths";
+import { validateFormData } from "@/lib/validateFormData";
 import User, { User as UserType } from "@/models/User";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -76,15 +77,11 @@ export async function editAccount(
   formState: EditAccountFormState,
   formData: FormData
 ): Promise<EditAccountFormState> {
-  const result = editAccountSchema.safeParse({
-    name: formData.get("edit-fullName"),
-    email: formData.get("edit-email"),
-    image: formData.get("edit-image"),
-  });
+  const { result, errors } = validateFormData(editAccountSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
@@ -96,96 +93,71 @@ export async function editAccount(
     };
   }
 
-  let newImageUrl;
+  let newImageUrl: string | undefined;
 
-  try {
-    await ConnectDB();
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const user: UserType | null = await User.findById(id);
 
-    const session = await auth();
-    const user: UserType | null = await User.findById(id);
-    const { name, email, image } = result.data;
+      if (!user) throw new Error("User not found");
 
-    if (user?.email.includes("@gmail.com")) {
-      return {
-        errors: {
-          _form: ["Please make the changes in your Google account"],
-        },
-      };
-    }
+      const { name, email, image } = result.data;
 
-    if (
-      !session ||
-      !session.user ||
-      session.user._id !== user?._id.toString()
-    ) {
-      return {
-        errors: {
-          _form: ["You are not authorized to do this"],
-        },
-      };
-    }
-
-    const oldImageUrl = user.image ?? "";
-
-    if (image && image.size > 0) {
-      newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
-    }
-
-    user.name = result.data.name;
-    user.email = result.data.email;
-    user.image = image && image.size > 0 ? newImageUrl : oldImageUrl;
-
-    await user.save();
-
-    if (
-      image &&
-      image.size > 0 &&
-      newImageUrl !== oldImageUrl &&
-      oldImageUrl.length
-    ) {
-      await removeImageFromCloudinary(oldImageUrl);
-    }
-
-    revalidatePath(paths.home(), "layout");
-    revalidatePath(paths.userProfile(), "layout");
-    return {
-      errors: {},
-      success: true,
-      updatedUser: {
-        name,
-        email,
-        image: image && image.size > 0 ? newImageUrl : oldImageUrl,
-      },
-    };
-  } catch (error: unknown) {
-    if (newImageUrl) {
-      try {
-        await removeImageFromCloudinary(newImageUrl);
-      } catch (removeError) {
-        console.error("Error removing image from Cloudinary:", removeError);
-      }
-    }
-    if (error instanceof Error) {
-      if (error.message.includes("duplicate key")) {
+      if (user?.email.includes("@gmail.com")) {
         return {
           errors: {
-            _form: ["The user with this e-mail address already exists"],
+            _form: ["Please make the changes in your Google account"],
           },
         };
       }
+
+      const { authorized, authError } = await validateUserSession(
+        user?._id.toString()
+      );
+
+      if (!authorized) throw new Error(authError);
+
+      const oldImageUrl = user.image ?? "";
+
+      if (image && image.size > 0) {
+        newImageUrl = await uploadIamgeToCloudinaryAndGetUrl(image);
+      }
+
+      user.name = result.data.name;
+      user.email = result.data.email;
+      user.image = image && image.size > 0 ? newImageUrl : oldImageUrl;
+
+      await user.save();
+
+      if (
+        image &&
+        image.size > 0 &&
+        newImageUrl !== oldImageUrl &&
+        oldImageUrl.length
+      ) {
+        await removeImageFromCloudinary(oldImageUrl);
+      }
+
+      revalidatePath(paths.home(), "layout");
+      revalidatePath(paths.userProfile(), "layout");
       return {
-        errors: {
-          _form: [error.message],
+        updatedUser: {
+          name,
+          email,
+          image: image && image.size > 0 ? newImageUrl : oldImageUrl,
         },
       };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+    },
+    "Something went wrong",
+    true,
+    newImageUrl
+  );
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+    updatedUser: mutationResult.data?.updatedUser,
+  };
 }
 
 interface ChangePasswordFormState {
@@ -203,23 +175,18 @@ export async function changePassword(
   formState: ChangePasswordFormState,
   formData: FormData
 ): Promise<ChangePasswordFormState> {
-  const result = changePasswordSchema.safeParse({
-    oldPassword: formData.get("old-password"),
-    newPassword: formData.get("new-password"),
-    newPasswordConfirm: formData.get("new-password-confirm"),
-  });
+  const { result, errors } = validateFormData(changePasswordSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  try {
-    await ConnectDB();
-
-    const session = await auth();
+  const mutationResult = await handleDataMutation(async () => {
     const user: UserType | null = await User.findById(id);
+
+    if (!user) throw new Error("User not found");
 
     if (user?.email.includes("@gmail.com")) {
       return {
@@ -229,54 +196,28 @@ export async function changePassword(
       };
     }
 
-    if (
-      !session ||
-      !session.user ||
-      session.user._id !== user?._id.toString()
-    ) {
-      return {
-        errors: {
-          _form: ["You are not authorized to do this"],
-        },
-      };
-    }
+    const { authorized, authError } = await validateUserSession(
+      user?._id.toString()
+    );
+
+    if (!authorized) throw new Error(authError);
 
     const isPasswordValid = await verifyPassword(
       result.data.oldPassword,
       user.password
     );
 
-    if (!isPasswordValid) {
-      return {
-        errors: {
-          oldPassword: ["Incorrect current password"],
-        },
-      };
-    }
+    if (!isPasswordValid) throw new Error("Incorrect current password");
 
     const newHashedPassword = await hashPassword(result.data.newPassword);
 
     user.password = newHashedPassword;
 
     await user.save();
+  });
 
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }

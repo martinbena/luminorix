@@ -1,44 +1,33 @@
 "use server";
 
 import { CartItem, DiscountCoupon } from "@/app/contexts/CartContext";
-import { auth } from "@/auth";
-import ConnectDB from "@/db/connectDB";
+import { validateUserSession } from "@/auth";
 import {
   getProductVariantsBySkus,
   hasFreeShipping,
 } from "@/db/queries/product";
 import {
+  updateProductAndVariantSold,
+  updateVariantStockBySku,
+} from "@/db/queries/products";
+import { ORDER_STATUSES, SHIPPING_RATE } from "@/lib/constants";
+import { handleDataMutation } from "@/lib/handleDataMutation";
+import {
   areAddressesDifferent,
   formatCurrency,
   getProductVariantTitle,
 } from "@/lib/helpers";
+import { transporter } from "@/lib/nodemailerTransporter";
 import paths from "@/lib/paths";
+import { validateFormData } from "@/lib/validateFormData";
 import { Category } from "@/models/Category";
-import { isRedirectError } from "next/dist/client/components/redirect";
-import { redirect } from "next/navigation";
-import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
 import Order, { CartSession } from "@/models/Order";
-import { DeleteItemState } from "./category";
-import { revalidatePath } from "next/cache";
-import {
-  updateProductAndVariantSold,
-  updateVariantStockBySku,
-} from "@/db/queries/products";
 import mongoose from "mongoose";
-import { ORDER_STATUSES, SHIPPING_RATE } from "@/lib/constants";
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  service: "Gmail",
-  auth: {
-    user: process.env.GMAIL_AUTH_USER,
-    pass: process.env.GMAIL_AUTH_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { v4 as uuidv4 } from "uuid";
+import { z } from "zod";
+import { DeleteItemState } from "./category";
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -84,17 +73,18 @@ export async function applyDiscountCoupon(
   formState: ApplyDiscountCouponFormState,
   formData: FormData
 ): Promise<ApplyDiscountCouponFormState> {
-  const result = applyDiscountCouponSchema.safeParse({
-    coupon: formData.get("coupon"),
-  });
+  const { result, errors } = validateFormData(
+    applyDiscountCouponSchema,
+    formData
+  );
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  try {
+  const mutationResult = await handleDataMutation(async () => {
     const coupons = await stripe.promotionCodes.list({
       code: result.data.coupon,
       active: true,
@@ -104,25 +94,13 @@ export async function applyDiscountCoupon(
       throw new Error("Promotion code not found");
     }
     const coupon = coupons.data[0];
-    return {
-      errors: {},
-      coupon: JSON.parse(JSON.stringify(coupon)),
-    };
-  } catch (error: unknown) {
-    console.log(error);
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error?.message],
-        },
-      };
-    }
-    return {
-      errors: {
-        _form: ["Something went wrong"],
-      },
-    };
-  }
+    return coupon;
+  });
+
+  return {
+    errors: mutationResult.errors || {},
+    coupon: mutationResult.data,
+  };
 }
 
 interface CreatePaymentSessionFormState {
@@ -139,14 +117,14 @@ export async function createPaymentSession(
   formState: CreatePaymentSessionFormState,
   formData: FormData
 ): Promise<CreatePaymentSessionFormState> {
-  const result = createPaymentSessionSchema.safeParse({
-    email: formData.get("email"),
-    telephone: formData.get("telephone"),
-  });
+  const { result, errors } = validateFormData(
+    createPaymentSessionSchema,
+    formData
+  );
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
@@ -158,10 +136,9 @@ export async function createPaymentSession(
     };
   }
 
-  try {
-    await ConnectDB();
-    const session = await auth();
-    const userId = session?.user._id;
+  const mutationResult = await handleDataMutation(async () => {
+    const { user } = await validateUserSession();
+    const userId = user?._id;
     const cartSessionId = uuidv4();
 
     const lineItems = await Promise.all(
@@ -242,102 +219,69 @@ export async function createPaymentSession(
     });
 
     redirect(paymentSession.url);
-  } catch (error: unknown) {
-    if (isRedirectError(error)) {
-      throw error;
-    }
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error?.message],
-        },
-      };
-    }
-    console.log(error);
-    return {
-      errors: {
-        _form: ["Something went wrong"],
-      },
-    };
-  }
+  });
+
+  return {
+    errors: mutationResult.errors || {},
+  };
 }
 
 export async function cancelOrder(id: string): Promise<DeleteItemState> {
-  try {
-    await ConnectDB();
-    const session = await auth();
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const updatedOrder = await Order.findById(id);
 
-    const updatedOrder = await Order.findById(id);
+      if (!updatedOrder) throw new Error("Order not found");
 
-    if (!updatedOrder) {
-      return {
-        error: "Order not found",
-      };
-    }
+      const { authorized, authError } = await validateUserSession(
+        updatedOrder.userId.toString()
+      );
 
-    if (
-      updatedOrder.delivery_status !== "Not Processed" &&
-      !(
-        session?.user.role === "admin" &&
-        updatedOrder.delivery_status === "Processing"
+      if (
+        updatedOrder.delivery_status !== "Not Processed" &&
+        !(authorized && updatedOrder.delivery_status === "Processing")
       )
-    ) {
-      return {
-        error: "This order cannot be cancelled",
-      };
-    }
+        throw new Error("This order cannot be cancelled");
 
-    if (
-      session?.user._id.toString() !== updatedOrder.userId.toString() ||
-      session?.user.role !== "admin"
-    ) {
-      return {
-        error: "You are not authorized to cancel this order",
-      };
-    }
+      if (!authorized) throw new Error(authError);
 
-    const refund = stripe.refunds.create({
-      payment_intent: updatedOrder.payment_intent,
-      reason: "requested_by_customer",
-    });
+      const refund = stripe.refunds.create({
+        payment_intent: updatedOrder.payment_intent,
+        reason: "requested_by_customer",
+      });
 
-    updatedOrder.status = "Refunded";
-    updatedOrder.refunded = true;
-    updatedOrder.delivery_status = "Cancelled";
-    updatedOrder.refundId = refund.id;
+      updatedOrder.status = "Refunded";
+      updatedOrder.refunded = true;
+      updatedOrder.delivery_status = "Cancelled";
+      updatedOrder.refundId = refund.id;
 
-    await updatedOrder.save();
+      await updatedOrder.save();
 
-    for (const cartItem of updatedOrder.cartItems) {
-      await updateVariantStockBySku(
-        cartItem.sku,
-        cartItem.quantity,
-        "increment"
-      );
-      await updateProductAndVariantSold(
-        cartItem.sku,
-        cartItem.quantity,
-        "decrement"
-      );
-    }
+      for (const cartItem of updatedOrder.cartItems) {
+        await updateVariantStockBySku(
+          cartItem.sku,
+          cartItem.quantity,
+          "increment"
+        );
+        await updateProductAndVariantSold(
+          cartItem.sku,
+          cartItem.quantity,
+          "decrement"
+        );
+      }
 
-    revalidatePath(paths.userOrderShowAll());
-    revalidatePath(paths.admin());
-    revalidatePath(paths.adminOrderShow());
-    revalidatePath(paths.orderSuccess(updatedOrder.success_token));
-    return {
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
-    }
-    return {
-      error: "Order could not be cancelled. Please try again",
-    };
-  }
+      revalidatePath(paths.userOrderShowAll());
+      revalidatePath(paths.admin());
+      revalidatePath(paths.adminOrderShow());
+      revalidatePath(paths.orderSuccess(updatedOrder.success_token));
+    },
+    "Order could not be cancelled. Please try again",
+    false
+  );
+
+  return {
+    success: mutationResult.success,
+  };
 }
 
 interface EditOrderFormState {
@@ -360,42 +304,27 @@ export async function editOrder(
   formState: EditOrderFormState,
   formData: FormData
 ): Promise<EditOrderFormState> {
-  const result = editOrderSchema.safeParse({
-    email: formData.get("edit-delivery-email"),
-    telephone: formData.get("edit-delivery-telephone"),
-    name: formData.get("edit-recipient-name"),
-    country: formData.get("edit-recipient-country"),
-    city: formData.get("edit-recipient-city"),
-    street: formData.get("edit-recipient-street"),
-    postalCode: formData.get("edit-recipient-postal-code"),
-    deliveryStatus: formData.get("edit-delivery-status"),
-  });
+  const { result, errors } = validateFormData(editOrderSchema, formData);
 
   if (!result.success) {
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
-  const session = await auth();
-  if (session?.user.role !== "admin") {
+  const { authorized, authError } = await validateUserSession();
+  if (!authorized) {
     return {
       errors: {
-        _form: ["You are not authorized to do this"],
+        _form: [authError],
       },
     };
   }
 
-  try {
-    await ConnectDB();
-
+  const mutationResult = await handleDataMutation(async () => {
     const updatedOrder = await Order.findById(id);
 
-    if (!updatedOrder) {
-      return {
-        errors: { _form: ["Order not found"] },
-      };
-    }
+    if (!updatedOrder) throw new Error("Order not found");
 
     const { delivery_status: deliveryStatus, shipping } = updatedOrder;
     const {
@@ -409,9 +338,8 @@ export async function editOrder(
       deliveryStatus: newDeliveryStatus,
     } = result.data;
 
-    if (deliveryStatus === "Cancelled" || deliveryStatus === "Delivered") {
-      return { errors: { _form: ["This order cannot be edited"] } };
-    }
+    if (deliveryStatus === "Cancelled" || deliveryStatus === "Delivered")
+      throw new Error("This order cannot be edited");
 
     const oldAddress = {
       name: shipping.name,
@@ -436,23 +364,13 @@ export async function editOrder(
       (addressHasChanged ||
         updatedOrder.delivery_email !== email ||
         updatedOrder.delivery_telephone !== telephone)
-    ) {
-      return {
-        errors: {
-          _form: ["Contact details cannot be changed at this stage"],
-        },
-      };
-    }
+    )
+      throw new Error("Contact details cannot be changed at this stage");
 
-    if (deliveryStatus === "Dispatched" && newDeliveryStatus !== "Delivered") {
-      return {
-        errors: {
-          _form: [
-            "Order cannot be cancelled or returned to staff at this stage",
-          ],
-        },
-      };
-    }
+    if (deliveryStatus === "Dispatched" && newDeliveryStatus !== "Delivered")
+      throw new Error(
+        "Order cannot be cancelled or returned to staff at this stage"
+      );
 
     updatedOrder.delivery_email = email;
     updatedOrder.delivery_telephone = telephone;
@@ -500,7 +418,7 @@ export async function editOrder(
         .slice(-5)}`;
       const hasFreeShipping = updatedOrder.cartItems.some(
         (item: CartItem) => item.freeShipping
-      );     
+      );
 
       const mailOptions = {
         to: updatedOrder.delivery_email,
@@ -590,25 +508,12 @@ export async function editOrder(
     revalidatePath(paths.adminOrderShow());
     revalidatePath(paths.userOrderShowAll());
     revalidatePath(paths.orderSuccess(updatedOrder.success_token));
-    return {
-      errors: {},
-      success: true,
-    };
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return {
-        errors: {
-          _form: [error.message],
-        },
-      };
-    } else {
-      return {
-        errors: {
-          _form: ["Something went wrong"],
-        },
-      };
-    }
-  }
+  });
+
+  return {
+    errors: mutationResult.errors || {},
+    success: mutationResult.success,
+  };
 }
 
 interface ProcessOrderFormState {
@@ -620,54 +525,38 @@ export async function processOrder(
   formState: ProcessOrderFormState,
   formData: FormData
 ): Promise<ProcessOrderFormState> {
-  const session = await auth();
-  if (session?.user.role !== "admin") {
+  const { authorized, authError } = await validateUserSession();
+  if (!authorized) {
     return {
-      error: "You are not authorized to do this",
+      error: authError,
     };
   }
 
-  try {
-    await ConnectDB();
+  const mutationResult = await handleDataMutation(
+    async () => {
+      const updatedOrder = await Order.findById(id);
 
-    const updatedOrder = await Order.findById(id);
+      if (!updatedOrder) throw new Error("Order not found");
 
-    if (!updatedOrder) {
-      return {
-        error: "Order not found",
-      };
-    }
+      const { delivery_status: deliveryStatus } = updatedOrder;
 
-    const { delivery_status: deliveryStatus } = updatedOrder;
+      if (deliveryStatus !== "Not Processed")
+        throw new Error("This order cannot be edited");
 
-    if (deliveryStatus !== "Not Processed") {
-      return { error: "This order cannot be edited" };
-    }
+      updatedOrder.delivery_status = "Processing";
 
-    updatedOrder.delivery_status = "Processing";
+      await updatedOrder.save();
 
-    await updatedOrder.save();
+      revalidatePath(paths.admin());
+      revalidatePath(paths.adminOrderShow());
+      revalidatePath(paths.userOrderShowAll());
+      revalidatePath(paths.orderSuccess(updatedOrder.success_token));
+    },
+    "Something went wrong",
+    false
+  );
 
-    revalidatePath(paths.admin());
-    revalidatePath(paths.adminOrderShow());
-    revalidatePath(paths.userOrderShowAll());
-    revalidatePath(paths.orderSuccess(updatedOrder.success_token));
-
-    return {
-      error: "",
-    };
-  } catch (error: unknown) {
-    if (isRedirectError(error)) {
-      throw error;
-    }
-    if (error instanceof Error) {
-      return {
-        error: error.message,
-      };
-    } else {
-      return {
-        error: "Something went wrong",
-      };
-    }
-  }
+  return {
+    error: mutationResult.error || "",
+  };
 }
