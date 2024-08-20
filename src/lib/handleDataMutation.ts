@@ -45,7 +45,8 @@ export async function handleDataMutation<T>(
       if (
         message === "CallbackRouteError" ||
         message.toLowerCase().startsWith("a") ||
-        message.toLowerCase().startsWith("o")
+        message.toLowerCase().startsWith("o") ||
+        message.toLowerCase().startsWith("y")
       ) {
         return {
           errors: {
